@@ -9,7 +9,7 @@ module.exports = class logger {
   }
   logFrom(msg, from) {
     let date = new Date();
-    console.log(`[${date.getHours()}:${date.getMinutes()}}][${from}]: ${msg}`);   
+    console.log(`[${date.getHours()}:${date.getMinutes()}][${from}]: ${msg}`);   
   }
 
 };
