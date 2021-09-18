@@ -12,20 +12,23 @@
 
 ### Setup:
 - will come soon.
-- bot currently non functional
+- please dont use this bot in its current form
   
 
 ### TODO
 
-- [ ] Get a basic discord bot runnable
-- [ ] Basic event handling
-- [ ] Commands 
-- [ ] Eval command for troubleshooting
+- [x] Get a basic discord bot runnable
+- [x] Basic event handling
+- [x] Commands
+- [x] Aliases
+- [x] Eval command for troubleshooting
 - [ ] Rob Pixelator (my other bot) of all of its good music functionality (but still rewriting this from scratch as now using lavalink)
-- [ ] Get basic music going (just youtube)
+- [x] Get basic music going (just youtube)
+- [ ] Setup normal music checks and events to handle randomly being disconnected, etc
 - [ ] Spotify support
 - [ ] Soundcloud support
 - [ ] Twitch stream support
+- [ ] Playlist support
 - [ ] Queueing songs
 - [ ] Queue command
 - [ ] Leaving after inactivity

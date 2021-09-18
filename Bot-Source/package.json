@@ -1,0 +1,33 @@
+{
+  "name": "music-bot",
+  "version": "0.0.1",
+  "description": "Open source freedom",
+  "main": "index.js",
+  "scripts": {
+    "run": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pixel1011/musicboat.git"
+  },
+  "keywords": [
+    "Discord",
+    "Music",
+    "Youtube",
+    "Twitch",
+    "Soundcloud",
+    "Spotify"
+  ],
+  "author": "Pixel",
+  "license": "",
+  "bugs": {
+    "url": "https://github.com/Pixel1011/musicboat/issues"
+  },
+  "homepage": "https://github.com/Pixel1011/musicboat#readme",
+  "dependencies": {
+    "discord.js": "^13.1.0",
+    "lavaclient": "^4.0.3",
+    "node-fetch": "^2.6.2",
+    "snekfetch": "^4.0.4"
+  }
+}
