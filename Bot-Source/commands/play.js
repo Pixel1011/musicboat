@@ -89,7 +89,6 @@ async function run(client, msg, args) {
     timeTillPlaying = timeTillPlaying + song.length - playingFor;
     var timeTillPlayMin= Math.floor(timeTillPlaying / 1000 / 60);
     var timeTillPlaySec = Math.floor(timeTillPlaying / 1000 - (timeTillPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
-    // use humanize, fix tomorrow
 
     let embed = new MessageEmbed();
     embed.setAuthor("", avatarURL);
