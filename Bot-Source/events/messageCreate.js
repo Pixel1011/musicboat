@@ -5,9 +5,9 @@ module.exports = (msg) => {
   const args = msg.content.split(" ");
   const command = args.shift().slice(prefix.length).toLowerCase();
 
+  if (!client.commands[command]) return;
+  let cmd = client.commands[command];
   try {
-    if (!client.commands[command]) return;
-    let cmd = client.commands[command];
     cmd.data.run(client, msg, args);
   } catch (e) {
     client.logger.log(e);

@@ -14,7 +14,7 @@ class musicBot {
     this.client.botnum = num + 1;
     this.client.logger = new logger(this.client);
     this.client.commands = [];
-    this.client.players = [];
+    this.client.inactiveStrikes = [];
     this.client.config = require("./config.json");
     this.token = token;
     this.client.prefix = prefix;
@@ -53,17 +53,17 @@ class musicBot {
       connection: info,
       sendGatewayPayload: (id, payload) => this.client.guilds.cache.get(id).shard.send(payload)
     });
+
+    // load events
     this.client.ws.on("VOICE_SERVER_UPDATE", data => this.client.lavalink.handleVoiceUpdate(data));
     this.client.ws.on("VOICE_STATE_UPDATE", data => this.client.lavalink.handleVoiceUpdate(data));
     this.client.lavalink.on("connect", () => require("./events/lavaConnect")(this.client));
     this.client.lavalink.on("error", (e) => require("./events/lavaError")(e, this.client));
-    this.client.lavalink.connect(this.client.user.id);
-
-
-    // load events
     this.client.on("ready", (client) => require("./events/ready")(client));
     this.client.on("messageCreate", (msg) => require("./events/messageCreate")(msg));
+    this.client.on("voiceStateUpdate", (oldState, newState) => require("./events/voiceStateUpdate")(oldState, newState));
     //
+    this.client.lavalink.connect(this.client.user.id);
 
   }
 

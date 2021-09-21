@@ -28,6 +28,6 @@
     "discord.js": "^13.1.0",
     "lavaclient": "^4.0.3",
     "node-fetch": "^2.6.2",
-    "snekfetch": "^4.0.4"
+    "ytdl-core": "^4.9.1"
   }
 }

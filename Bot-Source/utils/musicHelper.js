@@ -4,6 +4,7 @@ class musicHelper {
   constructor(client) {
     this.client = client;
     this.lavalink = client.lavalink;
+    this.queue = this.lavalink.queue;
   }
 
   async search(searchTerm, type) {
@@ -18,6 +19,13 @@ class musicHelper {
       return await this.lavalink.players.get(guildid).connect(voiceid);
     }
   }
+  async skip(guildid) {
+    let player = this.lavalink.players.get(guildid);
+    await player.queue.shift();
+    await player.stop();
+  }
+
+
 }
 
 module.exports = musicHelper;

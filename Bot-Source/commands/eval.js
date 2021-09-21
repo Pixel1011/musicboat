@@ -1,6 +1,6 @@
 // stolen from pixelator with few edits dont mind it
 const Discord = require("discord.js");
-const snek = require("snekfetch");
+
 async function run(client, msg, args) {
   if (msg.author.id !== client.config.ownerid) {
     return;
@@ -20,8 +20,7 @@ async function run(client, msg, args) {
   let message = "input:\n\n" + codeGiven + "\n\noutput:\n\n" + res;
 
   if(res.length > 1500) {
-    const ress = await snek.post("https://haste.pixelator.xyz/documents").send(message);
-    r = `https://haste.pixelator.xyz/${ress.body.key}.js`;
+    r = client.logger.logToHaste(message);
   }
 
   const embed = new Discord.MessageEmbed();
