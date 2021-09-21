@@ -29,11 +29,11 @@
 - [ ] Soundcloud support
 - [ ] Twitch stream support
 - [ ] Playlist support
-- [ ] Queueing songs
+- [x] Queueing songs
 - [ ] Queue command
 - [x] Leaving after inactivity
 - [ ] Voteskip
-- [ ] Forceskip
+- [x] Forceskip
 - [ ] Clear
 - [ ] Volume
 - [ ] Speed/pitch sound effects (nightcore mode)  - this will be very fun to try figure out
