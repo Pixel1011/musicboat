@@ -11,9 +11,11 @@ async function run(client, msg, args) {
     return msg.channel.send(":x: **Bot is not currently playing**");
   }
   let member = msg.guild.members.get(msg.author.id);
-  if(member.permissions.has(Permissions.FLAGS.MANAGE_MESSAGES) || member.roles.cache.find(role => role.name == "DJ")) {
+  if(member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) || member.roles.cache.find(role => role.name == "DJ")) {
     await music.skip(msg.guild.id);
     msg.channel.send(":fast_forward: **Skipped** :thumbsup:");
+  } else {
+    return msg.channel.send(":x: **This command requires you to either have a role named ``DJ`` or the ``Manage Channels`` permission to use it**");
   }
 }
 module.exports.data = {

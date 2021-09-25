@@ -22,9 +22,9 @@
 - [x] Commands
 - [x] Aliases
 - [x] Eval command for troubleshooting
-- [ ] Rob Pixelator (my other bot) of useful music functions
+- [x] Rob Pixelator (my other bot) of useful music functions
 - [x] Get basic music going (just youtube)
-- [ ] Setup normal music checks and events to handle randomly being disconnected, etc
+- [x] Setup normal music checks and events to handle randomly being disconnected, etc
 - [ ] Spotify support
 - [ ] Soundcloud support
 - [ ] Twitch stream support
@@ -32,15 +32,15 @@
 - [x] Queueing songs
 - [ ] Queue command
 - [x] Leaving after inactivity
-- [ ] Voteskip
+- [x] Voteskip
 - [x] Forceskip
 - [ ] Clear
 - [ ] Volume
 - [ ] Speed/pitch sound effects (nightcore mode)  - this will be very fun to try figure out
 - [ ] Bassboost
 - [ ] Slash commands
-- [ ] Looping/looping queue
-- [ ] Move command to move
+- [ ] Looping/looping queue - half done
+- [ ] Move command to move songs around in queue
 - [ ] Lyrics
 - [ ] Forward command - go forward in a song - this will also be fun to figure out
 - [ ] Rewind command
@@ -50,7 +50,7 @@
 - [ ] Playnow command
 - [ ] Removedupes command
 - [ ] Replay command
-- [ ] Search command
+- [x] Search command
 - [ ] Shuffle command
 - [ ] Some sort of database for queued songs
 - [ ] When bot restarts, try rejoin channels and replay queue

@@ -13,8 +13,9 @@ module.exports = class logger {
     console.log(`[${date.getHours().toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString("en-GB", {minimumIntegerDigits: 2})}][${from}]: ${msg}`);   
   }
   
-  async logToHaste(msg) {
-    if (typeof(msg) == "object") {
+  async logToHaste(msg, test) {
+    if(!test) test = false;
+    if (typeof(msg) == "object" && !test) {
       msg = JSON.stringify(msg);
     } 
     const response = await fetch("https://haste.pixelator.xyz/documents", {method: "POST", body: msg});

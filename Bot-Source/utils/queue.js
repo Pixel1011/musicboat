@@ -6,6 +6,7 @@ class Queue {
     this.lavalink = client.lavalink;
     this.songs = [];
     this.currentSong;
+    this.lastSong; // for replay command to be added
   }
   
   // requester is user object
@@ -43,6 +44,7 @@ class Queue {
   }
   shift() {
     let song = this.songs.shift();
+    this.lastSong = this.currentSong;
     this.currentSong = song;
   }
 

@@ -4,9 +4,10 @@ module.exports = async function (oldState, newState) {
   let client = oldState.guild.client;
   let lavalink = client.lavalink;
   const sleep = ms => new Promise(res => setTimeout(res, ms));
-
-  if ((newState.id != client.user.id) || (oldState.id != client.user.id)) return;
+  // if there is channel change
   if (newState.channelId == oldState.channelId) return;
+  // if it is bot
+  if ((newState.id != client.user.id) || (oldState.id != client.user.id)) return;
 
   // leaving handle
   let player = lavalink.players.get(newState.guild.id);
@@ -15,7 +16,9 @@ module.exports = async function (oldState, newState) {
     client.logger.log("handling a leave");
     player.destroy();
     player.disconnect();
-    clearInterval(client.inactiveStrikes.find(elm => elm.guild == newState.guild.id).interval);
+    if(client.inactiveStrikes.find(elm => elm.guild == newState.guild.id) != undefined) {
+      clearInterval(client.inactiveStrikes.find(elm => elm.guild == newState.guild.id).interval);
+    }
   } else
 
   // handle being moved

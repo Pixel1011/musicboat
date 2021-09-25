@@ -1,6 +1,9 @@
 const { MessageEmbed } = require("discord.js");
 const musicHelper = require("../utils/musicHelper");
 const Queue = require("../utils/queue");
+// eslint-disable-next-line no-undef
+const sleep = ms => new Promise(res => setTimeout(res, ms));
+
 async function run(client, msg, args) {
   let music = new musicHelper(client);
   let vchannel = msg.member.voice.channel;
@@ -57,18 +60,28 @@ async function run(client, msg, args) {
     player.queue = new Queue(client);
   }
   if(player.queue.currentSong == null || player.queue.currentSong == undefined) {
+    player.skips = [];
     await player.queue.add(result, msg.author);
     player.play(result);
     msg.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
     // register player events
-    player.on("trackEnd", (track, reason) => {
-      if(player.queue.songs[0] != undefined || player.queue.songs[0] != null) {
-        player.queue.shift();
+    player.on("trackEnd", async (track, reason) => {
+      if((player.queue.songs[0] != undefined || player.queue.songs[0] != null || player.loop == true ) && (player.queue.currentSong != null || player.queue.currentSong != undefined)) {
+        if(player.loop == undefined || player.loop == false) {
+          player.queue.shift();
+        }
+        await sleep(300);
         player.play(player.queue.currentSong.track);
       } else {
         // shift one last time to null currentSong from queue
         player.queue.shift();
       }
+    });
+    player.on("trackException", (track, error) => {
+      client.logger.log(error);
+    });
+    player.on("trackStuck", (track, threshold) => {
+      client.logger.log(threshold);
     });
 
   } else {
@@ -81,8 +94,8 @@ async function run(client, msg, args) {
 
     let timeTillPlaying = 0;
 
-    player.queue.songs.forEach(song => {
-      timeTillPlaying = timeTillPlaying + song.length;
+    player.queue.songs.forEach(sng => {
+      timeTillPlaying = timeTillPlaying + sng.length;
     });
     let playingFor = new Date().getTime() - player.playingSince;
     timeTillPlaying = timeTillPlaying - song.length;
@@ -96,7 +109,7 @@ async function run(client, msg, args) {
     embed.setTitle("**Added to queue**");
     embed.addField("**Channel**", song.channel, true);
     embed.addField("**Song Duration**", `${playMin}:${playSec}`, true);
-    embed.addField("**Estimated time until playing**", `${timeTillPlayMin}:${timeTillPlaySec}`, true);
+    embed.addField("**Estimated time until playing**", `${timeTillPlayMin}:${timeTillPlaySec}`, true); // this line
     embed.addField("**Position in queue**", `${player.queue.songs.length.toString()}`, true);
     embed.setThumbnail(song.thumbnail);
     msg.channel.send({embeds: [embed]});
@@ -119,6 +132,7 @@ async function run(client, msg, args) {
       if (client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).strikes == 5) {
         clearInterval(this);
         player.disconnect();
+        player.loop = false;
         let index = client.inactiveStrikes.findIndex(elm => elm.guild == msg.guild.id);
         client.inactiveStrikes.splice(index, 1);
       }

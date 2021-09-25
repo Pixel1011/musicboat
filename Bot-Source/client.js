@@ -14,7 +14,7 @@ class musicBot {
     this.client.botnum = num + 1;
     this.client.logger = new logger(this.client);
     this.client.commands = [];
-    this.client.inactiveStrikes = [];
+    this.client.inactiveStrikes = []; // reminder to change to per player instead of on client
     this.client.config = require("./config.json");
     this.token = token;
     this.client.prefix = prefix;
