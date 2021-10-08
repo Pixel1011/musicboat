@@ -17,12 +17,12 @@ async function run(client, msg, args) {
   }
   let r = `**Input:** ${codeGiven}
   **Output:**\n ${res.replace(client.token, "Token")}`;
-  let message = "input:\n\n" + codeGiven + "\n\noutput:\n\n" + res;
+  let message = "input:\n\n" + codeGiven + "\n\noutput:\n\n" + res.replace(client.token, "Token");
 
   if(res.length > 1500) {
-    r = client.logger.logToHaste(message);
+    r = await client.logger.logToHaste(message);
   }
-
+  
   const embed = new Discord.MessageEmbed();
   embed.setColor(0xa0d4ff);
   embed.setDescription(r);

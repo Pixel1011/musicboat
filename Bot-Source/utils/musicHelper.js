@@ -1,8 +1,7 @@
-// essentially where all the music happens
-
 class musicHelper {
-  constructor(client) {
+  constructor(client, guildid) {
     this.client = client;
+    this.guildid = guildid;
     this.lavalink = client.lavalink;
     this.queue = this.lavalink.queue;
   }
@@ -12,17 +11,21 @@ class musicHelper {
     return await this.lavalink.rest.loadTracks(searchTerm);
   }
 
-  async join(guildid, voiceid) {
-    if(this.lavalink.players.get(guildid) == null) {
-      return await this.lavalink.createPlayer(guildid).connect(voiceid);
+  async join(voiceid) {
+    if(this.lavalink.players.get(this.guildid) == null) {
+      return await this.lavalink.createPlayer(this.guildid).connect(voiceid);
     } else {
-      return await this.lavalink.players.get(guildid).connect(voiceid);
+      return await this.lavalink.players.get(this.guildid).connect(voiceid);
     }
   }
-  async skip(guildid) {
-    let player = this.lavalink.players.get(guildid);
+  async skip() {
+    let player = this.lavalink.players.get(this.guildid);
     await player.queue.shift();
     await player.stop();
+  }
+  
+  getPlayer() {
+    return this.lavalink.players.get(this.guildid);
   }
 
 

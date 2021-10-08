@@ -25,6 +25,8 @@
 - [x] Rob Pixelator (my other bot) of useful music functions
 - [x] Get basic music going (just youtube)
 - [x] Setup normal music checks and events to handle randomly being disconnected, etc
+- [x] Pause/Unpause commands
+- [ ] Deafened checks
 - [ ] Spotify support
 - [ ] Soundcloud support
 - [ ] Twitch stream support
@@ -36,13 +38,13 @@
 - [x] Forceskip
 - [ ] Clear
 - [ ] Volume
-- [ ] Speed/pitch sound effects (nightcore mode)  - this will be very fun to try figure out
+- [ ] Speed/pitch sound effects (nightcore mode)
 - [ ] Bassboost
 - [ ] Slash commands
 - [ ] Looping/looping queue - half done
 - [ ] Move command to move songs around in queue
 - [ ] Lyrics
-- [ ] Forward command - go forward in a song - this will also be fun to figure out
+- [ ] Forward command - go forward in a song
 - [ ] Rewind command
 - [ ] Seek command
 - [ ] Help command

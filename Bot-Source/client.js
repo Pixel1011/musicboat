@@ -12,23 +12,20 @@ class musicBot {
       intents: [Flags.DIRECT_MESSAGES, Flags.DIRECT_MESSAGE_REACTIONS, Flags.GUILDS, Flags.GUILD_EMOJIS_AND_STICKERS, Flags.GUILD_INTEGRATIONS, Flags.GUILD_INVITES, Flags.GUILD_MEMBERS, Flags.GUILD_MESSAGES, Flags.GUILD_MESSAGE_REACTIONS, Flags.GUILD_PRESENCES, Flags.GUILD_VOICE_STATES] // thats probably fine.. jesus
     });
     this.client.botnum = num + 1;
+    this.aliasnum = 0;
     this.client.logger = new logger(this.client);
     this.client.commands = [];
     this.client.inactiveStrikes = []; // reminder to change to per player instead of on client
     this.client.config = require("./config.json");
     this.token = token;
     this.client.prefix = prefix;
+    this.client.boat = this;
     this.init();
   }
-  // init
-  // login, load commands, event handling etc
-  async init() {
-    await this.client.login(this.token);
-    this.client.logger.log("Initializing..");
-
-    // load commands
+  async ReloadCommands() {
+    this.client.commands = [];
+    // load normal commands and aliases
     const files = fs.readdirSync(path.resolve("./", "commands"));
-    let aliasnum = 0;
     files.forEach(file => {
       try {
         let cmd = require(`./commands/${file}`);
@@ -37,15 +34,27 @@ class musicBot {
         if (cmd.data.aliases != null && cmd.data.aliases.length != 0) {
           cmd.data.aliases.forEach(alias => {
             this.client.commands[alias] = cmd;
-            aliasnum++;
+            this.aliasnum++;
           });
         }
       } catch (e) {
         throw `Failed to load ${file}\n${e.stack}`;
       }
     });
+    // todo - load up slash commands
 
-    this.client.logger.log(`${Object.keys(this.client.commands).length - aliasnum} Commands loaded with ${aliasnum} aliases.`);
+
+  }
+  // init
+  // login, load commands, event handling etc
+  async init() {
+    await this.client.login(this.token);
+    this.client.logger.log("Initializing..");
+
+    // load commands
+    await this.ReloadCommands();
+
+    this.client.logger.log(`${Object.keys(this.client.commands).length - this.aliasnum} Commands loaded with ${this.aliasnum} aliases.`);
     // lavalink stuff
     const info = { host: "localhost", port: 2333, password: "youshallnotpass" };
 

@@ -1,6 +1,6 @@
 async function run(client, msg, args) {
   const musicHelper = require("../utils/musicHelper");
-  const music = new musicHelper(client);
+  const music = new musicHelper(client, msg.guild.id);
   msg.channel.send(`**Searching** :mag_right: \`\`${args.join(" ")}\`\``);
   let results = await music.search(args.join(" "), "ytsearch:");
   let result = results.tracks[0];

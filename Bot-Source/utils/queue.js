@@ -13,15 +13,20 @@ class Queue {
   // track is a result from lavalink rest api
   async add(track, requester) {
     // grab thumbnail with ytdl
-    let info = await ytdl.getInfo(track.info.uri);
-    var thumbnail;
-    var width = info.videoDetails.thumbnails[0].width;
-    
-    for (var i in info.videoDetails.thumbnails) {
-      if (info.videoDetails.thumbnails[i].width >= width) {
-        width = info.videoDetails.thumbnails[i].width;
-        thumbnail = info.videoDetails.thumbnails[i].url;
+    let info;
+    let thumbnail;
+    try {
+      info = await ytdl.getInfo(track.info.uri);
+      var width = info.videoDetails.thumbnails[0].width;
+      
+      for (var i in info.videoDetails.thumbnails) {
+        if (info.videoDetails.thumbnails[i].width >= width) {
+          width = info.videoDetails.thumbnails[i].width;
+          thumbnail = info.videoDetails.thumbnails[i].url;
+        }
       }
+    } catch(e) {
+      return false;
     }
 
     let song = {
@@ -41,6 +46,7 @@ class Queue {
     } else {
       this.currentSong = song;
     }
+    return true;
   }
   shift() {
     let song = this.songs.shift();

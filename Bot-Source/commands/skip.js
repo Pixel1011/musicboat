@@ -2,7 +2,7 @@ const { Permissions } = require("discord.js");
 
 async function run(client, msg, args) {
   const musicHelper = require("../utils/musicHelper");
-  const music = new musicHelper(client);
+  const music = new musicHelper(client, msg.guild.id);
   let vchannel = msg.member.voice.channel;
   let player = client.lavalink.players.get(msg.guild.id);
   // check if playing
@@ -40,7 +40,7 @@ async function run(client, msg, args) {
   player.skips.push(msg.author.id);
   if (player.skips.length >= skipsRequired) {
     player.skips = [];
-    music.skip(msg.guild.id);
+    music.skip();
     msg.channel.send("⏩ **Skipped** 👍");
   } else {
     if(hasPerms) {
