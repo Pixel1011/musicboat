@@ -2,14 +2,9 @@ const { Permissions } = require("discord.js");
 const musicHelper = require("../utils/musicHelper");
 
 async function run(client, msg, args) {
-  let player = client.lavalink.players.get(msg.guild.id);
-  if (!player) {
-    return msg.channel.send(":x: **Bot is not currently playing**");
-  }
   const music = new musicHelper(client, msg.guild.id);
-  if(!player.playing && !player.queue.currentSong) {
-    return msg.channel.send(":x: **Bot is not currently playing**");
-  }
+  let check = await music.check(msg); if(check == false) return;
+  
   let member = msg.guild.members.cache.get(msg.author.id);
   if(member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) || member.roles.cache.find(role => role.name == "DJ")) {
     await music.skip();
