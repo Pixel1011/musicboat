@@ -26,7 +26,7 @@ class Queue {
         }
       }
     } catch(e) {
-      return false;
+      thumbnail = this.client.user.displayAvatarURL({size: 1024});
     }
 
     let song = {
@@ -48,9 +48,11 @@ class Queue {
     }
     return true;
   }
-  shift() {
+  async shift() {
     let song = this.songs.shift();
-    this.lastSong = this.currentSong;
+    if(this.currentSong != null || this.currentSong != undefined) {
+      this.lastSong = this.currentSong;
+    }
     this.currentSong = song;
   }
 

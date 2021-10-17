@@ -37,7 +37,7 @@
 - [x] Voteskip
 - [x] Forceskip
 - [ ] Clear
-- [ ] Volume
+- [x] Volume
 - [ ] Speed/pitch sound effects (nightcore mode)
 - [ ] Bassboost
 - [ ] Slash commands

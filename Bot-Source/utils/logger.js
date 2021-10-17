@@ -16,7 +16,7 @@ module.exports = class logger {
   async logToHaste(msg, test) {
     if(!test) test = false;
     if (typeof(msg) == "object" && !test) {
-      msg = JSON.stringify(msg);
+      msg = require("util").inspect(msg);
     } 
     const response = await fetch("https://haste.pixelator.xyz/documents", {method: "POST", body: msg});
     let data = await response.json();

@@ -12,23 +12,25 @@ async function run(client, msg, args) {
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
   if(lavalink.players.get(msg.guild.id) == null || lavalink.players.get(msg.guild.id).queue.currentSong == null) {
-    if(args.join(" ") == "") {
+    if(!args.join(" ")) {
       let embed = new MessageEmbed();
       embed.setTitle(":x: Invalid usage");
       embed.setDescription(`${client.prefix}play [Link or query]`);
       return msg.channel.send({embeds: [embed]});
     }
   } else {
-    if (args.join(" ") == "" && lavalink.players.get(msg.guild.id).paused) {
-      await lavalink.players.get(msg.guild.id).resume();
-      msg.channel.send("⏯ **Resuming** 👍");
-      return;
-    } else {
-      return msg.channel.send(":x: **The player is not paused**");
+    if(!args.join(" ")) {
+      if (lavalink.players.get(msg.guild.id).paused) {
+        await lavalink.players.get(msg.guild.id).resume();
+        msg.channel.send("⏯ **Resuming** 👍");
+        return;
+      } else {
+        return msg.channel.send(":x: **The player is not paused**");
       // let embed = new MessageEmbed();           // not sure which one to do here
       // embed.setTitle(":x: Invalid usage");
       // embed.setDescription(`${client.prefix}play [Link or query]`);
       // return msg.channel.send({embeds: [embed]});
+      }
     }
   }
   
@@ -85,14 +87,16 @@ async function run(client, msg, args) {
     // register player events
     player.on("trackEnd", async (track, reason) => {
       if((player.queue.songs[0] != undefined || player.queue.songs[0] != null || player.loop == true ) && (player.queue.currentSong != null || player.queue.currentSong != undefined)) {
-        if(player.loop == undefined || player.loop == false) {
-          player.queue.shift();
+        if(!player.loop) {
+          await player.queue.shift();
         }
+        client.logger.logToHaste(require("util").inspect(player.queue.songs) + require("util").inspect(player.queue.currentSong)); // apparantly this line fixes bug of currentSong turning undefined, how? i do not know, all i know it works therefore idc :)
         await sleep(300);
         player.play(player.queue.currentSong.track);
       } else {
         // shift one last time to null currentSong from queue
         player.queue.shift();
+        player.loop = false;
       }
     });
     player.on("trackException", (track, error) => {
@@ -126,14 +130,14 @@ async function run(client, msg, args) {
     var timeTillPlaySec = Math.floor(timeTillPlaying / 1000 - (timeTillPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
 
     let embed = new MessageEmbed();
-    embed.setAuthor("", avatarURL);
-    embed.setDescription(`**${song.title}**`);
-    embed.setTitle("**Added to queue**");
-    embed.addField("**Channel**", song.channel, true);
-    embed.addField("**Song Duration**", `${playMin}:${playSec}`, true);
-    embed.addField("**Estimated time until playing**", `${timeTillPlayMin}:${timeTillPlaySec}`, true); // this line
-    embed.addField("**Position in queue**", `${player.queue.songs.length.toString()}`, true);
+    embed.setAuthor("Added to queue", avatarURL);
+    embed.setDescription(`[**${song.title}**](${song.url})`);
+    embed.addField("Channel", song.channel, true);
+    embed.addField("Song Duration", `${playMin}:${playSec}`, true);
+    embed.addField("Estimated time until playing", `${timeTillPlayMin}:${timeTillPlaySec}`, true);
+    embed.addField("Position in queue", `${player.queue.songs.length.toString()}`, true);
     embed.setThumbnail(song.thumbnail);
+    embed.setColor(0x202225);
     msg.channel.send({embeds: [embed]});
 
   }
@@ -158,7 +162,7 @@ async function run(client, msg, args) {
         let index = client.inactiveStrikes.findIndex(elm => elm.guild == msg.guild.id);
         client.inactiveStrikes.splice(index, 1);
       }
-    }, 2 * 60 * 1000);
+    }, 2 * 60 * 1000); // every 2 mins, 5 strikes = 10mins
 
     client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).interval = interval;
   }

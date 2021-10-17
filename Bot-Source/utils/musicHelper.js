@@ -1,36 +1,63 @@
+const { Permissions } = require("discord.js");
+
+
 class musicHelper {
   constructor(client, guildid) {
     this.client = client;
     this.guildid = guildid;
     this.lavalink = client.lavalink;
   }
-  async check(msg) {
-    // the checks that i do in every music command, should prob throw them into a function
+  async check(msg, checkPlaying, checkVC) {
+    if(checkPlaying == undefined) checkPlaying = true;
+    if(checkVC == undefined) checkVC = true;
+
     let vchannel = msg.member.voice.channel;
     let player = this.client.lavalink.players.get(msg.guild.id);
 
     // check if playing
-    if (!player) {
-      msg.channel.send(":x: **Bot is not currently playing**");
-      return false;
-    }
-    if(!player.playing && !player.queue.currentSong) {
-      msg.channel.send(":x: **Bot is not currently playing**");
-      return false;
+    if(checkPlaying) {
+      if (!player) {
+        msg.channel.send(":x: **Bot is not currently playing**");
+        return false;
+      }
+      if(!player.playing && !player.queue.currentSong) {
+        msg.channel.send(":x: **Bot is not currently playing**");
+        return false;
+      }
     }
 
     // check if user in same vc
-    if (!vchannel) {
-      msg.channel.send(":x: **You have to be in a voice channel to use this command.**");
-      return false;
-    }
+    if (checkVC) {
+      if (!vchannel) {
+        msg.channel.send(":x: **You have to be in a voice channel to use this command.**");
+        return false;
+      }
     
-    if ((vchannel.id != msg.guild.me.voice.channelId) && msg.guild.me.voice.channelId != null) {
-      msg.channel.send(":x: **You have to be in the same voice channel to use this command**");
-      return false;
+      if ((vchannel.id != msg.guild.me.voice.channelId) && msg.guild.me.voice.channelId != null) {
+        msg.channel.send(":x: **You have to be in the same voice channel to use this command**");
+        return false;
+      }
     }
     return true; // true if all checks pass
 
+  }
+  // should be ran after check function
+  async PermsOrAloneCheck(msg, checkAlone, sendMsgs) {
+    if (!checkAlone) checkAlone = false;
+    if (!sendMsgs) sendMsgs = false;
+    let member = msg.guild.members.cache.get(msg.author.id);
+    let vchannel = msg.member.voice.channel;
+    let hasPerms = member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) || member.roles.cache.find(role => role.name == "DJ");
+
+    if (checkAlone) {
+      if (hasPerms || vchannel.members.size == 2) return true; // make sure to yeet bots from that role entirely
+      if (sendMsgs) msg.channel.send(":x: **This command requires you to either have a role named ``DJ`` or the ``Manage Channels`` permission to use it** (being alone with the bot also works)");
+      return false;
+    } else {
+      if (hasPerms) return true;
+      if (sendMsgs) msg.channel.send(":x: **This command requires you to either have a role named ``DJ`` or the ``Manage Channels`` permission to use it**");
+      return false;
+    }
   }
 
   async search(searchTerm, type) {
@@ -47,7 +74,9 @@ class musicHelper {
   }
   async skip() {
     let player = this.lavalink.players.get(this.guildid);
-    await player.queue.shift();
+    if (player.loop) {
+      player.queue.shift();
+    }
     await player.stop();
   }
   

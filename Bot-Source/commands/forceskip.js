@@ -1,17 +1,13 @@
-const { Permissions } = require("discord.js");
 const musicHelper = require("../utils/musicHelper");
 
 async function run(client, msg, args) {
   const music = new musicHelper(client, msg.guild.id);
   let check = await music.check(msg); if(check == false) return;
-  
-  let member = msg.guild.members.cache.get(msg.author.id);
-  if(member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) || member.roles.cache.find(role => role.name == "DJ")) {
-    await music.skip();
-    msg.channel.send(":fast_forward: **Skipped** :thumbsup:");
-  } else {
-    return msg.channel.send(":x: **This command requires you to either have a role named ``DJ`` or the ``Manage Channels`` permission to use it**");
-  }
+  if(!await music.PermsOrAloneCheck(msg, false, true)) return; 
+
+  await music.skip();
+  msg.channel.send(":fast_forward: **Skipped** :thumbsup:");
+
 }
 module.exports.data = {
   name: "forceskip",

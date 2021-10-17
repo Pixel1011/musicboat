@@ -12,17 +12,18 @@ async function run(client, msg, args) {
   const music = new musicHelper(client, msg.guild.id);
   let check = await music.check(msg); if(check == false) return;
   let player = music.getPlayer();
+  let vol = args.join(" ");
 
-  if (args.join(" ") == "") {
-    return msg.channel.send(`🎵 **The current volume is at ${player.volume}%**`); 
+  if (vol == "") {
+    return msg.channel.send(`🎵 **The current volume is at** \`\`${player.volume}%\`\``); 
   }
+  if (!isNumeric(vol)) return msg.channel.send(":x: **This value is not a number!**");
 
-  if (isNumeric(args.join(" "))) {
-    await player.setVolume(args.join(" "));
-    return msg.channel.send(`🎵 **Set volume to ${args.join(" ")}%** 👍`);
-  } else {
-    return msg.channel.send(":x: **This value is not a number!**");
-  }
+  if(vol > 2147483647) return msg.channel.send(":x: **The volume cannot be set this high!**");
+
+  await player.setVolume(vol);
+  return msg.channel.send(`🎵 **Set volume to ${vol}%** 👍`);
+
 
 
 
