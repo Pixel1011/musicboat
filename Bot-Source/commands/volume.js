@@ -10,7 +10,7 @@ function isNumeric(str) {
 // also need to reset volume when queue finishes and timeout occurs otherwise questionable surprises occur lmao
 async function run(client, msg, args) {
   const music = new musicHelper(client, msg.guild.id);
-  let check = await music.check(msg, true, false); if(check == false) return;
+  let check = await music.check(msg, true, false, true, true); if(check == false) return;
   let player = music.getPlayer();
   let vol = args.join(" ");
 

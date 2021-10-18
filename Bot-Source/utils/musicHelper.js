@@ -6,9 +6,11 @@ class musicHelper {
     this.guildid = guildid;
     this.lavalink = client.lavalink;
   }
-  async check(msg, checkPlayer, checkPlaying, checkVC) {
+  async check(msg, checkPlayer, checkPlaying, checkVC, checkSameVC) {
     if(checkPlaying == undefined) checkPlaying = true;
+    if(checkPlayer == undefined) checkPlayer = true;
     if(checkVC == undefined) checkVC = true;
+    if(checkSameVC == undefined) checkSameVC = true;
 
     let vchannel = msg.member.voice.channel;
     let player = this.client.lavalink.players.get(msg.guild.id);
@@ -21,7 +23,7 @@ class musicHelper {
       }
     }
     // check if playing
-    if(checkPlaying) {
+    if(checkPlayer) {
       if(!player.playing && !player.queue.currentSong) {
         msg.channel.send(":x: **Bot is not currently playing**");
         return false;
@@ -34,7 +36,8 @@ class musicHelper {
         msg.channel.send(":x: **You have to be in a voice channel to use this command.**");
         return false;
       }
-    
+    }
+    if (checkSameVC) {
       if ((vchannel.id != msg.guild.me.voice.channelId) && msg.guild.me.voice.channelId != null) {
         msg.channel.send(":x: **You have to be in the same voice channel to use this command**");
         return false;
