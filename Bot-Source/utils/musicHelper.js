@@ -1,25 +1,27 @@
 const { Permissions } = require("discord.js");
 
-
 class musicHelper {
   constructor(client, guildid) {
     this.client = client;
     this.guildid = guildid;
     this.lavalink = client.lavalink;
   }
-  async check(msg, checkPlaying, checkVC) {
+  async check(msg, checkPlayer, checkPlaying, checkVC) {
     if(checkPlaying == undefined) checkPlaying = true;
     if(checkVC == undefined) checkVC = true;
 
     let vchannel = msg.member.voice.channel;
     let player = this.client.lavalink.players.get(msg.guild.id);
 
-    // check if playing
-    if(checkPlaying) {
+    // check if player exists
+    if (checkPlaying) {
       if (!player) {
         msg.channel.send(":x: **Bot is not currently playing**");
         return false;
       }
+    }
+    // check if playing
+    if(checkPlaying) {
       if(!player.playing && !player.queue.currentSong) {
         msg.channel.send(":x: **Bot is not currently playing**");
         return false;
