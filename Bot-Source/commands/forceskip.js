@@ -2,8 +2,8 @@ const musicHelper = require("../utils/musicHelper");
 
 async function run(client, msg, args) {
   const music = new musicHelper(client, msg.guild.id);
-  let check = await music.check(msg); if(check == false) return;
-  if(!await music.PermsOrAloneCheck(msg, false, true)) return; 
+  if (!await music.check(msg)) return;
+  if (!await music.PermsOrAloneCheck(msg, false, true)) return;
 
   await music.skip();
   msg.channel.send(":fast_forward: **Skipped** :thumbsup:");

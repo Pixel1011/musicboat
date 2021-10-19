@@ -56,7 +56,11 @@ class musicBot {
 
     this.client.logger.log(`${Object.keys(this.client.commands).length - this.aliasnum} Commands loaded with ${this.aliasnum} aliases.`);
     // lavalink stuff
-    const info = { host: "localhost", port: 2333, password: "youshallnotpass" };
+    const info = {
+      host: "localhost",
+      port: 2333,
+      password: "youshallnotpass"
+    };
 
     this.client.lavalink = new Node({
       connection: info,

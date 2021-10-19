@@ -3,8 +3,8 @@ let musicbot = require("./client.js");
 let numOfBots = config.tokens.length;
 let i = 0;
 
-String.prototype.replaceAt = function(index, replacement) { // hopefully doing this isnt a mistake
-  if(!index || !replacement) return this;
+String.prototype.replaceAt = function (index, replacement) { // hopefully doing this isnt a mistake
+  if (!index || !replacement) return this;
   return this.substr(0, index) + replacement + this.substr(index + replacement.length);
 };
 

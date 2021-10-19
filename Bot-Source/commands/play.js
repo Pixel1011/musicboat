@@ -11,31 +11,33 @@ async function run(client, msg, args) {
   let player;
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
-  if(!lavalink.players.get(msg.guild.id) || !lavalink.players.get(msg.guild.id).queue || !lavalink.players.get(msg.guild.id).queue.currentSong) {
-    if(!args.join(" ")) {
+  if (!lavalink.players.get(msg.guild.id) || !lavalink.players.get(msg.guild.id).queue || !lavalink.players.get(msg.guild.id).queue.currentSong) {
+    if (!args.join(" ")) {
       let embed = new MessageEmbed();
       embed.setTitle(":x: Invalid usage");
       embed.setDescription(`${client.prefix}play [Link or query]`);
-      return msg.channel.send({embeds: [embed]});
+      return msg.channel.send({
+        embeds: [embed]
+      });
     }
   } else {
-    if(!args.join(" ")) {
+    if (!args.join(" ")) {
       if (lavalink.players.get(msg.guild.id).paused) {
         await lavalink.players.get(msg.guild.id).resume();
         msg.channel.send("⏯ **Resuming** 👍");
         return;
       } else {
         return msg.channel.send(":x: **The player is not paused**");
-      // let embed = new MessageEmbed();           // not sure which one to do here
-      // embed.setTitle(":x: Invalid usage");
-      // embed.setDescription(`${client.prefix}play [Link or query]`);
-      // return msg.channel.send({embeds: [embed]});
+        // let embed = new MessageEmbed();           // not sure which one to do here
+        // embed.setTitle(":x: Invalid usage");
+        // embed.setDescription(`${client.prefix}play [Link or query]`);
+        // return msg.channel.send({embeds: [embed]});
       }
     }
   }
-  
+
   // check if user in same vc
-  
+
   if (!vchannel) {
     return msg.channel.send(":x: **You have to be in a voice channel to use this command.**");
   }
@@ -68,15 +70,15 @@ async function run(client, msg, args) {
   msg.channel.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
   let results = await music.search(args.join(" "), "ytsearch:");
   let result = results.tracks[0];
-  if(!result) {
+  if (!result) {
     return msg.channel.send(":x: **No Matches**");
   }
   // play
-  if(!player.queue) {
+  if (!player.queue) {
     player.queue = new Queue(client);
   }
   // if nothing in queue/nothing playing
-  if(player.queue.currentSong == null || player.queue.currentSong == undefined) {
+  if (player.queue.currentSong == null || player.queue.currentSong == undefined) {
     player.skips = [];
     let success = await player.queue.add(result, msg.author);
     if (!success) {
@@ -86,9 +88,9 @@ async function run(client, msg, args) {
     msg.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
     // register player events
     player.on("trackEnd", async (track, reason) => {
-      if(!player.queue) return; // if disconnected while playing
-      if((player.queue.songs[0] != undefined || player.queue.songs[0] != null || player.loop == true ) && (player.queue.currentSong != null || player.queue.currentSong != undefined)) {
-        if(!player.loop) {
+      if (!player.queue) return; // if disconnected while playing
+      if ((player.queue.songs[0] != undefined || player.queue.songs[0] != null || player.loop == true) && (player.queue.currentSong != null || player.queue.currentSong != undefined)) {
+        if (!player.loop) {
           await player.queue.shift();
         }
         client.logger.logToHaste(require("util").inspect(player.queue.songs) + require("util").inspect(player.queue.currentSong)); // apparantly this line fixes bug of currentSong turning undefined, how? i do not know, all i know it works therefore idc :)
@@ -114,9 +116,9 @@ async function run(client, msg, args) {
     }
     let song = player.queue.songs.at(-1);
     // embed
-    let avatarURL = song.requester.avatarURL({size:4096});
+    let avatarURL = song.requester.avatarURL({size: 4096});
 
-    var playMin= Math.floor(song.length / 1000 / 60);
+    var playMin = Math.floor(song.length / 1000 / 60);
     var playSec = Math.floor(song.length / 1000 - (playMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
 
     let timeTillPlaying = 0;
@@ -127,7 +129,7 @@ async function run(client, msg, args) {
     let playingFor = new Date().getTime() - player.playingSince;
     timeTillPlaying = timeTillPlaying - song.length;
     timeTillPlaying = timeTillPlaying + song.length - playingFor;
-    var timeTillPlayMin= Math.floor(timeTillPlaying / 1000 / 60);
+    var timeTillPlayMin = Math.floor(timeTillPlaying / 1000 / 60);
     var timeTillPlaySec = Math.floor(timeTillPlaying / 1000 - (timeTillPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
 
     let embed = new MessageEmbed();
@@ -151,8 +153,8 @@ async function run(client, msg, args) {
       strikes: 0,
       interval: this
     });
-    let interval = setInterval(function() { 
-      if(player.playing && vchannel.members.size > 1) return client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).strikes = 0;
+    let interval = setInterval(function () {
+      if (player.playing && vchannel.members.size > 1) return client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).strikes = 0;
 
       client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).strikes++;
 

@@ -2,10 +2,10 @@ const musicHelper = require("../utils/musicHelper");
 
 async function run(client, msg, args) {
   const music = new musicHelper(client, msg.guild.id);
-  let check = await music.check(msg); if(check == false) return;
+  if (!await music.check(msg)) return;
   let player = music.getPlayer();
 
-  if(player.paused) {
+  if (player.paused) {
     await player.resume();
     msg.channel.send("⏯ **Resuming** 👍");
   } else {

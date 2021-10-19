@@ -7,10 +7,10 @@ class musicHelper {
     this.lavalink = client.lavalink;
   }
   async check(msg, checkPlayer, checkPlaying, checkVC, checkSameVC) {
-    if(checkPlaying == undefined) checkPlaying = true;
-    if(checkPlayer == undefined) checkPlayer = true;
-    if(checkVC == undefined) checkVC = true;
-    if(checkSameVC == undefined) checkSameVC = true;
+    if (checkPlaying == undefined) checkPlaying = true;
+    if (checkPlayer == undefined) checkPlayer = true;
+    if (checkVC == undefined) checkVC = true;
+    if (checkSameVC == undefined) checkSameVC = true;
 
     let vchannel = msg.member.voice.channel;
     let player = this.getPlayer();
@@ -23,8 +23,8 @@ class musicHelper {
       }
     }
     // check if playing
-    if(checkPlayer) {
-      if(!player.playing && !player.queue.currentSong) {
+    if (checkPlayer) {
+      if (!player.playing && !player.queue.currentSong) {
         msg.channel.send(":x: **Bot is not currently playing**");
         return false;
       }
@@ -71,7 +71,7 @@ class musicHelper {
   }
 
   async join(voiceid) {
-    if(this.lavalink.players.get(this.guildid) == null) {
+    if (this.lavalink.players.get(this.guildid) == null) {
       return await this.lavalink.createPlayer(this.guildid).connect(voiceid);
     } else {
       return await this.lavalink.players.get(this.guildid).connect(voiceid);
@@ -84,7 +84,7 @@ class musicHelper {
     }
     await player.stop();
   }
-  
+
   getPlayer() {
     return this.lavalink.players.get(this.guildid);
   }
@@ -93,7 +93,7 @@ class musicHelper {
     let player = this.getPlayer();
     player.destroy();
     player.disconnect();
-    if(this.client.inactiveStrikes.find(elm => elm.guild == this.guildid) != undefined) {
+    if (this.client.inactiveStrikes.find(elm => elm.guild == this.guildid) != undefined) {
       clearInterval(this.client.inactiveStrikes.find(elm => elm.guild == this.guildid).interval);
     }
     player.queue = undefined;

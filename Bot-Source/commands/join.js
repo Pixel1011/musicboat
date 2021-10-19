@@ -1,15 +1,15 @@
 const musicHelper = require("../utils/musicHelper");
 async function run(client, msg) {
   const music = new musicHelper(client, msg.guild.id);
-  let check = await music.check(msg, false, false, true, false); if(check == false) return;
+  if (!await music.check(msg, false, false, true, false)) return;
   let vchannel = msg.member.voice.channel;
   let player = music.getPlayer();
 
   // check if bot already in vc
-  if(msg.guild.me.voice.channelId == vchannel.id && player) {
+  if (msg.guild.me.voice.channelId == vchannel.id && player) {
     return msg.channel.send(":x: **I am already connected to your channel**");
   }
-  if(msg.guild.me.voice.channelId && player) {
+  if (msg.guild.me.voice.channelId && player) {
     return msg.channel.send(":x: **You cannot summon the bot as it is playing elsewhere**");
   }
 

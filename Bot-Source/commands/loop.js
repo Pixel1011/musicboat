@@ -1,11 +1,11 @@
 const musicHelper = require("../utils/musicHelper");
 async function run(client, msg) {
   const music = new musicHelper(client, msg.guild.id);
-  let check = await music.check(msg); if(check == false) return;
-  if(!await music.PermsOrAloneCheck(msg, true, true)) return; 
+  if (!await music.check(msg)) return;
+  if (!await music.PermsOrAloneCheck(msg, true, true)) return;
   let player = music.getPlayer();
 
-  if(player.loop == undefined || player.loop == false) {
+  if (player.loop == undefined || player.loop == false) {
     player.loop = true;
     return msg.channel.send("🔂 **Enabled!**");
   } else {
