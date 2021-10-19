@@ -13,7 +13,7 @@ class musicHelper {
     if(checkSameVC == undefined) checkSameVC = true;
 
     let vchannel = msg.member.voice.channel;
-    let player = this.client.lavalink.players.get(msg.guild.id);
+    let player = this.getPlayer();
 
     // check if player exists
     if (checkPlaying) {
@@ -78,7 +78,7 @@ class musicHelper {
     }
   }
   async skip() {
-    let player = this.lavalink.players.get(this.guildid);
+    let player = this.getPlayer();
     if (player.loop) {
       player.queue.shift();
     }
@@ -87,6 +87,16 @@ class musicHelper {
   
   getPlayer() {
     return this.lavalink.players.get(this.guildid);
+  }
+
+  destroyPlayer() {
+    let player = this.getPlayer();
+    player.destroy();
+    player.disconnect();
+    if(this.client.inactiveStrikes.find(elm => elm.guild == this.guildid) != undefined) {
+      clearInterval(this.client.inactiveStrikes.find(elm => elm.guild == this.guildid).interval);
+    }
+    player.queue = undefined;
   }
 
 

@@ -1,3 +1,4 @@
+const musicHelper = require("../utils/musicHelper");
 
 // handle random leaving of bot or moving of channel
 module.exports = async function (oldState, newState) {
@@ -8,17 +9,13 @@ module.exports = async function (oldState, newState) {
   if (newState.channelId == oldState.channelId) return;
   // if it is bot
   if ((newState.id != client.user.id) || (oldState.id != client.user.id)) return;
+  const music = new musicHelper(client, newState.guild.id);
 
   // leaving handle
-  let player = lavalink.players.get(newState.guild.id);
+  let player = music.getPlayer();
   if (!player) return;
   if (newState.channelId == null) {
-    client.logger.log("handling a leave");
-    player.destroy();
-    player.disconnect();
-    if(client.inactiveStrikes.find(elm => elm.guild == newState.guild.id) != undefined) {
-      clearInterval(client.inactiveStrikes.find(elm => elm.guild == newState.guild.id).interval);
-    }
+    music.destroyPlayer();
   } else
 
   // handle being moved

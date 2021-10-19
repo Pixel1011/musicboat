@@ -48,7 +48,7 @@
 - [ ] Rewind command
 - [ ] Seek command
 - [ ] Help command
-- [ ] Join/leave commands
+- [x] Join/leave commands
 - [ ] Playnow command
 - [ ] Removedupes command
 - [ ] Replay command

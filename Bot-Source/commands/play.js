@@ -11,7 +11,7 @@ async function run(client, msg, args) {
   let player;
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
-  if(lavalink.players.get(msg.guild.id) == null || lavalink.players.get(msg.guild.id).queue.currentSong == null) {
+  if(!lavalink.players.get(msg.guild.id) || !lavalink.players.get(msg.guild.id).queue || !lavalink.players.get(msg.guild.id).queue.currentSong) {
     if(!args.join(" ")) {
       let embed = new MessageEmbed();
       embed.setTitle(":x: Invalid usage");
@@ -69,7 +69,7 @@ async function run(client, msg, args) {
   let results = await music.search(args.join(" "), "ytsearch:");
   let result = results.tracks[0];
   if(!result) {
-    return msg.channel.send(":x: **No Matches found**");
+    return msg.channel.send(":x: **No Matches**");
   }
   // play
   if(!player.queue) {
@@ -86,6 +86,7 @@ async function run(client, msg, args) {
     msg.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
     // register player events
     player.on("trackEnd", async (track, reason) => {
+      if(!player.queue) return; // if disconnected while playing
       if((player.queue.songs[0] != undefined || player.queue.songs[0] != null || player.loop == true ) && (player.queue.currentSong != null || player.queue.currentSong != undefined)) {
         if(!player.loop) {
           await player.queue.shift();
