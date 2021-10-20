@@ -97,6 +97,8 @@ class musicHelper {
       clearInterval(this.client.inactiveStrikes.find(elm => elm.guild == this.guildid).interval);
     }
     player.queue = undefined;
+    player.loop = false;
+    player.setVolume(100);
   }
 
 
