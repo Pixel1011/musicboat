@@ -32,6 +32,7 @@
 - [ ] Twitch stream support
 - [ ] Playlist support
 - [x] Queueing songs
+- [x] np command
 - [ ] Queue command
 - [x] Leaving after inactivity
 - [x] Voteskip
