@@ -126,7 +126,7 @@ async function run(client, msg, args) {
     player.queue.songs.forEach(sng => {
       timeTillPlaying = timeTillPlaying + sng.length;
     });
-    let playingFor = new Date().getTime() - player.playingSince;
+    let playingFor = player.position;
     timeTillPlaying = timeTillPlaying - song.length;
     timeTillPlaying = timeTillPlaying + song.length - playingFor;
     var timeTillPlayMin = Math.floor(timeTillPlaying / 1000 / 60);

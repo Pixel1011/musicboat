@@ -10,7 +10,7 @@ async function run(client, msg) {
   let title = currentSong.title;
   let url = currentSong.url;
 
-  let timePlayed = Date.now() - player.playingSince;
+  let timePlayed = player.position;
   let timePlayedMin = Math.floor(timePlayed / 1000 / 60);
   let TimePlayedSec = Math.floor(timePlayed / 1000 - (timePlayedMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
 
@@ -23,7 +23,7 @@ async function run(client, msg) {
   let dashes = "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
   let dot = "🔘"; // WHO MADE THIS SINGLE THING 2 CHARACTERS
 
-  timePlayed = (Date.now() - player.playingSince) / 1000;
+  timePlayed = (player.position) / 1000;
   timeToPlay = currentSong.length / 1000;
   let index = Math.floor((timePlayed/timeToPlay) * 30);
   if (index >= 30) index = 29; // just incase
