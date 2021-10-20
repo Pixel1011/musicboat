@@ -28,7 +28,7 @@ async function run(client, msg) {
   let index = Math.floor((timePlayed/timeToPlay) * 30);
   if (index >= 30) index = 29; // just incase
   dashes = dashes.substr(0, index) + dot + dashes.substr(index + dot.length);
-  dashes = dashes.replace(dot, dot + "▬"); // grr
+  if (index != 29) dashes = dashes.replace(dot, dot + "▬"); // grr
 
   let embed = new MessageEmbed();
   embed.setAuthor("Now Playing ♪", avatarURL);
