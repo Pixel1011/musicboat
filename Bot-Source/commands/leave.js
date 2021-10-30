@@ -9,6 +9,7 @@ async function run(client, msg) {
   }
 
   music.destroyPlayer();
+  msg.channel.send("📭 **Successfully disconnected**");
 
 }
 module.exports.data = {

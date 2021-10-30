@@ -96,6 +96,8 @@ class musicHelper {
     if (this.client.inactiveStrikes.find(elm => elm.guild == this.guildid) != undefined) {
       clearInterval(this.client.inactiveStrikes.find(elm => elm.guild == this.guildid).interval);
     }
+    let index = this.client.inactiveStrikes.findIndex(elm => elm.guild == this.guildid);
+    this.client.inactiveStrikes.splice(index, 1);
     player.queue = undefined;
     player.loop = false;
     player.setVolume(100);
