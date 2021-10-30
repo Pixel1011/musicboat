@@ -88,13 +88,13 @@ async function run(client, msg, args) {
     msg.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
     // register player events
     player.on("trackEnd", async (track, reason) => {
+      client.logger.log(reason);
       if (!player.queue) return; // if disconnected while playing
-      if ((player.queue.songs[0] != undefined || player.queue.songs[0] != null || player.loop == true) && (player.queue.currentSong != null || player.queue.currentSong != undefined)) {
+      if ((player.queue.songs[0] || player.loop == true) && player.queue.currentSong) {
         if (!player.loop) {
-          await player.queue.shift();
+          player.queue.shift();
         }
-        client.logger.logToHaste(require("util").inspect(player.queue.songs) + require("util").inspect(player.queue.currentSong)); // apparantly this line fixes bug of currentSong turning undefined, how? i do not know, all i know it works therefore idc :)
-        await sleep(300);
+        sleep(300); // i swear to god this code is cursed it went back up to line 94 after coming here.. maybe i fixed it
         player.play(player.queue.currentSong.track);
       } else {
         // shift one last time to null currentSong from queue
@@ -102,8 +102,9 @@ async function run(client, msg, args) {
         player.loop = false;
       }
     });
-    player.on("trackException", (track, error) => {
+    player.on("trackException", async (track, error) => {
       client.logger.log(error);
+      await sleep(2000);
     });
     player.on("trackStuck", (track, threshold) => {
       client.logger.log(threshold);
@@ -126,9 +127,10 @@ async function run(client, msg, args) {
     player.queue.songs.forEach(sng => {
       timeTillPlaying = timeTillPlaying + sng.length;
     });
+
     let playingFor = player.position;
     timeTillPlaying = timeTillPlaying - song.length;
-    timeTillPlaying = timeTillPlaying + song.length - playingFor;
+    timeTillPlaying = timeTillPlaying + (song.length - playingFor);
     var timeTillPlayMin = Math.floor(timeTillPlaying / 1000 / 60);
     var timeTillPlaySec = Math.floor(timeTillPlaying / 1000 - (timeTillPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
 
@@ -158,12 +160,8 @@ async function run(client, msg, args) {
 
       client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).strikes++;
 
-      if (client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).strikes == 5) {
-        clearInterval(this);
-        player.disconnect();
-        player.loop = false;
-        let index = client.inactiveStrikes.findIndex(elm => elm.guild == msg.guild.id);
-        client.inactiveStrikes.splice(index, 1);
+      if (client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).strikes == 10) {
+        music.destroyPlayer();
       }
     }, 2 * 60 * 1000); // every 2 mins, 5 strikes = 10mins
 
