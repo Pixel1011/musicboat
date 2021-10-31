@@ -22,8 +22,10 @@ class musicBot {
     this.client.boat = this;
     this.init();
   }
-  async ReloadCommands() {
+
+  async ReloadCommands(msg) {
     this.client.commands = [];
+    this.aliasnum = 0;
     // load normal commands and aliases
     const files = fs.readdirSync(path.resolve("./", "commands"));
     files.forEach(file => {
@@ -41,6 +43,9 @@ class musicBot {
         throw `Failed to load ${file}\n${e.stack}`;
       }
     });
+    
+    this.client.logger.log(`${Object.keys(this.client.commands).length - this.aliasnum} Commands loaded with ${this.aliasnum} aliases.`);
+    if(msg) msg.channel.send(`**${Object.keys(this.client.commands).length - this.aliasnum}** Commands loaded with **${this.aliasnum}** aliases.`);
     // todo - load up slash commands
 
 
@@ -53,8 +58,6 @@ class musicBot {
 
     // load commands
     await this.ReloadCommands();
-
-    this.client.logger.log(`${Object.keys(this.client.commands).length - this.aliasnum} Commands loaded with ${this.aliasnum} aliases.`);
     // lavalink stuff
     const info = {
       host: "localhost",
