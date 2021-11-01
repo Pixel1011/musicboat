@@ -33,7 +33,7 @@
 - [ ] Playlist support
 - [x] Queueing songs
 - [x] np command
-- [ ] Queue command
+- [x] Queue command
 - [x] Leaving after inactivity
 - [x] Voteskip
 - [x] Forceskip

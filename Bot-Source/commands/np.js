@@ -11,12 +11,10 @@ async function run(client, msg) {
   let url = currentSong.url;
 
   let timePlayed = player.position;
-  let timePlayedMin = Math.floor(timePlayed / 1000 / 60);
-  let TimePlayedSec = Math.floor(timePlayed / 1000 - (timePlayedMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
+  timePlayed = music.time(timePlayed);
 
   let timeToPlay = currentSong.length;
-  let timeToPlayMin = Math.floor(timeToPlay / 1000 / 60);
-  let timeToPlaySec = Math.floor(timeToPlay / 1000 - (timeToPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
+  timeToPlay = music.time(timeToPlay);
 
   let requester = currentSong.requester.tag;
   
@@ -33,7 +31,7 @@ async function run(client, msg) {
   let embed = new MessageEmbed();
   embed.setAuthor("Now Playing ♪", avatarURL);
   embed.setThumbnail(currentSong.thumbnail);
-  embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedMin}:${TimePlayedSec} / ${timeToPlayMin}:${timeToPlaySec}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
+  embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayed} / ${timeToPlay}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
   msg.channel.send({embeds: [embed]});
 
 

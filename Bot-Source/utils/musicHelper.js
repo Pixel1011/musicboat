@@ -103,6 +103,12 @@ class musicHelper {
     player.setVolume(100);
   }
 
+  time(ms) { // update with hours later
+    var mins = Math.floor(ms / 1000 / 60);
+    var secs = Math.floor(ms / 1000 - (mins * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
+    return `${mins}:${secs}`;
+  }
+
 
 }
 

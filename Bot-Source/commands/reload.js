@@ -8,9 +8,11 @@ async function run(client, msg, args) {
   try {
     let cmdFile = require("./" + command);
     client.commands[command] = cmdFile;
-    cmdFile.aliases.forEach(alias => {
-      client.commands[alias] = cmdFile;  
-    });
+    if (cmdFile.data.aliases[0]) {
+      cmdFile.data.aliases.forEach(alias => {
+        client.commands[alias] = cmdFile;  
+      });
+    }
   } catch (e) {
     msg.channel.send(`Failed to load ${command}\n ${e.stack}`);
   }

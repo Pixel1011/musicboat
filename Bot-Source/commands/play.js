@@ -48,10 +48,10 @@ async function run(client, msg, args) {
 
   // check perms to join channel
   if (!vchannel.joinable) {
-    return msg.channel.send(":x: **Your channel is not joinable**");
+    return msg.channel.send(`🙅 **No permission to join** \`\`${vchannel.name}\`\``);
   }
   if (!vchannel.speakable) {
-    return msg.channel.send(":x: **The bot cannot speak in your channel**");
+    return msg.channel.send(`🙅 **No permission to speak in** \`\`${vchannel.name}\`\``);
   }
 
   // Join
@@ -91,10 +91,9 @@ async function run(client, msg, args) {
       client.logger.log(reason);
       if (!player.queue) return; // if disconnected while playing
       if ((player.queue.songs[0] || player.loop == true) && player.queue.currentSong) {
-        if (!player.loop) {
-          player.queue.shift();
-        }
-        sleep(300); // i swear to god this code is cursed it went back up to line 94 after coming here.. maybe i fixed it
+        if (reason == "REPLACED") await sleep(10000);
+        if (!player.loop) player.queue.shift();
+        sleep(300); // i swear to god this code is cursed it went back up to line 95 after coming here.. maybe i fixed it
         player.play(player.queue.currentSong.track);
       } else {
         // shift one last time to null currentSong from queue
@@ -119,8 +118,7 @@ async function run(client, msg, args) {
     // embed
     let avatarURL = song.requester.avatarURL({size: 4096});
 
-    var playMin = Math.floor(song.length / 1000 / 60);
-    var playSec = Math.floor(song.length / 1000 - (playMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
+    let songLength = music.time(song.length);
 
     let timeTillPlaying = 0;
 
@@ -128,18 +126,17 @@ async function run(client, msg, args) {
       timeTillPlaying = timeTillPlaying + sng.length;
     });
 
-    let playingFor = player.position;
+    timeTillPlaying = timeTillPlaying + (player.queue.currentSong.length - player.position);
     timeTillPlaying = timeTillPlaying - song.length;
-    timeTillPlaying = timeTillPlaying + (song.length - playingFor);
-    var timeTillPlayMin = Math.floor(timeTillPlaying / 1000 / 60);
-    var timeTillPlaySec = Math.floor(timeTillPlaying / 1000 - (timeTillPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
+    
+    timeTillPlaying = music.time(timeTillPlaying);
 
     let embed = new MessageEmbed();
     embed.setAuthor("Added to queue", avatarURL);
     embed.setDescription(`[**${song.title}**](${song.url})`);
     embed.addField("Channel", song.channel, true);
-    embed.addField("Song Duration", `${playMin}:${playSec}`, true);
-    embed.addField("Estimated time until playing", `${timeTillPlayMin}:${timeTillPlaySec}`, true);
+    embed.addField("Song Duration", `${songLength}`, true);
+    embed.addField("Estimated time until playing", `${timeTillPlaying}`, true);
     embed.addField("Position in queue", `${player.queue.songs.length.toString()}`, true);
     embed.setThumbnail(song.thumbnail);
     embed.setColor(0x202225);

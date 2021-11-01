@@ -36,6 +36,7 @@ class musicBot {
         if (cmd.data.aliases != null && cmd.data.aliases.length != 0) {
           cmd.data.aliases.forEach(alias => {
             this.client.commands[alias] = cmd;
+            this.client.commands[alias].data.alias = true;
             this.aliasnum++;
           });
         }
@@ -43,7 +44,7 @@ class musicBot {
         throw `Failed to load ${file}\n${e.stack}`;
       }
     });
-    
+
     this.client.logger.log(`${Object.keys(this.client.commands).length - this.aliasnum} Commands loaded with ${this.aliasnum} aliases.`);
     if(msg) msg.channel.send(`**${Object.keys(this.client.commands).length - this.aliasnum}** Commands loaded with **${this.aliasnum}** aliases.`);
     // todo - load up slash commands
