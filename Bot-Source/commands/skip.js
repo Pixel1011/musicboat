@@ -32,8 +32,8 @@ async function run(client, msg, args) {
 }
 module.exports.data = {
   name: "skip",
-  description: "Skips current song",
-  aliases: [],
+  description: "Votes to skip the current playing song.",
+  aliases: ["voteskip", "next", "s"],
   hide: false,
   run: run
 };

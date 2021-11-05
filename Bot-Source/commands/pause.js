@@ -16,8 +16,8 @@ async function run(client, msg, args) {
 }
 module.exports.data = {
   name: "pause",
-  description: "Pauses the current song",
-  aliases: [],
+  description: "Pauses the current playing track.",
+  aliases: ["stop"],
   hide: false,
   run: run
 };

@@ -19,8 +19,8 @@ async function run(client, msg) {
 }
 module.exports.data = {
   name: "loop",
-  description: "Loops the current song",
-  aliases: [],
+  description: "Toggles looping for the current playing song.",
+  aliases: ["repeat"],
   hide: false,
   run: run
 };

@@ -14,8 +14,8 @@ async function run(client, msg) {
 }
 module.exports.data = {
   name: "leave",
-  description: "Disconnects the bot from the voice channel",
-  aliases: ["disconnect"],
+  description: "Disconnects the bot from the voice channel it is in.",
+  aliases: ["disconnect", "dc", "dis"],
   hide: false,
   run: run
 };

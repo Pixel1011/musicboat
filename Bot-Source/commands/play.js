@@ -246,7 +246,7 @@ async function run(client, msg, args) {
 
 module.exports.data = {
   name: "play",
-  description: "plays a song",
+  description: "Plays a song with the given name or url.",
   aliases: ["p"],
   hide: false, // hide from help command
   run: run

@@ -16,8 +16,8 @@ async function run(client, msg, args) {
 }
 module.exports.data = {
   name: "resume",
-  description: "Resumes the current song if it is paused",
-  aliases: [],
+  description: "Resumes paused music.",
+  aliases: ["re", "res", "continue"],
   hide: false,
   run: run
 };

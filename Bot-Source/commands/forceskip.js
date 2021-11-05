@@ -11,8 +11,8 @@ async function run(client, msg, args) {
 }
 module.exports.data = {
   name: "forceskip",
-  description: "Forces the current song to skip without voting",
-  aliases: ["fs"],
+  description: "Skips the current playing song immediately.",
+  aliases: ["fs", "fskip"],
   hide: false, // hide from help command
   run: run
 };

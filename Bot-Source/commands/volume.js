@@ -7,7 +7,6 @@ function isNumeric(str) {
 }
 
 // i have no idea what the rythm responses to music were so help appreciated
-// also need to reset volume when queue finishes and timeout occurs otherwise questionable surprises occur lmao
 async function run(client, msg, args) {
   const music = new musicHelper(client, msg.guild.id);
   if (!await music.check(msg, true, false, true, true)) return;
@@ -30,8 +29,8 @@ async function run(client, msg, args) {
 }
 module.exports.data = {
   name: "volume",
-  description: "Sets volume to any percentage",
-  aliases: ["v"],
+  description: "Outputs or changes the current volume",
+  aliases: ["v", "vol"],
   hide: false,
   run: run
 };

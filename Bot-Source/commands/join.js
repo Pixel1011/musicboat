@@ -27,8 +27,8 @@ async function run(client, msg) {
 }
 module.exports.data = {
   name: "join",
-  description: "Connects the bot to your voice channel",
-  aliases: ["connect"],
+  description: "Summons the bot to the voice channel you are in.",
+  aliases: ["summon"],
   hide: false,
   run: run
 };

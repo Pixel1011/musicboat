@@ -38,7 +38,7 @@ async function run(client, msg) {
 }
 module.exports.data = {
   name: "np",
-  description: "Shows the current playing song",
+  description: "Shows what song is currently playing.",
   aliases: ["nowplaying"],
   hide: false,
   run: run

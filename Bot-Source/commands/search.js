@@ -9,8 +9,10 @@ async function run(client, msg, args) {
 }
 module.exports.data = {
   name: "search",
-  description: "Searches through youtube for a song",
-  aliases: ["s"],
-  hide: false, // hide from help command
+  description: "Searches from Youtube for a song via your query and returns the top 10 results.",
+  aliases: ["find"],
+  hide: false,
   run: run
 };
+
+// fix up this command to what its meant to do
