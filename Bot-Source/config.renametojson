@@ -1,5 +1,7 @@
 {
     "tokens": [""],
+    "spotifyID": "",
+    "spotifySecret": "",
     "prefixes": ["!", ">"],
     "ownerid": "",
     "website": "https://github.com/Pixel1011/musicboat/"

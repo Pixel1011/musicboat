@@ -69,6 +69,10 @@ class musicHelper {
     searchTerm = type + searchTerm;
     return await this.lavalink.rest.loadTracks(searchTerm);
   }
+  
+  async loadSpotify(url) {
+    return await this.lavalink.spotify.load(url);
+  }
 
   async join(voiceid) {
     if (this.lavalink.players.get(this.guildid) == null) {

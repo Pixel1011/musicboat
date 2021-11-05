@@ -27,7 +27,7 @@
 - [x] Setup normal music checks and events to handle randomly being disconnected, etc
 - [x] Pause/Unpause commands
 - [ ] Deafened checks
-- [ ] Spotify support
+- [x] Spotify support
 - [ ] Soundcloud support
 - [ ] Twitch stream support
 - [ ] Playlist support

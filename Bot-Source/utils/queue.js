@@ -14,19 +14,25 @@ class Queue {
   async add(track, requester) {
     // grab thumbnail with ytdl
     let info;
-    let thumbnail;
-    try {
-      info = await ytdl.getInfo(track.info.uri);
-      var width = info.videoDetails.thumbnails[0].width;
+    let thumbnail = track.info.thumbnail;
+    if (!thumbnail) {
+      try {
+        info = await ytdl.getInfo(track.info.uri);
+        var width = info.videoDetails.thumbnails[0].width;
 
-      for (var i in info.videoDetails.thumbnails) {
-        if (info.videoDetails.thumbnails[i].width >= width) {
-          width = info.videoDetails.thumbnails[i].width;
-          thumbnail = info.videoDetails.thumbnails[i].url;
+        for (var i in info.videoDetails.thumbnails) {
+          if (info.videoDetails.thumbnails[i].width >= width) {
+            width = info.videoDetails.thumbnails[i].width;
+            thumbnail = info.videoDetails.thumbnails[i].url;
+          }
         }
+      } catch (e) {
+        thumbnail = this.client.user.displayAvatarURL({size: 1024});
       }
-    } catch (e) {
-      thumbnail = this.client.user.displayAvatarURL({size: 1024});
+    }
+
+    if (track.info.spotify) {
+      track.info.uri = track.info.url;
     }
 
     let song = {

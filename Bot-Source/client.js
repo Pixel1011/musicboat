@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const Flags = Discord.Intents.FLAGS;
 const { Node } = require("lavaclient");
+const { load } = require("@lavaclient/spotify");
 
 
 class musicBot {
@@ -19,6 +20,7 @@ class musicBot {
     this.client.config = require("./config.json");
     this.token = token;
     this.client.prefix = prefix;
+    this.client.spotify = false;
     this.client.boat = this;
     this.init();
   }
@@ -54,6 +56,18 @@ class musicBot {
   // init
   // login, load commands, event handling etc
   async init() {
+    if (this.client.config.spotifyID && this.client.config.spotifySecret) this.client.spotify = true;
+    if (this.client.spotify) {
+      load({
+        client: {
+          id: this.client.config.spotifyID,
+          secret: this.client.config.spotifySecret,
+        },
+        autoResolveYoutubeTracks: false,
+        //loaders: [ "track", "album", "playlist" ]
+      });
+    }
+
     await this.client.login(this.token);
     this.client.logger.log("Initializing..");
 
@@ -70,6 +84,7 @@ class musicBot {
       connection: info,
       sendGatewayPayload: (id, payload) => this.client.guilds.cache.get(id).shard.send(payload)
     });
+    
 
     // load events
     this.client.ws.on("VOICE_SERVER_UPDATE", data => this.client.lavalink.handleVoiceUpdate(data));

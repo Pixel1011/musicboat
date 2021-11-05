@@ -35,9 +35,9 @@ async function run(client, msg, args) {
       queueLength = queueLength + sng.length;
     });
 
-    queueLength = queueLength + (player.queue.currentSong.length - player.position);
-
-    desc.push("\n" + `**${player.queue.songs.length} songs in queue | ${music.time(queueLength)} **`);
+    //queueLength = queueLength + (player.queue.currentSong.length - player.position);
+    let text = player.queue.songs.length > 1 ? "songs" : "song";
+    desc.push("\n" + `**${player.queue.songs.length} ${text} in queue | ${music.time(queueLength)} total length**`);
   }
 
   let loopEmote = "❌";

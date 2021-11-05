@@ -11,10 +11,10 @@ async function run(client, msg) {
   let url = currentSong.url;
 
   let timePlayed = player.position;
-  timePlayed = music.time(timePlayed);
+  let timePlayedstr = music.time(timePlayed);
 
   let timeToPlay = currentSong.length;
-  timeToPlay = music.time(timeToPlay);
+  let timeToPlaystr = music.time(timeToPlay);
 
   let requester = currentSong.requester.tag;
   
@@ -31,7 +31,7 @@ async function run(client, msg) {
   let embed = new MessageEmbed();
   embed.setAuthor("Now Playing ♪", avatarURL);
   embed.setThumbnail(currentSong.thumbnail);
-  embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayed} / ${timeToPlay}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
+  embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedstr} / ${timeToPlaystr}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
   msg.channel.send({embeds: [embed]});
 
 
