@@ -1,7 +1,7 @@
 const musicHelper = require("../utils/musicHelper");
 async function run(client, msg) {
   const music = new musicHelper(client, msg.guild.id);
-  if (!await music.check(msg)) return;
+  if (!await music.check(msg, true)) return;
   //if (!await music.PermsOrAloneCheck(msg, true, true)) return;
   let player = music.getPlayer();
 

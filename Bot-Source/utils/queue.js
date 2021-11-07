@@ -54,7 +54,9 @@ class Queue {
     }
     return true;
   }
-  async shift() {
+  async shift(player) {
+    if (player.queueLoop) this.songs.push(this.currentSong);
+    
     let song = this.songs.shift();
     if (this.currentSong != null || this.currentSong != undefined) {
       this.lastSong = this.currentSong;

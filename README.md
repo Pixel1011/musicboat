@@ -42,7 +42,7 @@
 - [ ] Speed/pitch sound effects (nightcore mode)
 - [ ] Bassboost
 - [ ] Slash commands
-- [ ] Looping/looping queue - half done
+- [x] Looping/looping queue
 - [ ] Move command to move songs around in queue
 - [ ] Lyrics
 - [ ] Forward command - go forward in a song

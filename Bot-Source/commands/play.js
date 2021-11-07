@@ -149,13 +149,14 @@ async function run(client, msg, args) {
       if (!player.queue) return; // if disconnected while playing
       if ((player.queue.songs[0] || player.loop == true) && player.queue.currentSong) {
         if (reason == "REPLACED") return await sleep(10000);
-        if (!player.loop) player.queue.shift();
+        if (!player.loop) player.queue.shift(player);
         sleep(300); // i swear to god this code is cursed it went back up to line 95 after coming here.. maybe i fixed it
         player.play(player.queue.currentSong.track);
       } else {
         // shift one last time to null currentSong from queue
-        player.queue.shift();
+        player.queue.shift(player);
         player.loop = false;
+        player.queueLoop = false;
       }
     });
     player.on("trackException", async (track, error) => {

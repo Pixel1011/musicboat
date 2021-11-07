@@ -84,7 +84,7 @@ class musicHelper {
   async skip() {
     let player = this.getPlayer();
     if (player.loop) {
-      player.queue.shift();
+      player.queue.shift(player);
     }
     await player.stop();
   }
@@ -104,6 +104,7 @@ class musicHelper {
     this.client.inactiveStrikes.splice(index, 1);
     player.queue = undefined;
     player.loop = false;
+    player.queueLoop = false;
     player.setVolume(100);
   }
 
