@@ -1,5 +1,3 @@
-const ytdl = require("ytdl-core");
-
 class Queue {
   constructor(client) {
     this.client = client;
@@ -9,28 +7,18 @@ class Queue {
     this.lastSong; // for replay command to be added
   }
 
+  async getThumbnail(track) {
+    let thumbnail = track.info.thumbnail;
+
+    if (!thumbnail) {
+      thumbnail = `https://img.youtube.com/vi/${track.info.identifier}/maxresdefault.jpg`;
+    }
+    return thumbnail;
+  }
   // requester is user object
   // track is a result from lavalink rest api
   async add(track, requester) {
-    // grab thumbnail with ytdl
-    let info;
-    let thumbnail = track.info.thumbnail;
-    if (!thumbnail) {
-      try {
-        info = await ytdl.getInfo(track.info.uri);
-        var width = info.videoDetails.thumbnails[0].width;
-
-        for (var i in info.videoDetails.thumbnails) {
-          if (info.videoDetails.thumbnails[i].width >= width) {
-            width = info.videoDetails.thumbnails[i].width;
-            thumbnail = info.videoDetails.thumbnails[i].url;
-          }
-        }
-      } catch (e) {
-        thumbnail = this.client.user.displayAvatarURL({size: 1024});
-      }
-    }
-
+    let thumbnail = await this.getThumbnail(track);
     if (track.info.spotify) {
       track.info.uri = track.info.url;
     }
@@ -56,7 +44,7 @@ class Queue {
   }
   async shift(player) {
     if (player.queueLoop) this.songs.push(this.currentSong);
-    
+
     let song = this.songs.shift();
     if (this.currentSong != null || this.currentSong != undefined) {
       this.lastSong = this.currentSong;
