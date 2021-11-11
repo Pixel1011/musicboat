@@ -11,7 +11,7 @@ class Queue {
     let thumbnail = track.info.thumbnail;
 
     if (!thumbnail) {
-      thumbnail = `https://img.youtube.com/vi/${track.info.identifier}/maxresdefault.jpg`;
+      thumbnail = `https://img.youtube.com/vi/${track.info.identifier}/hqdefault.jpg`;
     }
     return thumbnail;
   }

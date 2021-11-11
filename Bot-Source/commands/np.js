@@ -6,6 +6,8 @@ async function run(client, msg) {
   let player = music.getPlayer();
   let currentSong = player.queue.currentSong;
 
+  if (!currentSong) return msg.channel.send("no song, check with eval pls");
+
   let avatarURL = client.user.displayAvatarURL({size:4096});
   let title = currentSong.title;
   let url = currentSong.url;

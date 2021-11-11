@@ -66,6 +66,7 @@ class musicHelper {
   }
 
   async search(searchTerm, type) {
+    if (!type) type = "";
     searchTerm = type + searchTerm;
     return await this.lavalink.rest.loadTracks(searchTerm);
   }

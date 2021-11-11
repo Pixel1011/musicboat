@@ -30,7 +30,7 @@
 - [x] Spotify support
 - [ ] Soundcloud support
 - [ ] Twitch stream support
-- [ ] Playlist support
+- [x] Playlist support
 - [x] Queueing songs
 - [x] np command
 - [x] Queue command

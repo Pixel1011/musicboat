@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 const { MessageEmbed } = require("discord.js");
 const musicHelper = require("../utils/musicHelper");
 const Queue = require("../utils/queue");
@@ -10,6 +11,8 @@ async function run(client, msg, args) {
   let lavalink = client.lavalink;
   let spotify = lavalink.spotify;
   let player;
+  let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+  let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
   if (!lavalink.players.get(msg.guild.id) || !lavalink.players.get(msg.guild.id).queue || !lavalink.players.get(msg.guild.id).queue.currentSong) {
@@ -75,6 +78,9 @@ async function run(client, msg, args) {
   let result;
   let results; // pure spaghetti
   let isPlaylist = false;
+  let playlistName = "";
+  let playlistThumb = "";
+  let totalTracks = 0;
   let tracks;
   msg.channel.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
 
@@ -99,12 +105,38 @@ async function run(client, msg, args) {
         t.info.title = results.tracks[i].data.name;
         i++;
       });
+      playlistName = results.data.name;
+      totalTracks = results.data.tracks.total;
+      playlistThumb = results.data.images[0].url;
       result = tracks[0];
     }
 
   } else {
-    results = await music.search(args.join(" "), "ytsearch:");
-    result = results.tracks[0];
+    if (youtubeVideoRegex.test(args.join(" "))) {
+      if (youtubePlaylistRegex.test(args.join(" "))) {
+        // youtube playlist
+        results = await music.search(args.join(" "));
+        isPlaylist = true;
+        tracks = results.tracks;
+        totalTracks = tracks.length;
+        playlistName = results.playlistInfo.name;
+        playlistThumb = await player.queue.getThumbnail(tracks[0]);
+
+        let selectedTrack = results.playlistInfo.selectedTrack;
+        result = tracks[selectedTrack];
+
+      } else {
+        // youtube link
+        results = await music.search(args.join(" "));
+        result = results.tracks[0];
+      }
+    } 
+
+    // normal search if its not a link
+    if (!result) {
+      results = await music.search(args.join(" "), "ytsearch:");
+      result = results.tracks[0];
+    }
   }
   if (!result) {
     return msg.channel.send(":x: **No Matches**");
@@ -121,20 +153,23 @@ async function run(client, msg, args) {
     // if playlist with more than 1 song
     if (isPlaylist && tracks[1]) {
       tracks.shift();
-      tracks.forEach(async t => {
+
+      for (let i in tracks) {
+        let t = tracks[i];
+        if (!t) break;
         await player.queue.add(t, msg.author);
-      });
+      }
       // playlist embed
       let avatarURL = msg.author.avatarURL({size: 4096});
       let timeTillPlaying = "Now!"; // nothing else in queue
 
       let embed = new MessageEmbed();
       embed.setAuthor("Playlist added to queue", avatarURL);
-      embed.setDescription(`**${results.data.name}**`);
+      embed.setDescription(`**${playlistName}**`);
       embed.addField("Estimated time until playing", `${timeTillPlaying}`, true);
       embed.addField("Position in queue", "1", true);
-      embed.addField("Enqueued", `\`\`${results.data.tracks.total}\`\` songs`, true);
-      embed.setThumbnail(results.data.images[0].url);
+      embed.addField("Enqueued", `\`\`${totalTracks}\`\` songs`, true);
+      embed.setThumbnail(playlistThumb);
       embed.setColor(0x202225);
       msg.channel.send({embeds: [embed]});
 
@@ -144,13 +179,12 @@ async function run(client, msg, args) {
     msg.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
     // register player events
 
-    player.on("trackEnd", async (track, reason) => {
+    player.on("trackEnd", (track, reason) => {
       client.logger.log(reason);
+      if (reason == "REPLACED") return;
       if (!player.queue) return; // if disconnected while playing
-      if ((player.queue.songs[0] || player.loop == true) && player.queue.currentSong) {
-        if (reason == "REPLACED") return await sleep(10000);
+      if ((player.queue.songs[0] || player.loop || player.queueLoop) && player.queue.currentSong) {
         if (!player.loop) player.queue.shift(player);
-        sleep(300); // i swear to god this code is cursed it went back up to line 95 after coming here.. maybe i fixed it
         player.play(player.queue.currentSong.track);
       } else {
         // shift one last time to null currentSong from queue
@@ -159,10 +193,11 @@ async function run(client, msg, args) {
         player.queueLoop = false;
       }
     });
-    player.on("trackException", async (track, error) => {
+
+    player.on("trackException", (track, error) => {
       client.logger.log(error);
-      await sleep(2000);
     });
+
     player.on("trackStuck", (track, threshold) => {
       client.logger.log(threshold);
     });
@@ -183,11 +218,11 @@ async function run(client, msg, args) {
 
       let embed = new MessageEmbed();
       embed.setAuthor("Playlist added to queue", avatarURL);
-      embed.setDescription(`**${results.data.name}**`);
+      embed.setDescription(`**${playlistName}**`);
       embed.addField("Estimated time until playing", `${timeTillPlaying}`, true);
-      embed.addField("Position in queue", `${player.queue.songs.length - results.data.tracks.total + 1}`, true);
-      embed.addField("Enqueued", `\`\`${results.data.tracks.total}\`\` songs`, true);
-      embed.setThumbnail(results.data.images[0].url);
+      embed.addField("Position in queue", `${player.queue.songs.length - totalTracks + 1}`, true);
+      embed.addField("Enqueued", `\`\`${totalTracks}\`\` songs`, true);
+      embed.setThumbnail(playlistThumb);
       embed.setColor(0x202225);
       msg.channel.send({embeds: [embed]});
 
