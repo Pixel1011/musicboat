@@ -2,8 +2,7 @@
 const { MessageEmbed } = require("discord.js");
 const musicHelper = require("../utils/musicHelper");
 const Queue = require("../utils/queue");
-// eslint-disable-next-line no-undef
-const sleep = ms => new Promise(res => setTimeout(res, ms));
+
 
 async function run(client, msg, args) {
   let music = new musicHelper(client, msg.guild.id);
@@ -178,30 +177,20 @@ async function run(client, msg, args) {
     player.play(result);
     msg.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
     // register player events
+    if (!player.eventsCreated) {
+      let TrackEnd = require("../events/PlayerEvents/trackEnd");
+      let EndClass = new TrackEnd(music);
+      player.on("trackEnd", async (track, reason) => EndClass.handle(track, reason));
 
-    player.on("trackEnd", (track, reason) => {
-      client.logger.log(reason);
-      if (reason == "REPLACED") return;
-      if (!player.queue) return; // if disconnected while playing
-      if ((player.queue.songs[0] || player.loop || player.queueLoop) && player.queue.currentSong) {
-        if (!player.loop) player.queue.shift(player);
-        player.play(player.queue.currentSong.track);
-      } else {
-        // shift one last time to null currentSong from queue
-        player.queue.shift(player);
-        player.loop = false;
-        player.queueLoop = false;
-      }
-    });
+      let TrackException = require("../events/PlayerEvents/trackException");
+      let ExceptionClass = new TrackException(music);
+      player.on("trackException", (track, error) => ExceptionClass.handle(track, error));
 
-    player.on("trackException", (track, error) => {
-      client.logger.log(error);
-    });
-
-    player.on("trackStuck", (track, threshold) => {
-      client.logger.log(threshold);
-    });
-
+      let TrackStuck = require("../events/PlayerEvents/trackStuck");
+      let StuckClass = new TrackStuck(music);
+      player.on("trackStuck", (track, threshold) => StuckClass.handle(track, threshold));
+      player.eventsCreated = true;
+    }
   } else { // if is playing
     let success = await player.queue.add(result, msg.author);
     if (!success) {
@@ -274,7 +263,7 @@ async function run(client, msg, args) {
       if (client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).strikes == 10) {
         music.destroyPlayer();
       }
-    }, 2 * 60 * 1000); // every 2 mins, 5 strikes = 10mins
+    }, 2 * 60 * 1000); // every 2 mins, 10 strikes = 20mins
 
     client.inactiveStrikes.find(elm => elm.guild == msg.guild.id).interval = interval;
   }

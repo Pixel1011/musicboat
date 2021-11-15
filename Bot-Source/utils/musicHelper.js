@@ -85,7 +85,7 @@ class musicHelper {
   async skip() {
     let player = this.getPlayer();
     if (player.loop) {
-      player.queue.shift(player);
+      await player.queue.shift(player.queueLoop);
     }
     await player.stop();
   }
@@ -112,7 +112,15 @@ class musicHelper {
   time(ms) { // update with hours later
     var mins = Math.floor(ms / 1000 / 60);
     var secs = Math.floor(ms / 1000 - (mins * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
-    return `${mins}:${secs}`;
+    if (mins < 60) return `${mins}:${secs}`;
+
+    var hours = Math.floor(mins / 60);
+    mins = Math.floor(mins - (hours * 60));
+    if (hours < 24) return `${hours}:${mins}:${secs}`;
+
+    var days = Math.floor(hours / 24);
+    hours = Math.floor(hours - (days * 24));
+    return `${days}:${hours}:${mins}:${secs}`;
   }
 
 
