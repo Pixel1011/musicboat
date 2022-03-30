@@ -1,10 +1,15 @@
 let config = require("./config.json");
 let musicbot = require("./client.js");
-let numOfBots = config.tokens.length;
 let i = 0;
+let args = require("minimist")(process.argv.slice(2));
+let botnum;
+
+if (args.bot) {
+  botnum = args.bot - 1 + i;
+} else {
+  botnum = i;
+}
 
 // add some checks for empty config too
-while (i != numOfBots) {
-  new musicbot(config.tokens[i], config.prefixes[i], i);
-  i++;
-}
+
+new musicbot(config.tokens[botnum], config.prefixes[botnum], botnum);

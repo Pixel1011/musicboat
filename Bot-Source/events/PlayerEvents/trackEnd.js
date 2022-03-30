@@ -2,7 +2,6 @@ module.exports = class TrackEnd {
   constructor(music) {
     this.client = music.client;
     this.music = music;
-    this.client.logger.log("New TrackEnd");
   }
 
   async handle (track, reason) {
@@ -14,7 +13,7 @@ module.exports = class TrackEnd {
 
     if ((player.queue.songs[0] || player.loop || player.queueLoop) && player.queue.currentSong) {       
     
-      if (!player.loop) player.queue.shift(player.queueLoop);
+      if (!player.loop) await player.queue.shift(player.queueLoop);
       await player.play(player.queue.currentSong.track);
     
     } else {

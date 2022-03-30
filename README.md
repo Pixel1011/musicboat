@@ -1,5 +1,6 @@
 # Music boat
 
+- So im currently in exam year so ive put off this bot for a bit, ill come back to it in a few months but anyway enjoy these random commits, and the bot certainly works but not as user friendly as i would like yet
   
 
 ### What is this bot?

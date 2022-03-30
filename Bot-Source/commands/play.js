@@ -18,7 +18,7 @@ async function run(client, msg, args) {
     if (!args.join(" ")) {
       let embed = new MessageEmbed();
       embed.setTitle(":x: Invalid usage");
-      embed.setDescription(`${client.prefix}play [Link or query]`);
+      embed.setDescription(`\n${client.prefix}play [Link or query]`);
       return msg.channel.send({
         embeds: [embed]
       });
@@ -82,6 +82,7 @@ async function run(client, msg, args) {
   let totalTracks = 0;
   let tracks;
   msg.channel.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
+  client.logger.log(`Searching: ${args.join(" ")}`);
 
   if (spotify.isSpotifyUrl(args.join(" "))) {
     results = await music.loadSpotify(args.join(" "));
@@ -112,7 +113,7 @@ async function run(client, msg, args) {
 
   } else {
     if (youtubeVideoRegex.test(args.join(" "))) {
-      if (youtubePlaylistRegex.test(args.join(" "))) {
+      if (youtubePlaylistRegex.test(args.join(" ")) && args.join(" ").includes("&list=")) {
         // youtube playlist
         results = await music.search(args.join(" "));
         isPlaylist = true;

@@ -18,7 +18,7 @@ async function run(client, msg, args) {
     var res = await eval(`(async function(){${codeGiven}}).call()`);
     res = require("util").inspect(res);
   } catch (e) {
-    res = e.stack;
+    res = e.message;
   }
   let r = `**Input:** ${codeGiven}
   **Output:**\n ${res.replace(client.token, "Token")}`;

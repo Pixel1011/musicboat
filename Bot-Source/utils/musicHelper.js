@@ -24,7 +24,7 @@ class musicHelper {
     }
     // check if playing
     if (checkPlayer) {
-      if (!player.playing && !player.queue.currentSong) {
+      if (!player.playing && (!player.queue || !player.queue.currentSong)) {
         msg.channel.send(":x: **Bot is not currently playing**");
         return false;
       }

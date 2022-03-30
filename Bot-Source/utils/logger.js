@@ -12,7 +12,7 @@ module.exports = class logger {
   
   logFrom(msg, from) {
     let date = new Date();
-    console.log(`[${date.getHours().toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString("en-GB", {minimumIntegerDigits: 2})}][${from}]: ${msg}`);   
+    console.log(`[${date.getHours().toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString("en-GB", {minimumIntegerDigits: 2})}][${this.client.user.username}][${from}]: ${msg}`);   
   }
   
   async logToHaste(msg, test) {
