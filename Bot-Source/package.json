@@ -30,6 +30,6 @@
     "lavaclient": "^4.0.3",
     "minimist": "^1.2.5",
     "moment": "^2.29.1",
-    "node-fetch": "^2.6.2"
+    "node-fetch": "^2.6.7"
   }
 }
