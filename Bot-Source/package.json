@@ -27,7 +27,7 @@
   "dependencies": {
     "@lavaclient/spotify": "^3.0.0",
     "discord.js": "^13.1.0",
-    "lavaclient": "^4.0.3",
+    "lavaclient": "^4.0.8",
     "minimist": "^1.2.5",
     "moment": "^2.29.1",
     "node-fetch": "^2.6.2"
