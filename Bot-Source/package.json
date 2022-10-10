@@ -25,7 +25,7 @@
   },
   "homepage": "https://github.com/Pixel1011/musicboat#readme",
   "dependencies": {
-    "@lavaclient/spotify": "^3.0.0",
+    "@lavaclient/spotify": "^3.1.0",
     "discord.js": "^13.1.0",
     "lavaclient": "^4.0.3",
     "minimist": "^1.2.5",
