@@ -4,7 +4,7 @@
   "description": "Open source freedom",
   "main": "index.js",
   "scripts": {
-    "run": "echo \"Error: no test specified\" && exit 1"
+    "run": "tsc && node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,11 +25,18 @@
   },
   "homepage": "https://github.com/Pixel1011/musicboat#readme",
   "dependencies": {
-    "@lavaclient/spotify": "^3.0.0",
-    "discord.js": "^13.1.0",
-    "lavaclient": "^4.0.3",
-    "minimist": "^1.2.5",
-    "moment": "^2.29.1",
-    "node-fetch": "^2.6.2"
+    "@lavaclient/spotify": "^3.1.0",
+    "discord.js": "^13.11.0",
+    "lavaclient": "^4.1.1",
+    "minimist": "^1.2.6",
+    "moment": "^2.29.4",
+    "node-fetch": "^2.6.7"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.39.0",
+    "@typescript-eslint/parser": "^5.39.0",
+    "eslint": "^8.25.0",
+    "@lavaclient/types": "^2.1.1",
+    "@types/minimist": "^1.2.2"
   }
 }

@@ -1,8 +1,7 @@
 /node_modules
-.eslintrc.json
 config.json
 /logs
 test.js
-/utils/checks.js
 Lavalink.jar
 .vscode
+/dist

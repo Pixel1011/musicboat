@@ -1,0 +1,29 @@
+{
+  "compilerOptions": {
+      "lib": ["ES2022"],
+      "outDir": "./dist",
+
+      "module": "Node16",
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+
+      "declaration": false,
+      "declarationMap": false,
+      "sourceMap": false,
+      "esModuleInterop": true,
+      "newLine": "crlf",
+      "removeComments": true,
+      "inlineSourceMap": false,
+      "useDefineForClassFields": false,
+      "importHelpers": false,
+
+      "skipLibCheck": true,
+      "alwaysStrict": true,
+      "importsNotUsedAsValues": "error",
+      "preserveConstEnums": true,
+
+      "types": ["node"],
+      "forceConsistentCasingInFileNames": true
+  },
+  "exclude": ["dist/**/*", "node_modules/**/*"]
+}
