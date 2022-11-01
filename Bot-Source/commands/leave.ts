@@ -7,7 +7,7 @@ async function run(client: musicBot, msg: Message) {
   if (!await music.check(msg, false, false, true, true)) return;
   let player = music.getPlayer();
 
-  if (!msg.guild.me.voice.channelId || !player) {
+  if (!msg.guild.members.me.voice.channelId || !player) {
     return msg.channel.send(`:x: **I am not connected to a voice channel.** Type ${client.prefix}join to get me in one`);
   }
 

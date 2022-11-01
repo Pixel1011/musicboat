@@ -2,7 +2,7 @@ import Discord, { Message } from "discord.js";
 import {logger} from "./utils/logger.js";
 import fs from "fs";
 import path from "path";
-const Flags = Discord.Intents.FLAGS;
+const Flags = Discord.GatewayIntentBits;
 import { Node } from "lavaclient";
 import { load } from "@lavaclient/spotify";
 import Config from "./config.json";
@@ -29,7 +29,7 @@ export class musicBot extends Discord.Client {
 
   constructor(token : string, prefix : string, num : number) {
     super({
-      intents: [Flags.DIRECT_MESSAGES, Flags.DIRECT_MESSAGE_REACTIONS, Flags.GUILDS, Flags.GUILD_EMOJIS_AND_STICKERS, Flags.GUILD_INTEGRATIONS, Flags.GUILD_INVITES, Flags.GUILD_MEMBERS, Flags.GUILD_MESSAGES, Flags.GUILD_MESSAGE_REACTIONS, Flags.GUILD_PRESENCES, Flags.GUILD_VOICE_STATES] // thats probably fine.. jesus
+      intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildEmojisAndStickers, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent] // thats probably fine.. jesus
     });
     
     this.botnum = num + 1;
@@ -106,8 +106,12 @@ export class musicBot extends Discord.Client {
     
 
     // load events
-    this.ws.on("VOICE_SERVER_UPDATE", data => this.lavalink.handleVoiceUpdate(data));
-    this.ws.on("VOICE_STATE_UPDATE", data => this.lavalink.handleVoiceUpdate(data));
+    this.on("raw", async (packet) => {
+      if (packet.t === "VOICE_SERVER_UPDATE" || packet.t === "VOICE_STATE_UPDATE") {
+        this.lavalink.handleVoiceUpdate(packet.d);
+      }
+
+    });
     this.lavalink.on("connect", () => lavaConnect(this));
     this.lavalink.on("error", (e) => lavaError(e, this));
     this.on("ready", () => ready(this));

@@ -1,4 +1,4 @@
-import { Guild, MessageEmbed } from "discord.js";
+import { Guild, EmbedBuilder } from "discord.js";
 import type { Message } from "discord.js";
 import type { musicBot } from "../client";
 import { musicHelper } from "../utils/musicHelper";
@@ -48,11 +48,14 @@ async function run(client: musicBot, msg: Message, args: string[]) {
   let queueLoopEmote = "❌";
   if(player.queueLoop) queueLoopEmote = "✅";
     
-  let embed = new MessageEmbed();
+  let embed = new EmbedBuilder();
   embed.setTitle(`Queue for ${msg.guild.name}`);
   embed.setURL(client.config.website);
   embed.setDescription(desc.join("\n"));
-  embed.setFooter(`Page ${page}/${pages} | Loop: ${loopEmote} | Queue Loop: ${queueLoopEmote}`, msg.author.avatarURL({size:2048}));
+  embed.setFooter({
+    text: `Page ${page}/${pages} | Loop: ${loopEmote} | Queue Loop: ${queueLoopEmote}`,
+    iconURL: msg.author.avatarURL({size:2048})
+  });
 
   msg.channel.send({embeds: [embed]});
 

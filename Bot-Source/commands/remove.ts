@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import type { Message } from "discord.js";
 import type { musicBot } from "../client";
 import { musicHelper } from "../utils/musicHelper";
@@ -12,7 +12,7 @@ async function run(client: musicBot, msg: Message, args: string[]) {
   if (!await music.check(msg, true, true)) return;
   let player = music.getPlayer();
 
-  let failEmbed = new MessageEmbed();
+  let failEmbed = new EmbedBuilder();
   failEmbed.setTitle(":x: Invalid usage");
   failEmbed.setDescription(`\n${client.prefix}remove [Index / Indices]\nExample: \`\`${client.prefix}remove 1 2 3\`\``);
   if (!args.join()) {
@@ -20,7 +20,7 @@ async function run(client: musicBot, msg: Message, args: string[]) {
   }
 
   let nums = args;
-  let INums = Array<number>;
+  let INums: number[] = [];
   // make sure numbers are actually a number and that they are above 0 
   for (let i in nums) {
     let num = nums[i];

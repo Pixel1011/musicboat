@@ -1,10 +1,11 @@
 {
   "name": "music-bot",
   "version": "0.0.1",
-  "description": "Open source freedom",
-  "main": "index.js",
+  "description": "Open source music.",
+  "main": "dist/index.js",
   "scripts": {
-    "run": "tsc && node dist/index.js"
+    "start": "node dist/index.js",
+    "prestart": "tsc"
   },
   "repository": {
     "type": "git",
@@ -26,17 +27,18 @@
   "homepage": "https://github.com/Pixel1011/musicboat#readme",
   "dependencies": {
     "@lavaclient/spotify": "^3.1.0",
-    "discord.js": "^13.11.0",
+    "discord.js": "^14.6.0",
     "lavaclient": "^4.1.1",
     "minimist": "^1.2.6",
     "moment": "^2.29.4",
     "node-fetch": "^2.6.7"
   },
   "devDependencies": {
+    "@lavaclient/types": "^2.1.1",
+    "@types/minimist": "^1.2.2",
+    "@types/node-fetch": "^2.6.2",
     "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.39.0",
-    "eslint": "^8.25.0",
-    "@lavaclient/types": "^2.1.1",
-    "@types/minimist": "^1.2.2"
+    "eslint": "^8.25.0"
   }
 }

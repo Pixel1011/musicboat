@@ -3,7 +3,7 @@ import type { musicBot } from "../client";
 import { musicHelper } from "../utils/musicHelper";
 
 
-async function run(client: musicBot, msg: Message, args: string[]) {
+async function run(client: musicBot, msg: Message) {
   const music = new musicHelper(client, msg.guild.id);
   if (!await music.check(msg)) return;
   let player = music.getPlayer();

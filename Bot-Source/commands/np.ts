@@ -1,4 +1,4 @@
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { musicHelper } from "../utils/musicHelper";
 import type { Message } from "discord.js";
 import type { musicBot } from "../client";
@@ -32,8 +32,8 @@ async function run(client: musicBot, msg: Message) {
   dashes = dashes.substr(0, index) + dot + dashes.substr(index + dot.length);
   if (index != 29) dashes = dashes.replace(dot, dot + "▬"); // grr
 
-  let embed = new MessageEmbed();
-  embed.setAuthor("Now Playing ♪", avatarURL);
+  let embed = new EmbedBuilder(); 
+  embed.setAuthor({name: "Now Playing ♪", iconURL: avatarURL});
   embed.setThumbnail(currentSong.thumbnail);
   embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedstr} / ${timeToPlaystr}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
   msg.channel.send({embeds: [embed]});

@@ -9,10 +9,10 @@ async function run(client: musicBot, msg: Message) {
   let player = music.getPlayer();
 
   // check if bot already in vc
-  if (msg.guild.me.voice.channelId == vchannel.id && player) {
+  if (msg.guild.members.me.voice.channelId == vchannel.id && player) {
     return msg.channel.send(":x: **I am already connected to your channel**");
   }
-  if (msg.guild.me.voice.channelId && player) {
+  if (msg.guild.members.me.voice.channelId && player) {
     return msg.channel.send(":x: **You cannot summon the bot as it is playing elsewhere**");
   }
 

@@ -4,11 +4,11 @@ import type { CTrack, QueueSong } from "../Structures/Structures";
 import type { User } from "discord.js";
 
 export class Queue {
-	public client: musicBot;
-	public lavalink: Node;
-	public songs: Array<QueueSong>;
-	public currentSong: QueueSong;
-	public lastSong: QueueSong;
+  public client: musicBot;
+  public lavalink: Node;
+  public songs: Array<QueueSong>;
+  public currentSong: QueueSong;
+  public lastSong: QueueSong;
 
   constructor(client: musicBot) {
     this.client = client;

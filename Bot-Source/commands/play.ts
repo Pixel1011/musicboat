@@ -2,7 +2,7 @@
 import type { Message, VoiceChannel } from "discord.js";
 import type { musicBot } from "../client";
 import { musicHelper } from "../utils/musicHelper";
-import { MessageEmbed } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { Queue } from "../utils/queue";
 import type { Player } from "lavaclient";
 
@@ -19,7 +19,7 @@ async function run(client: musicBot, msg: Message, args: string[]) {
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
   if (!lavalink.players.get(msg.guild.id) || !lavalink.players.get(msg.guild.id).queue || !lavalink.players.get(msg.guild.id).queue.currentSong) {
     if (!args.join(" ")) {
-      let embed = new MessageEmbed();
+      let embed = new EmbedBuilder();
       embed.setTitle(":x: Invalid usage");
       embed.setDescription(`\n${client.prefix}play [Link or query]`);
       return msg.channel.send({
@@ -34,7 +34,7 @@ async function run(client: musicBot, msg: Message, args: string[]) {
         return;
       } else {
         return msg.channel.send(":x: **The player is not paused**");
-        // let embed = new MessageEmbed();           // not sure which one to do here
+        // let embed = new EmbedBuilder();           // not sure which one to do here
         // embed.setTitle(":x: Invalid usage");
         // embed.setDescription(`${client.prefix}play [Link or query]`);
         // return msg.channel.send({embeds: [embed]});
@@ -48,7 +48,7 @@ async function run(client: musicBot, msg: Message, args: string[]) {
     return msg.channel.send(":x: **You have to be in a voice channel to use this command.**");
   }
 
-  if ((vchannel.id != msg.guild.me.voice.channelId) && msg.guild.me.voice.channelId != null) {
+  if ((vchannel.id != msg.guild.members.me.voice.channelId) && msg.guild.members.me.voice.channelId != null) {
     return msg.channel.send(":x: **You have to be in the same voice channel to use this command**");
   }
 
@@ -63,7 +63,7 @@ async function run(client: musicBot, msg: Message, args: string[]) {
   // Join
   // check if not in vc already
 
-  if (!msg.guild.me.voice.channelId) {
+  if (!msg.guild.members.me.voice.channelId) {
     player = await music.join(vchannel.id);
     msg.channel.send(`:thumbsup: **Joined** \`\`${vchannel.name}\`\` **and bound to** <#${msg.channel.id}>`); // store channel somewhere for queues
   } else {
@@ -169,12 +169,14 @@ async function run(client: musicBot, msg: Message, args: string[]) {
       let avatarURL = msg.author.avatarURL({size: 4096});
       let timeTillPlaying = "Now!"; // nothing else in queue
 
-      let embed = new MessageEmbed();
-      embed.setAuthor("Playlist added to queue", avatarURL);
+      let embed = new EmbedBuilder();
+      embed.setAuthor({name: "Playlist added to queue", iconURL: avatarURL});
       embed.setDescription(`**${playlistName}**`);
-      embed.addField("Estimated time until playing", `${timeTillPlaying}`, true);
-      embed.addField("Position in queue", "1", true);
-      embed.addField("Enqueued", `\`\`${totalTracks}\`\` songs`, true);
+      embed.addFields([
+        {name: "Estimated time until playing", value: timeTillPlaying, inline: true},
+        {name: "Position in queue", value: "1", inline: true},
+        {name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true}
+      ]);
       embed.setThumbnail(playlistThumb);
       embed.setColor(0x202225);
       msg.channel.send({embeds: [embed]});
@@ -212,12 +214,15 @@ async function run(client: musicBot, msg: Message, args: string[]) {
       let avatarURL = msg.author.avatarURL({size: 4096});
       let timeTillPlaying = "Now!"; // nothing else in queue
 
-      let embed = new MessageEmbed();
-      embed.setAuthor("Playlist added to queue", avatarURL);
+      let embed = new EmbedBuilder();
+      embed.setAuthor({name: "Playlist added to queue", iconURL: avatarURL});
       embed.setDescription(`**${playlistName}**`);
-      embed.addField("Estimated time until playing", `${timeTillPlaying}`, true);
-      embed.addField("Position in queue", `${player.queue.songs.length - totalTracks + 1}`, true);
-      embed.addField("Enqueued", `\`\`${totalTracks}\`\` songs`, true);
+      embed.addFields([
+        {name: "Estimated time until playing", value: `${timeTillPlaying}`, inline: true},
+        {name: "Position in queue", value: `${player.queue.songs.length - totalTracks + 1}`, inline: true},
+        {name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true}
+      ]);
+
       embed.setThumbnail(playlistThumb);
       embed.setColor(0x202225);
       msg.channel.send({embeds: [embed]});
@@ -238,13 +243,15 @@ async function run(client: musicBot, msg: Message, args: string[]) {
       timeTillPlaying = timeTillPlaying + (player.queue.currentSong.length - player.position);
       timeTillPlaying = timeTillPlaying - song.length;
 
-      let embed = new MessageEmbed();
+      let embed = new EmbedBuilder();
       embed.setAuthor({name: "Added to queue", iconURL: avatarURL});
       embed.setDescription(`[**${song.title}**](${song.url})`);
-      embed.addField("Channel", song.channel, true);
-      embed.addField("Song Duration", `${songLength}`, true);
-      embed.addField("Estimated time until playing", `${music.time(timeTillPlaying)}`, true);
-      embed.addField("Position in queue", `${player.queue.songs.length}`, true);
+      embed.addFields([
+        {name: "Channel", value: song.channel, inline: true},
+        {name: "Song Duration", value: songLength, inline: true},
+        {name: "Estimated time until playing", value: music.time(timeTillPlaying), inline: true},
+        {name: "Position in queue", value: `${player.queue.songs.length}`, inline: true}
+      ]);
       embed.setThumbnail(song.thumbnail);
       embed.setColor(0x202225);
       msg.channel.send({embeds: [embed]});

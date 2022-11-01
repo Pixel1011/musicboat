@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Discord from "discord.js";
 import { musicHelper } from "../utils/musicHelper";
 import type { Message } from "discord.js";
@@ -30,7 +31,7 @@ async function run(client: musicBot, msg: Message, args: string[]) {
     r = await client.logger.logToHaste(message);
   }
 
-  const embed = new Discord.MessageEmbed();
+  const embed = new Discord.EmbedBuilder();
   embed.setColor(0xa0d4ff);
   embed.setDescription(r);
   msg.channel.send({embeds: [embed]});

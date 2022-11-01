@@ -27,4 +27,4 @@ export class logger {
     return `https://haste.pixelator.xyz/${data.key}`;
   }
 
-};
+}

@@ -1,11 +1,12 @@
-import { Message, Permissions } from "discord.js";
+import type { Message } from "discord.js";
+import { PermissionFlagsBits } from "discord.js";
 import type { Node } from "lavaclient";
 import type { musicBot } from "../client";
 
 export class musicHelper {
-	public client: musicBot;
-	public guildid: string;
-	public lavalink: Node;
+  public client: musicBot;
+  public guildid: string;
+  public lavalink: Node;
 
   constructor(client : musicBot, guildid: string) {
     this.client = client;
@@ -44,7 +45,7 @@ export class musicHelper {
       }
     }
     if (checkSameVC) {
-      if ((vchannel.id != msg.guild.me.voice.channelId) && msg.guild.me.voice.channelId != null) {
+      if ((vchannel.id != msg.guild.members.me.voice.channelId) && msg.guild.members.me.voice.channelId != null) {
         msg.channel.send(":x: **You have to be in the same voice channel to use this command**");
         return false;
       }
@@ -58,7 +59,7 @@ export class musicHelper {
     if (!sendMsgs) sendMsgs = false;
     let member = msg.guild.members.cache.get(msg.author.id);
     let vchannel = msg.member.voice.channel;
-    let hasPerms = member.permissions.has(Permissions.FLAGS.MANAGE_CHANNELS) || member.roles.cache.find(role => role.name == "DJ");
+    let hasPerms = member.permissions.has(PermissionFlagsBits.ManageChannels) || member.roles.cache.find(role => role.name == "DJ");
 
     if (checkAlone) {
       if (hasPerms || vchannel.members.size == 2) return true; // make sure to yeet bots from that role entirely
