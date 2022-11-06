@@ -1,14 +1,14 @@
 import { musicHelper } from "../utils/musicHelper";
-import type { Message } from "discord.js";
 import type { musicBot } from "../client";
+import type { UnifiedData } from "../utils/SlashUnifier";
 
-async function run(client: musicBot, msg: Message) {
-  const music = new musicHelper(client, msg.guild.id);
-  if (!await music.check(msg)) return;
-  if (!await music.PermsOrAloneCheck(msg, false, true)) return;
+async function run(client: musicBot, data: UnifiedData) {
+  const music = new musicHelper(client, data.guild.id);
+  if (!await music.check(data)) return;
+  if (!await music.PermsOrAloneCheck(data, false, true)) return;
 
   await music.skip();
-  msg.channel.send(":fast_forward: **Skipped** :thumbsup:");
+  data.send(":fast_forward: **Skipped** :thumbsup:");
 
 }
 export const data = {
@@ -16,5 +16,6 @@ export const data = {
   description: "Skips the current playing song immediately.",
   aliases: ["fs", "fskip"],
   hide: false, // hide from help command
-  run: run
+  arguments: [],
+  run: run,
 };

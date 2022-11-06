@@ -1,19 +1,19 @@
 import { musicHelper } from "../utils/musicHelper";
-import type { Message } from "discord.js";
 import type { musicBot } from "../client";
+import type { UnifiedData } from "../utils/SlashUnifier";
 
-async function run(client: musicBot, msg: Message) {
-  const music = new musicHelper(client, msg.guild.id);
-  if (!await music.check(msg, true)) return;
+async function run(client: musicBot, data: UnifiedData) {
+  const music = new musicHelper(client, data.guild.id);
+  if (!await music.check(data, true)) return;
   //if (!await music.PermsOrAloneCheck(msg, true, true)) return;
   let player = music.getPlayer();
 
   if (player.loop == undefined || player.loop == false) {
     player.loop = true;
-    return msg.channel.send("🔂 **Enabled!**");
+    return data.send("🔂 **Enabled!**");
   } else {
     player.loop = false;
-    return msg.channel.send("🔂 **Disabled!**");
+    return data.send("🔂 **Disabled!**");
   }
 
 
@@ -25,5 +25,6 @@ export const data = {
   description: "Toggles looping for the current playing song.",
   aliases: ["repeat"],
   hide: false,
+  arguments: [],
   run: run
 };

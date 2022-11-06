@@ -1,14 +1,15 @@
 import { EmbedBuilder } from "discord.js";
 import { musicHelper } from "../utils/musicHelper";
-import type { Message } from "discord.js";
 import type { musicBot } from "../client";
-async function run(client: musicBot, msg: Message) {
-  const music = new musicHelper(client, msg.guild.id);
-  if (!await music.check(msg, true, true, false, false)) return;
+import type { UnifiedData } from "../utils/SlashUnifier";
+
+async function run(client: musicBot, data: UnifiedData) {
+  const music = new musicHelper(client, data.guild.id);
+  if (!await music.check(data, true, true, false, false)) return;
   let player = music.getPlayer();
   let currentSong = player.queue.currentSong;
 
-  if (!currentSong) return msg.channel.send("no song, check with eval pls");
+  if (!currentSong) return data.send("no song, check with eval pls");
 
   let avatarURL = client.user.displayAvatarURL({size:4096});
   let title = currentSong.title;
@@ -36,7 +37,7 @@ async function run(client: musicBot, msg: Message) {
   embed.setAuthor({name: "Now Playing ♪", iconURL: avatarURL});
   embed.setThumbnail(currentSong.thumbnail);
   embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedstr} / ${timeToPlaystr}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
-  msg.channel.send({embeds: [embed]});
+  data.send({embeds: [embed]});
 
 
 }
@@ -45,5 +46,6 @@ export const data = {
   description: "Shows what song is currently playing.",
   aliases: ["nowplaying"],
   hide: false,
+  arguments: [],
   run: run
 };

@@ -1,4 +1,4 @@
-import Discord, { Message } from "discord.js";
+import Discord, { Client, Message, REST, Routes, SlashCommandBuilder } from "discord.js";
 import {logger} from "./utils/logger.js";
 import fs from "fs";
 import path from "path";
@@ -13,13 +13,14 @@ import ready from "./events/ready.js";
 import messageCreate from "./events/messageCreate.js";
 import voiceStateUpdate from "./events/voiceStateUpdate.js";
 import type { config } from "./Structures/Config.js";
-import type { command } from "./Structures/Command.js";
+import { ArgType, Command } from "./Structures/Command.js";
+import interactionCreate from "./events/interactionCreate.js";
 
 
-export class musicBot extends Discord.Client {
+export class musicBot extends Client {
 
   logger: logger;
-  commands: command[];
+  commands: Command[];
   inactiveStrikes: any[];
   config: config;
   prefix: string;
@@ -51,7 +52,7 @@ export class musicBot extends Discord.Client {
     files.forEach(file => {
       try {
         file = file.replace("ts", "js"); // someone please tell me why i have to do this
-        let cmd: command = require(`./commands/${file}`);
+        let cmd: Command = require(`./commands/${file}`);
         this.commands[cmd.data.name] = cmd;
         // register aliases the command may have
         if (cmd.data.aliases != null && cmd.data.aliases.length != 0) {
@@ -68,8 +69,51 @@ export class musicBot extends Discord.Client {
 
     this.logger.log(`${Object.keys(this.commands).length - aliasnum} Commands loaded with ${aliasnum} aliases.`);
     if(msg) msg.channel.send(`**${Object.keys(this.commands).length - aliasnum}** Commands loaded with **${aliasnum}** aliases.`);
-    // todo - load up slash commands
+    // load up slash commands
+    let slashCommands: Discord.SlashCommandBuilder[] = [];
+    // register slash commands but not aliances
 
+    for (let file of files) {
+      file = file.replace("ts", "js");
+      let cmd: Command = require(`./commands/${file}`);
+
+      if (cmd.data.hide) continue;
+
+      let slash = new SlashCommandBuilder().setName(cmd.data.name).setDescription(cmd.data.description);
+      
+      if (cmd.data.arguments.length != 0) {
+        // add all different types of arguments
+        cmd.data.arguments.forEach(async arg => {
+          function setOption(option: any) {
+            option.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
+            return option;
+          }
+          if (arg.type == ArgType.STRING) slash.addStringOption(option => setOption(option));
+          if (arg.type == ArgType.INTEGER) slash.addIntegerOption(option => setOption(option));
+          if (arg.type == ArgType.USER) slash.addUserOption(option => setOption(option));
+          if (arg.type == ArgType.CHANNEL) slash.addChannelOption(option => setOption(option));
+          if (arg.type == ArgType.ROLE) slash.addRoleOption(option => setOption(option));
+          if (arg.type == ArgType.BOOLEAN) slash.addBooleanOption(option => setOption(option));
+        });
+
+      }
+      // in future slash command permissions?
+
+      slashCommands.push(slash);
+    }
+
+    const rest = new REST({ version: "10" }).setToken(this.token);
+    (async () => {
+      try {
+        console.log("Started refreshing application (/) commands.");
+    
+        await rest.put(Routes.applicationCommands(this.user.id), { body: slashCommands });
+    
+        console.log("Successfully reloaded application (/) commands.");
+      } catch (error) {
+        console.error(error);
+      }
+    })();
 
   }
   // init
@@ -116,6 +160,7 @@ export class musicBot extends Discord.Client {
     this.lavalink.on("error", (e) => lavaError(e, this));
     this.on("ready", () => ready(this));
     this.on("messageCreate", (msg) => messageCreate(msg, this));
+    this.on("interactionCreate", (inter) => interactionCreate(inter, this));
     this.on("voiceStateUpdate", (oldState, newState) => voiceStateUpdate(oldState, newState, this));
     //
     this.lavalink.connect(this.user.id);

@@ -1,8 +1,9 @@
-import type { Message } from "discord.js";
 import type { musicBot } from "../client";
-
-async function run(client: musicBot, msg: Message, args: string[]) {
-  if (msg.author.id !== client.config.ownerid) return;
+import { ArgOption, ArgType } from "../Structures/Command";
+import type { UnifiedData } from "../utils/SlashUnifier";
+// this command a bit idk
+async function run(client: musicBot, data: UnifiedData, args: string[]) {
+  if (data.author.id !== client.config.ownerid) return;
   let command = args.join(" ").toLowerCase();
   if(!client.commands[command]) return;
 
@@ -16,14 +17,17 @@ async function run(client: musicBot, msg: Message, args: string[]) {
       });
     }
   } catch (e) {
-    msg.channel.send(`Failed to load ${command}\n ${e.stack}`);
+    data.send(`Failed to load ${command}\n ${e.stack}`);
   }
-  msg.channel.send(`Reloaded \`\`${command}\`\``);
+  data.send(`Reloaded \`\`${command}\`\``);
 }
 export const data = {
   name: "reload",
   description: "Reloads a bot command",
   aliases: [],
   hide: true,
+  arguments: [
+    new ArgOption("command", "Command to reload", false, ArgType.STRING) // wont be needed but anyways
+  ],
   run: run
 };

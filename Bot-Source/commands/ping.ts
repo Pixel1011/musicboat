@@ -1,9 +1,9 @@
-import type { Message } from "discord.js";
 import type { musicBot } from "../client";
+import type { UnifiedData } from "../utils/SlashUnifier";
 
-async function run(client: musicBot, msg: Message) {
-  msg.channel.send("Pong!").then(msg2 => {
-    msg2.edit(`Pong! \`${msg2.createdTimestamp - msg.createdTimestamp}ms\``);
+async function run(client: musicBot, data: UnifiedData) {
+  data.send("Pong!").then(msg2 => {
+    msg2.edit(`Pong! \`${msg2.createdTimestamp - data.createdTimestamp}ms\``);
   });
   client.logger.log("ping test");
 }
@@ -13,5 +13,6 @@ export const data = {
   description: "pong",
   aliases: [],
   hide: false, // hide from help command
+  arguments: [],
   run: run
 };

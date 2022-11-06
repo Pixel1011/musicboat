@@ -17,7 +17,7 @@ export class logger {
     console.log(`[${date.getHours().toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString("en-GB", {minimumIntegerDigits: 2})}][${this.client.user.username}][${from}]: ${msg}`);   
   }
   
-  async logToHaste(msg: string, test?: boolean) {
+  async logToHaste(msg: any, test?: boolean) {
     if (!test) test = false;
     if (typeof (msg) == "object" && !test) {
       msg = require("util").inspect(msg);

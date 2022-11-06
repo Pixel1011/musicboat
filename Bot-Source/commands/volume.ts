@@ -1,6 +1,7 @@
-import type { Message } from "discord.js";
 import type { musicBot } from "../client";
+import { ArgOption, ArgType } from "../Structures/Command";
 import { musicHelper } from "../utils/musicHelper";
+import type { UnifiedData } from "../utils/SlashUnifier";
 
 // thanks stackoverflow
 function isNumeric(str: string) {
@@ -8,25 +9,22 @@ function isNumeric(str: string) {
 }
 
 // i have no idea what the rythm responses to music were so help appreciated
-async function run(client : musicBot, msg: Message, args: string[]) {
-  const music = new musicHelper(client, msg.guild.id);
-  if (!await music.check(msg, true, false, true, true)) return;
+async function run(client : musicBot, data: UnifiedData, args: string[]) {
+  const music = new musicHelper(client, data.guild.id);
+  if (!await music.check(data, true, false, true, true)) return;
   let player = music.getPlayer();
   let vol = args.join(" ");
 
   if (vol == "") {
-    return msg.channel.send(`🎵 **The current volume is at** \`\`${player.volume}%\`\``);
+    return data.send(`🎵 **The current volume is at** \`\`${player.volume}%\`\``);
   }
-  if (!isNumeric(vol)) return msg.channel.send(":x: **This value is not a number!**");
+  if (!isNumeric(vol)) return data.send(":x: **This value is not a number!**");
   let Ivol = Number(vol);
-  if (Ivol > 2147483647) return msg.channel.send(":x: **The volume cannot be set this high!**");
+  if (Ivol > 2147483647) return data.send(":x: **The volume cannot be set this high!**");
 
   await player.setVolume(Ivol);
-  return msg.channel.send(`🎵 **Set volume to ${vol}%** 👍`);
-
-
-
-
+  return data.send(`🎵 **Set volume to ${vol}%** 👍`);
+  
 }
 
 export const data = {
@@ -34,5 +32,8 @@ export const data = {
   description: "Outputs or changes the current volume",
   aliases: ["v", "vol"],
   hide: false,
+  arguments: [
+    new ArgOption("volume", "Volume to set to (1-2147483647)", false, ArgType.INTEGER)
+  ],
   run: run
 };

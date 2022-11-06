@@ -1,7 +1,8 @@
 import type { musicBot } from "../client";
 import type { Node } from "lavaclient";
-import type { CTrack, QueueSong } from "../Structures/Structures";
 import type { User } from "discord.js";
+import type { QueueSong } from "../Structures/Song";
+import type { CTrack } from "../Structures/Track";
 
 export class Queue {
   public client: musicBot;

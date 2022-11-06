@@ -1,16 +1,18 @@
 /* eslint-disable no-unused-vars */
-import Discord from "discord.js";
+import Discord, { SlashCommandBuilder, SlashCommandRoleOption } from "discord.js";
 import { musicHelper } from "../utils/musicHelper";
-import type { Message } from "discord.js";
 import type { musicBot } from "../client";
+import type { UnifiedData } from "../utils/SlashUnifier";
+import { ArgOption, ArgType } from "../Structures/Command";
+import { mayStartNext } from "@lavaclient/types/payloads";
 
-async function run(client: musicBot, msg: Message, args: string[]) {
-  if (msg.author.id !== client.config.ownerid) {
+async function run(client: musicBot, data: UnifiedData, args: string[]) {
+  if (data.author.id !== client.config.ownerid) {
     return;
   }
 
   // random variables to make evals quicker
-  const music = new musicHelper(client, msg.guild.id);
+  const music = new musicHelper(client, data.guild.id);
   let player = music.getPlayer();
   //
 
@@ -34,7 +36,7 @@ async function run(client: musicBot, msg: Message, args: string[]) {
   const embed = new Discord.EmbedBuilder();
   embed.setColor(0xa0d4ff);
   embed.setDescription(r);
-  msg.channel.send({embeds: [embed]});
+  data.send({embeds: [embed]});
 }
 
 export const data = {
@@ -42,5 +44,8 @@ export const data = {
   description: "evaluates code",
   aliases: [],
   hide: true,
+  arguments: [
+    new ArgOption("code", "Code to evaluate", true, ArgType.STRING)
+  ],
   run: run
 };
