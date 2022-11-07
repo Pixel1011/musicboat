@@ -9,7 +9,7 @@
 
       "declaration": false,
       "declarationMap": false,
-      "sourceMap": false,
+      "sourceMap": true,
       "esModuleInterop": true,
       "newLine": "crlf",
       "removeComments": true,
