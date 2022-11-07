@@ -10,6 +10,9 @@ import { ArgOption, ArgType } from "../Structures/Command";
 import { TrackEnd } from "../events/PlayerEvents/trackEnd";
 import { TrackStuck } from "../events/PlayerEvents/trackStuck";
 import { TrackException } from "../events/PlayerEvents/trackException";
+import type { CTrack } from "../Structures/Track";
+import type { Item, SpotifyPlaylist, SpotifyTrack } from "@lavaclient/spotify";
+import { LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
 
 
 async function run(client: musicBot, data: UnifiedData, args: string[]) {
@@ -20,7 +23,6 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   let player: Player;
   let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
   let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
-  // 
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
 
@@ -88,79 +90,89 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
 
 
 
-  // when i decide to rewrite, remember music.search() returns a load_type which can tell me whether whats loaded is a track or a playlist but anyway spaghetti code is good
   // search
-  let result;
-  let results; // pure spaghetti
+  let result: CTrack;
+  let results: Item | LoadTracksResponse;
   let isPlaylist = false;
   let playlistName = "";
   let playlistThumb = "";
   let totalTracks = 0;
-  let tracks: any[];
+  let tracks: CTrack[];
 
-  data.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
+  await data.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
   client.logger.log(`Searching: ${args.join(" ")}`);
 
   if (spotify.isSpotifyUrl(args.join(" "))) {
     results = await music.loadSpotify(args.join(" "));
 
-    if (results.data.type == "track") {
-      result = await results.resolveYoutubeTrack();
-      result.info.url = results.data.external_urls.spotify;
-      result.info.thumbnail = results.data.album.images[0].url;
-      result.info.title = results.data.name;
-      result.info.spotify = true;
+    switch (results.data.type) {
+        case "track": {
+          let track = results as SpotifyTrack;
+          result = await track.resolveYoutubeTrack();
+          result.info.url = results.data.external_urls.spotify;
+          result.info.thumbnail = results.data.album.images[0].url;
+          result.info.title = results.data.name;
+          result.info.spotify = true;  
+          break;
+        }
 
-    } else if(results.data.type == "playlist") {
-      isPlaylist = true;
-      tracks = await results.resolveYoutubeTracks();
-      let i = 0;
-      tracks.forEach(t => {
-        t.info.spotify = true;
-        t.info.url = results.tracks[i].data.external_urls.spotify;
-        t.info.thumbnail = results.tracks[i].data.album.images[0].url;
-        t.info.title = results.tracks[i].data.name;
-        i++;
-      });
-      playlistName = results.data.name;
-      totalTracks = results.data.tracks.total;
-      playlistThumb = results.data.images[0].url;
-      result = tracks[0];
+        case "playlist": {
+          isPlaylist = true;
+          let playlist = results as SpotifyPlaylist;
+          tracks = await playlist.resolveYoutubeTracks();
+          let i = 0;
+          tracks.forEach(t => {
+            t.info.spotify = true;
+            t.info.url = playlist.tracks[i].data.external_urls.spotify;
+            t.info.thumbnail = playlist.tracks[i].data.album.images[0].url;
+            t.info.title = playlist.tracks[i].data.name;
+            i++;
+          });
+          playlistName = playlist.data.name;
+          totalTracks = playlist.data.tracks.total;
+          playlistThumb = playlist.data.images[0].url;
+          result = tracks[0];  
+          break;
+        }
+
     }
     // else if is not spotify
-  } else { 
-    // check if youtube video/ playlist
-    if (youtubeVideoRegex.test(args.join(" "))) {
-      if (youtubePlaylistRegex.test(args.join(" ")) && args.join(" ").includes("list")) {
-        // youtube playlist
-        results = await music.search(args.join(" "));
-        isPlaylist = true;
-        tracks = results.tracks;
-        totalTracks = tracks.length;
-        playlistName = results.playlistInfo.name;
-        playlistThumb = await player.queue.getThumbnail(tracks[0]);
-
-        let selectedTrack = results.playlistInfo.selectedTrack;
-        if (selectedTrack == -1) selectedTrack = 0;
-        result = tracks[selectedTrack];
-
-      } else {
-        // youtube link
-        results = await music.search(args.join(" "));
-        result = results.tracks[0];
-      }
-    } 
-
-    // normal search if its not a link
-    if (!result) {
+  } 
+  // prob put soundcloud somewhere around here
+  else { 
+    if (youtubeVideoRegex.test(args.join(" ")) || youtubePlaylistRegex.test(args.join(" "))) {
+      results = await music.search(args.join(" "));
+    } else {
       results = await music.search(args.join(" "), "ytsearch:");
+    }
+    
+    // youtube playlist
+    if (results.loadType == LoadType.PlaylistLoaded) {        
+      isPlaylist = true;
+      tracks = results.tracks;
+      totalTracks = tracks.length;
+      playlistName = results.playlistInfo.name;
+      playlistThumb = await player.queue.getThumbnail(tracks[0]);
+
+      let selectedTrack = results.playlistInfo.selectedTrack;
+      if (selectedTrack == -1) selectedTrack = 0;
+      result = tracks[selectedTrack];
+    } else 
+    // single youtube video / search result
+    if (results.loadType == LoadType.TrackLoaded || results.loadType == LoadType.SearchResult) {
       result = results.tracks[0];
+    } else
+    // nothing found
+    if (results.loadType == LoadType.NoMatches) {
+      return data.channel.send(":x: **No Matches**");
+    } else
+    // failed to load
+    if (results.loadType == LoadType.LoadFailed) {
+      return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
     }
   }
-  // if after checking for spotify and youtube and done normal search, still no result, return
-  if (!result) {
-    return data.channel.send(":x: **No Matches**");
-  }
+
+  
   // play
   // if nothing in queue/nothing playing
   if (player.queue.currentSong == null || player.queue.currentSong == undefined) {
@@ -212,12 +224,16 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
       player.on("trackStuck", (track, threshold) => StuckClass.handle(track, threshold));
       player.eventsCreated = true;
     }
-  } else {     // if is already playing
+  } else {     
+    // if is already playing
+
     let success = await player.queue.add(result, data.author);
     if (!success) {
       return data.channel.send(":x: **This video cannot be played**");
     }
-    // if playlist
+
+
+    // adding playlist
     if (isPlaylist && tracks[0]) {
       tracks.forEach(async t => {
         await player.queue.add(t, data.author);
@@ -231,7 +247,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
       embed.setDescription(`**${playlistName}**`);
       embed.addFields([
         {name: "Estimated time until playing", value: `${timeTillPlaying}`, inline: true},
-        {name: "Position in queue", value: `${player.queue.songs.length - totalTracks + 1}`, inline: true},
+        {name: "Position in queue", value: `${player.queue.songs.length + 1}`, inline: true},
         {name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true}
       ]);
 
@@ -239,7 +255,10 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
       embed.setColor(0x202225);
       data.channel.send({embeds: [embed]});
 
-    } else { // 1 song
+    } else { 
+
+
+      // adding 1 song
       let song = player.queue.songs.at(-1);
       // embed
       let avatarURL = song.requester.avatarURL({size: 4096});
