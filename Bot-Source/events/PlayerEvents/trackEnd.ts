@@ -2,7 +2,7 @@ import type { TrackEndReason } from "@lavaclient/types/payloads";
 import type { musicBot } from "../../client";
 import type { musicHelper } from "../../utils/musicHelper";
 
-module.exports = class TrackEnd {
+export class TrackEnd {
   client: musicBot;
   music: musicHelper;
 
@@ -30,4 +30,4 @@ module.exports = class TrackEnd {
       player.queue.shift(player.queueLoop);
     }
   }
-};
+}

@@ -1,7 +1,7 @@
 import type { musicBot } from "../../client";
 import type { musicHelper } from "../../utils/musicHelper";
 
-module.exports = class TrackEnd {
+export class TrackException {
   client: musicBot;
   music: musicHelper;
   constructor(music: musicHelper) {
@@ -12,4 +12,4 @@ module.exports = class TrackEnd {
   async handle (track: string, error: Error) {
     this.client.logger.log(error.message);
   }
-};
+}

@@ -7,6 +7,9 @@ import { Queue } from "../utils/queue";
 import type { Player } from "lavaclient";
 import type { UnifiedData } from "../utils/SlashUnifier";
 import { ArgOption, ArgType } from "../Structures/Command";
+import { TrackEnd } from "../events/PlayerEvents/trackEnd";
+import { TrackStuck } from "../events/PlayerEvents/trackStuck";
+import { TrackException } from "../events/PlayerEvents/trackException";
 
 
 async function run(client: musicBot, data: UnifiedData, args: string[]) {
@@ -199,15 +202,12 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     
     // register player events if not already
     if (!player.eventsCreated) {
-      let TrackEnd = require("../events/PlayerEvents/trackEnd");
       let EndClass = new TrackEnd(music);
       player.on("trackEnd", async (track, reason) => EndClass.handle(track, reason));
 
-      let TrackException = require("../events/PlayerEvents/trackException");
       let ExceptionClass = new TrackException(music);
       player.on("trackException", (track, error) => ExceptionClass.handle(track, error));
 
-      let TrackStuck = require("../events/PlayerEvents/trackStuck");
       let StuckClass = new TrackStuck(music);
       player.on("trackStuck", (track, threshold) => StuckClass.handle(track, threshold));
       player.eventsCreated = true;
