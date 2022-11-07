@@ -4,8 +4,10 @@
   "description": "Open source music.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "node dist/index.js",
-    "prestart": "tsc"
+    "start": "concurrently \"npm:Boat\" \"npm:LavaServer\"  ",
+    "prestart": "tsc -b --verbose",
+    "Boat": "node dist/index.js",
+    "LavaServer": "java -jar ./Lavalink.jar"
   },
   "repository": {
     "type": "git",
@@ -27,6 +29,7 @@
   "homepage": "https://github.com/Pixel1011/musicboat#readme",
   "dependencies": {
     "@lavaclient/spotify": "^3.1.0",
+    "concurrently": "^7.5.0",
     "discord.js": "^14.6.0",
     "lavaclient": "^4.1.1",
     "minimist": "^1.2.6",
