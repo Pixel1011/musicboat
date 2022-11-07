@@ -156,8 +156,9 @@ export class musicBot extends Client {
       }
 
     });
+    let lavaErrorClass = new lavaError(this);
     this.lavalink.on("connect", () => lavaConnect(this));
-    this.lavalink.on("error", (e) => lavaError(e, this));
+    this.lavalink.on("error", async (e) => await lavaErrorClass.handle(e));
     this.on("ready", () => ready(this));
     this.on("messageCreate", (msg) => messageCreate(msg, this));
     this.on("interactionCreate", (inter) => interactionCreate(inter, this));
