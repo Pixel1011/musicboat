@@ -144,7 +144,6 @@ export class musicHelper {
     let playlistName = "";
     let playlistThumb = "";
     let totalTracks = 0;
-    let loadtype: LoadType;
 
     let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
     let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
@@ -193,8 +192,7 @@ export class musicHelper {
       } else {
         results = await this.search(args.join(" "), "ytsearch:");
       }
-      loadtype = results.loadType;
-      
+            
       // youtube playlist
       if (results.loadType == LoadType.PlaylistLoaded) {        
         isPlaylist = true;
