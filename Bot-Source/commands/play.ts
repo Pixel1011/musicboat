@@ -10,19 +10,14 @@ import { ArgOption, ArgType } from "../Structures/Command";
 import { TrackEnd } from "../events/PlayerEvents/trackEnd";
 import { TrackStuck } from "../events/PlayerEvents/trackStuck";
 import { TrackException } from "../events/PlayerEvents/trackException";
-import type { CTrack } from "../Structures/Track";
-import type { Item, SpotifyPlaylist, SpotifyTrack } from "@lavaclient/spotify";
-import { LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
+import { LoadType } from "@lavaclient/types/rest";
 
 
 async function run(client: musicBot, data: UnifiedData, args: string[]) {
   let music = new musicHelper(client, data.guild.id);
   let vchannel = data.member.voice.channel as VoiceChannel;
   let lavalink = client.lavalink;
-  let spotify = lavalink.spotify;
   let player: Player;
-  let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
-  let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
 
@@ -91,7 +86,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
 
 
   // search
-  let result: CTrack;
+  /* let result: CTrack;
   let results: Item | LoadTracksResponse;
   let isPlaylist = false;
   let playlistName = "";
@@ -170,7 +165,18 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     if (results.loadType == LoadType.LoadFailed) {
       return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
     }
+  }*/
+  let {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args, player);
+
+  // nothing found
+  if (results.loadType == LoadType.NoMatches) {
+    return data.channel.send(":x: **No Matches**");
+  } else
+  // failed to load
+  if (results.loadType == LoadType.LoadFailed) {
+    return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
   }
+
 
   
   // play

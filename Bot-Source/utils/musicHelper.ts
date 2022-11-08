@@ -1,6 +1,9 @@
+import type { Item, SpotifyPlaylist, SpotifyTrack } from "@lavaclient/spotify";
+import { LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
 import { PermissionFlagsBits } from "discord.js";
-import type { Node } from "lavaclient";
+import type { Node, Player } from "lavaclient";
 import type { musicBot } from "../client";
+import type { CTrack } from "../Structures/Track";
 import type { UnifiedData } from "./SlashUnifier";
 
 export class musicHelper {
@@ -123,12 +126,93 @@ export class musicHelper {
 
     var hours = Math.floor(mins / 60);
     mins = Math.floor(mins - (hours * 60));
-    if (hours < 24) return `${hours}:${mins}:${secs}`;
+    if (hours < 24) return `${hours.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${mins.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${secs}`;
 
     var days = Math.floor(hours / 24);
     hours = Math.floor(hours - (days * 24));
-    return `${days}:${hours}:${mins}:${secs}`;
+    return `${days.toLocaleString("en-GB", {minimumIntegerDigits: 1})}:${hours.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${mins.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${secs}`;
   }
 
+  async parseSearch(args: string[], player: Player<Node>) {
+    let spotify = this.lavalink.spotify;
+    let results: Item | LoadTracksResponse;
+    
+    //return values
+    let result: CTrack;
+    let isPlaylist: boolean = false;
+    let tracks: CTrack[];
+    let playlistName = "";
+    let playlistThumb = "";
+    let totalTracks = 0;
+    let loadtype: LoadType;
 
+    let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
+    let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
+  
+
+    if (spotify.isSpotifyUrl(args.join(" "))) {
+      let results = await this.loadSpotify(args.join(" "));
+  
+      switch (results.data.type) {
+          case "track": {
+            let track = results as SpotifyTrack;
+            result = await track.resolveYoutubeTrack();
+            result.info.url = results.data.external_urls.spotify;
+            result.info.thumbnail = results.data.album.images[0].url;
+            result.info.title = results.data.name;
+            result.info.spotify = true;  
+            break;
+          }
+  
+          case "playlist": {
+            isPlaylist = true;
+            let playlist = results as SpotifyPlaylist;
+            tracks = await playlist.resolveYoutubeTracks();
+            let i = 0;
+            tracks.forEach(t => {
+              t.info.spotify = true;
+              t.info.url = playlist.tracks[i].data.external_urls.spotify;
+              t.info.thumbnail = playlist.tracks[i].data.album.images[0].url;
+              t.info.title = playlist.tracks[i].data.name;
+              i++;
+            });
+            playlistName = playlist.data.name;
+            totalTracks = playlist.data.tracks.total;
+            playlistThumb = playlist.data.images[0].url;
+            result = tracks[0];  
+            break;
+          }
+  
+      }
+      // else if is not spotify
+    } 
+    // prob put soundcloud somewhere around here
+    else { 
+      if (youtubeVideoRegex.test(args.join(" ")) || youtubePlaylistRegex.test(args.join(" "))) {
+        results = await this.search(args.join(" "));
+      } else {
+        results = await this.search(args.join(" "), "ytsearch:");
+      }
+      loadtype = results.loadType;
+      
+      // youtube playlist
+      if (results.loadType == LoadType.PlaylistLoaded) {        
+        isPlaylist = true;
+        tracks = results.tracks;
+        totalTracks = tracks.length;
+        playlistName = results.playlistInfo.name;
+        playlistThumb = await player.queue.getThumbnail(tracks[0]);
+  
+        let selectedTrack = results.playlistInfo.selectedTrack;
+        if (selectedTrack == -1) selectedTrack = 0;
+        result = tracks[selectedTrack];
+      } else 
+      // single youtube video / search result
+      if (results.loadType == LoadType.TrackLoaded || results.loadType == LoadType.SearchResult) {
+        result = results.tracks[0];
+      } 
+      
+      return {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks};
+    }
+  }
 }
