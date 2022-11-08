@@ -12,7 +12,7 @@ export class TrackEnd {
   }
 
   async handle (track: string, reason: TrackEndReason) {
-    this.client.logger.logFrom(reason, "TRACKEND");
+    this.client.logger.logFrom(reason, "TrackEnd");
     let player = this.music.getPlayer();
       
     if (reason == "REPLACED") return;
