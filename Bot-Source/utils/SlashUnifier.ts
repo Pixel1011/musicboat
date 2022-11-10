@@ -10,6 +10,8 @@ export class UnifiedData {
   createdTimestamp: number;
   args: string[];
 
+  replied: boolean;
+
   // internal vars
   private inter: ChatInputCommandInteraction;
   private msg: Message;
@@ -48,6 +50,7 @@ export class UnifiedData {
     if (this.isMsg) {
       return await this.msg.channel.send(content);
     } else {
+      this.replied = true;
       if (typeof content == "string") {
         return await this.inter.followUp({ content: content, fetchReply: true });
       } else {
