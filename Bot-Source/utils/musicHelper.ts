@@ -145,9 +145,9 @@ export class musicHelper {
     let playlistThumb = "";
     let totalTracks = 0;
 
-    let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w\-]+\?v=|embed\/|v\/)?)([\w\-]+)(\S+)?$/;
-    let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#\&\?]*).*/;
-  
+    let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/;
+    let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#&?]*).*/;
+    let soundcloudTrackRegex = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
 
     if (spotify.isSpotifyUrl(args.join(" "))) {
       let results = await this.loadSpotify(args.join(" "));
@@ -162,7 +162,6 @@ export class musicHelper {
             result.info.spotify = true;  
             break;
           }
-  
           case "playlist": {
             isPlaylist = true;
             let playlist = results as SpotifyPlaylist;
@@ -185,15 +184,15 @@ export class musicHelper {
       }
       // else if is not spotify
     } 
-    // prob put soundcloud somewhere around here
+
     else { 
-      if (youtubeVideoRegex.test(args.join(" ")) || youtubePlaylistRegex.test(args.join(" "))) {
+      if (youtubeVideoRegex.test(args.join(" ")) || youtubePlaylistRegex.test(args.join(" ")) || soundcloudTrackRegex.test(args.join(" "))) {
         results = await this.search(args.join(" "));
       } else {
         results = await this.search(args.join(" "), "ytsearch:");
       }
             
-      // youtube playlist
+      // playlist
       if (results.loadType == LoadType.PlaylistLoaded) {        
         isPlaylist = true;
         tracks = results.tracks;
@@ -205,7 +204,8 @@ export class musicHelper {
         if (selectedTrack == -1) selectedTrack = 0;
         result = tracks[selectedTrack];
       } else 
-      // single youtube video / search result
+      
+      // single track / search result
       if (results.loadType == LoadType.TrackLoaded || results.loadType == LoadType.SearchResult) {
         result = results.tracks[0];
       } 

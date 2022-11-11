@@ -3,6 +3,8 @@ import type { Node } from "lavaclient";
 import type { User } from "discord.js";
 import type { QueueSong } from "../Structures/Song";
 import type { CTrack } from "../Structures/Track";
+import * as cheerio from "cheerio";
+import fetch from "node-fetch";
 
 export class Queue {
   public client: musicBot;
@@ -22,8 +24,14 @@ export class Queue {
   async getThumbnail(track: CTrack) {
     let thumbnail = track.info.thumbnail;
 
-    if (!thumbnail) {
+    if (!thumbnail && track.info.sourceName == "youtube") {
       thumbnail = `https://img.youtube.com/vi/${track.info.identifier}/hqdefault.jpg`;
+    }
+    if (track.info.sourceName == "soundcloud") {
+      let html = await fetch(track.info.uri).then((res) => res.text());
+      let $ = cheerio.load(html);
+      thumbnail = $("meta[property='og:image']").attr("content");
+
     }
     return thumbnail;
   }
