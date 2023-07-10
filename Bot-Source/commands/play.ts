@@ -1,11 +1,11 @@
 /* eslint-disable no-useless-escape */
 import type { VoiceChannel } from "discord.js";
 import type { musicBot } from "../client";
+import type { Player } from "lavaclient";
+import type { UnifiedData } from "../utils/SlashUnifier";
 import { musicHelper } from "../utils/musicHelper";
 import { EmbedBuilder } from "discord.js";
 import { Queue } from "../utils/queue";
-import type { Player } from "lavaclient";
-import type { UnifiedData } from "../utils/SlashUnifier";
 import { ArgOption, ArgType } from "../Structures/Command";
 import { TrackEnd } from "../events/PlayerEvents/trackEnd";
 import { TrackStuck } from "../events/PlayerEvents/trackStuck";
@@ -234,7 +234,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
       interval: this
     });
     let interval = setInterval(function () {
-      
+      // really gotta rewrite this and just set to player like holy it keeps failing
       if (player.playing && vchannel.members.size > 1) return client.inactiveStrikes.find(elm => elm.guild == data.guild.id).strikes = 0;
 
       client.inactiveStrikes.find(elm => elm.guild == data.guild.id).strikes++;

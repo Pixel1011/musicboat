@@ -4,10 +4,8 @@
   "description": "Open source music.",
   "main": "dist/index.js",
   "scripts": {
-    "start": "concurrently \"npm:Boat\" \"npm:LavaServer\"  ",
-    "prestart": "tsc -b --verbose",
-    "Boat": "node dist/index.js",
-    "LavaServer": "java -jar ./Lavalink.jar"
+    "start": "node dist/index.js",
+    "prestart": "tsc -b --verbose"
   },
   "repository": {
     "type": "git",
@@ -43,6 +41,7 @@
     "@types/node-fetch": "^2.6.2",
     "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.39.0",
-    "eslint": "^8.27.0"
+    "eslint": "^8.27.0",
+    "typescript": "^5.1.3"
   }
 }

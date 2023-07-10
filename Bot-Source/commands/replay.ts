@@ -5,7 +5,8 @@ import type { UnifiedData } from "../utils/SlashUnifier";
 async function run(client: musicBot, data: UnifiedData) {
   const music = new musicHelper(client, data.guild.id);
   let player = music.getPlayer();
-  if (!player || (!player.queue.currentSong && !player.queue.lastSong)) return data.send(":x: **Bot has not previously played a song**"); // check responses later
+  if (!await music.PermsOrAloneCheck(data, true , true)) return;
+  if (!player || (!player.queue.currentSong && !player.queue.lastSong)) return data.send(":x: **Nothing to replay!**"); // check responses later
   if (player.playing && (player.queue || player.queue.currentSong)) {
     // if playing, seek song back to 0
     player.seek(0);
@@ -14,6 +15,7 @@ async function run(client: musicBot, data: UnifiedData) {
     // if not playing, play last song
     let lastSong = player.queue.lastSong;
     player.queue.songs.unshift(lastSong);
+    player.queue.shift(false);
     player.play(lastSong.track);
     data.send(":musical_note: **Song progress reset** :track_previous:");
   }

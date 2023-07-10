@@ -13,7 +13,7 @@ import ready from "./events/ready.js";
 import messageCreate from "./events/messageCreate.js";
 import voiceStateUpdate from "./events/voiceStateUpdate.js";
 import type { config } from "./Structures/Config.js";
-import { ArgType, Command } from "./Structures/Command.js";
+import { ArgType, type Command } from "./Structures/Command.js";
 import interactionCreate from "./events/interactionCreate.js";
 
 

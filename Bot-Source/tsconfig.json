@@ -4,7 +4,7 @@
       "outDir": "./dist",
 
       "module": "Node16",
-      "moduleResolution": "node",
+      "moduleResolution": "Node16",
       "resolveJsonModule": true,
 
       "declaration": false,
@@ -19,7 +19,7 @@
 
       "skipLibCheck": true,
       "alwaysStrict": true,
-      "importsNotUsedAsValues": "error",
+      "verbatimModuleSyntax": false,
       "preserveConstEnums": true,
 
       "types": ["node"],

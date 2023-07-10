@@ -1,5 +1,5 @@
 import type { Item, SpotifyPlaylist, SpotifyTrack } from "@lavaclient/spotify";
-import { LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
+import { type LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
 import { PermissionFlagsBits } from "discord.js";
 import type { Node, Player } from "lavaclient";
 import type { musicBot } from "../client";
