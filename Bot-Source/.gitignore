@@ -3,7 +3,6 @@ logs
 test.js
 Lavalink.jar
 .vscode
-/dist
 /JarDecomp
 
 # node modules is a fun folder
