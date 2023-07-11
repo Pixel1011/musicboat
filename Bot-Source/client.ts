@@ -21,7 +21,6 @@ export class musicBot extends Client {
 
   logger: logger;
   commands: Command[];
-  inactiveStrikes: any[];
   config: config;
   prefix: string;
   spotify: boolean;
@@ -36,7 +35,6 @@ export class musicBot extends Client {
     this.botnum = num + 1;
     this.logger = new logger(this);
     this.commands = [];
-    this.inactiveStrikes = []; // reminder to change to per player instead of on client
     this.config = Config;
     this.token = token;
     this.prefix = prefix;

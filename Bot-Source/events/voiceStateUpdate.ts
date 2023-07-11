@@ -13,6 +13,9 @@ export default async function (oldState: any, newState: any, client: musicBot) {
   // leaving handle
   let player = music.getPlayer();
   if (!player) return;
+
+  // if disconnected while playing, this ends up causing destroyPlayer happening twice as when its called first time, it disconnects, leading to this
+  // doesnt seem to cause problems but is a note
   if (newState.channelId == null) {
     music.destroyPlayer();
   } else

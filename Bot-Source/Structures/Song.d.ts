@@ -13,3 +13,9 @@ export interface QueueSong {
   thumbnail: string;
   requester: User
 }
+
+export interface InactiveStriker {
+  guild: string;
+  strikes: number;
+  interval: NodeJS.Timer;
+}

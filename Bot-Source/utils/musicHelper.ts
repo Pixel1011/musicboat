@@ -108,11 +108,10 @@ export class musicHelper {
     let player = this.getPlayer();
     player.destroy();
     player.disconnect();
-    if (this.client.inactiveStrikes.find(elm => elm.guild == this.guildid) != undefined) {
-      clearInterval(this.client.inactiveStrikes.find(elm => elm.guild == this.guildid).interval);
+    if (player.striker != undefined) {
+      clearInterval(player.striker.interval);
     }
-    let index = this.client.inactiveStrikes.findIndex(elm => elm.guild == this.guildid);
-    this.client.inactiveStrikes.splice(index, 1);
+    player.striker = undefined;
     player.queue = undefined;
     player.loop = false;
     player.queueLoop = false;

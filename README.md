@@ -9,3 +9,14 @@
 
 ### Setup:
 - will come soon.
+- (note if you attempt to build this and find it doesnt work, its due to added values to index.d.ts from lavaclient to the player class)
+    ```ts
+    import { Queue } from '../../../utils/queue';
+    import { InactiveStriker } from '../../../Structures/Song';
+       loop?: boolean;
+       queueLoop?: boolean;
+       queue?: Queue;
+       skips?: Array<string>;
+       eventsCreated?: boolean;
+       striker?: InactiveStriker;
+    ```

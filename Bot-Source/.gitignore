@@ -1,8 +1,11 @@
-/node_modules
+
+node_modules/**/*
 config.json
-/logs
+logs
 test.js
 Lavalink.jar
 .vscode
 /dist
 /JarDecomp
+
+!node_modules/lavaclient/dist/index.d.ts

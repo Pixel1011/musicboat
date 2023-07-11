@@ -227,24 +227,25 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
 
 
   // inactive timer
-  if (client.inactiveStrikes.find(elm => elm.guild == data.guild.id) == undefined) {
-    client.inactiveStrikes.push({
+  if (player.striker == undefined) {
+    player.striker = {
       guild: data.guild.id,
       strikes: 0,
       interval: this
-    });
+    };
+
     let interval = setInterval(function () {
       // really gotta rewrite this and just set to player like holy it keeps failing
-      if (player.playing && vchannel.members.size > 1) return client.inactiveStrikes.find(elm => elm.guild == data.guild.id).strikes = 0;
+      if (player.playing && vchannel.members.size > 1) return player.striker.strikes = 0;
 
-      client.inactiveStrikes.find(elm => elm.guild == data.guild.id).strikes++;
+      player.striker.strikes++;
 
-      if (client.inactiveStrikes.find(elm => elm.guild == data.guild.id).strikes == 10) {
+      if (player.striker.strikes == 10) {
         music.destroyPlayer();
       }
     }, 2 * 60 * 1000); // every 2 mins, 10 strikes = 20mins
 
-    client.inactiveStrikes.find(elm => elm.guild == data.guild.id).interval = interval;
+    player.striker.interval = interval;
   }
 }
 
