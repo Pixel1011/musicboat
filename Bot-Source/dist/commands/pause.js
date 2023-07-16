@@ -12,7 +12,7 @@ async function run(client, data) {
     }
     else {
         await player.pause();
-        data.send("**Paused** ⏸");
+        data.send("**Paused** :pause_button:");
     }
 }
 exports.data = {

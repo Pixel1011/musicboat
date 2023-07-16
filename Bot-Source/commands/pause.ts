@@ -11,7 +11,7 @@ async function run(client: musicBot, data: UnifiedData) {
     data.send(":x: **The player is already paused**");
   } else {
     await player.pause();
-    data.send("**Paused** ⏸");
+    data.send("**Paused** :pause_button:");
   }
 
 

@@ -37,7 +37,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     if (!args.join(" ")) {
       if (lavalink.players.get(data.guild.id).paused) {
         await lavalink.players.get(data.guild.id).resume();
-        data.send("⏯ **Resuming** 👍");
+        data.send(":play_pause: **Resuming** :thumbsup:");
         return;
       } else {
         // otherwise tell user its already playing or theyre not using command properly. not sure which
@@ -61,11 +61,11 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
 
   // check perms to join channel
   if (!vchannel.joinable) {
-    return data.send(`🙅 **No permission to join** \`\`${vchannel.name}\`\``);
+    return data.send(`:person_gesturing_no: **No permission to join** \`\`${vchannel.name}\`\``);
   }
   // check perms to speak in channel
   if (!vchannel.speakable) {
-    return data.send(`🙅 **No permission to speak in** \`\`${vchannel.name}\`\``);
+    return data.send(`:person_gesturing_no: **No permission to speak in** \`\`${vchannel.name}\`\``);
   }
 
   // Join

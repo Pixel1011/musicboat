@@ -34,7 +34,7 @@ async function run(client: musicBot, data: UnifiedData) {
   if (index != 29) dashes = dashes.replace(dot, dot + "▬"); // grr
 
   let embed = new EmbedBuilder(); 
-  embed.setAuthor({name: "Now Playing ♪", iconURL: avatarURL});
+  embed.setAuthor({name: "Now Playing :musical_note:", iconURL: avatarURL});
   embed.setThumbnail(currentSong.thumbnail);
   embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedstr} / ${timeToPlaystr}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
   data.send({embeds: [embed]});

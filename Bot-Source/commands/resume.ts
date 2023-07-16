@@ -10,7 +10,7 @@ async function run(client: musicBot, data: UnifiedData) {
 
   if (player.paused) {
     await player.resume();
-    data.send("⏯ **Resuming** 👍");
+    data.send(":play_pause: **Resuming** :thumbsup:");
   } else {
     return data.send(":x: **The player is not paused**");
   }

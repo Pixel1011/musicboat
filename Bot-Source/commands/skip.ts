@@ -23,7 +23,7 @@ async function run(client: musicBot, data: UnifiedData) {
   if (player.skips.length >= skipsRequired) {
     player.skips = [];
     music.skip();
-    data.send("⏩ **Skipped** 👍");
+    data.send(":fast_forward: **Skipped** :thumbsup:");
   } else {
     if (music.PermsOrAloneCheck(data)) {
       return data.send(`**Skipping?** (${player.skips.length}/${skipsRequired} people) \`\`${client.prefix}forceskip\`\` **or** \`\`${client.prefix}fs\`\` **to force**`);

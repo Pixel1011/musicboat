@@ -197,6 +197,26 @@ node_modules/lavaclient/node_modules
 node_modules/lavaclient/LICENSE
 node_modules/lavaclient/README.md
 node_modules/lavaclient/package.json
+node_modules/asap/
+node_modules/call-bind
+node_modules/component-emitter
+node_modules/cookiejar
+node_modules/dezalgo
+node_modules/fast-safe-stringify
+node_modules/formidable
+node_modules/function-bind
+node_modules/get-intrinsic
+node_modules/has
+node_modules/has-proto
+node_modules/has-symbols
+node_modules/hexoid
+node_modules/methods
+node_modules/mime
+node_modules/object-inspect
+node_modules/qs
+node_modules/side-channel
+node_modules/superagent
+
 
 
 !node_modules/lavaclient/dist/index.d.ts

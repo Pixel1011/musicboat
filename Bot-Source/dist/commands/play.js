@@ -28,7 +28,7 @@ async function run(client, data, args) {
         if (!args.join(" ")) {
             if (lavalink.players.get(data.guild.id).paused) {
                 await lavalink.players.get(data.guild.id).resume();
-                data.send("⏯ **Resuming** 👍");
+                data.send(":play_pause: **Resuming** :thumbsup:");
                 return;
             }
             else {
@@ -43,10 +43,10 @@ async function run(client, data, args) {
         return data.send(":x: **You have to be in the same voice channel to use this command**");
     }
     if (!vchannel.joinable) {
-        return data.send(`🙅 **No permission to join** \`\`${vchannel.name}\`\``);
+        return data.send(`:person_gesturing_no: **No permission to join** \`\`${vchannel.name}\`\``);
     }
     if (!vchannel.speakable) {
-        return data.send(`🙅 **No permission to speak in** \`\`${vchannel.name}\`\``);
+        return data.send(`:person_gesturing_no: **No permission to speak in** \`\`${vchannel.name}\`\``);
     }
     if (!data.guild.members.me.voice.channelId) {
         player = await music.join(vchannel.id);

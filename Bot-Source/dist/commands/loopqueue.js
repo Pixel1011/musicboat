@@ -9,11 +9,11 @@ async function run(client, data) {
     let player = music.getPlayer();
     if (player.queueLoop == undefined || player.queueLoop == false) {
         player.queueLoop = true;
-        return data.send("🔁 **Queue loop enabled**");
+        return data.send(":repeat: **Queue loop enabled**");
     }
     else {
         player.queueLoop = false;
-        return data.send("🔁 **Queue loop disabled**");
+        return data.send(":repeat: **Queue loop disabled**");
     }
 }
 exports.data = {

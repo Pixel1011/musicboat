@@ -10,10 +10,10 @@ async function run(client: musicBot, data: UnifiedData) {
 
   if (player.loop == undefined || player.loop == false) {
     player.loop = true;
-    return data.send("🔂 **Enabled!**");
+    return data.send(":repeat_one: **Enabled!**");
   } else {
     player.loop = false;
-    return data.send("🔂 **Disabled!**");
+    return data.send(":repeat_one: **Disabled!**");
   }
 
 

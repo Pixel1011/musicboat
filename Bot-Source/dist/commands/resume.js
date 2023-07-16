@@ -9,7 +9,7 @@ async function run(client, data) {
     let player = music.getPlayer();
     if (player.paused) {
         await player.resume();
-        data.send("⏯ **Resuming** 👍");
+        data.send(":play_pause: **Resuming** :thumbsup:");
     }
     else {
         return data.send(":x: **The player is not paused**");
