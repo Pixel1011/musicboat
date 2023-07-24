@@ -15,6 +15,7 @@ import voiceStateUpdate from "./events/voiceStateUpdate.js";
 import type { config } from "./Structures/Config.js";
 import { ArgType, type Command } from "./Structures/Command.js";
 import interactionCreate from "./events/interactionCreate.js";
+import { LavalinkUpdater } from "./updateLavaLink.js";
 
 
 export class musicBot extends Client {
@@ -26,8 +27,9 @@ export class musicBot extends Client {
   spotify: boolean;
   botnum: number;
   lavalink: Node;
+  updater: LavalinkUpdater;
 
-  constructor(token : string, prefix : string, num : number) {
+  constructor(token : string, prefix : string, num : number, updater: LavalinkUpdater) {
     super({
       intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildEmojisAndStickers, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent] // thats probably fine.. jesus
     });
@@ -39,6 +41,7 @@ export class musicBot extends Client {
     this.token = token;
     this.prefix = prefix;
     this.spotify = false;
+    this.updater = updater;
     this.init();
   }
 
@@ -153,6 +156,10 @@ export class musicBot extends Client {
         this.lavalink.handleVoiceUpdate(packet.d);
       }
 
+    });
+    this.updater.on("close", () => {
+      this.logger.log("Lavalink closed, reconnecting...");
+      this.lavalink.connect(this.user.id);
     });
     let lavaErrorClass = new lavaError(this);
     this.lavalink.on("connect", () => lavaConnect(this));

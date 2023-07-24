@@ -11,7 +11,7 @@ async function run(client, data) {
         return data.send(`:x: **I am not connected to a voice channel.** Type ${client.prefix}join to get me in one`);
     }
     music.destroyPlayer();
-    data.channel.send(":mailbox_with_no_mail: **Successfully disconnected**");
+    data.send(":mailbox_with_no_mail: **Successfully disconnected**");
 }
 exports.data = {
     name: "leave",

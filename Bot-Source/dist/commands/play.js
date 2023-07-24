@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = void 0;
 const musicHelper_1 = require("../utils/musicHelper");
 const discord_js_1 = require("discord.js");
-const queue_1 = require("../utils/queue");
+const Queue_1 = require("../utils/Queue");
 const Command_1 = require("../Structures/Command");
 const trackEnd_1 = require("../events/PlayerEvents/trackEnd");
 const trackStuck_1 = require("../events/PlayerEvents/trackStuck");
@@ -58,7 +58,7 @@ async function run(client, data, args) {
             player = await music.join(vchannel.id);
     }
     if (!player.queue) {
-        player.queue = new queue_1.Queue(client);
+        player.queue = new Queue_1.Queue(client);
     }
     if (!data.replied) {
         await data.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
@@ -68,11 +68,17 @@ async function run(client, data, args) {
     }
     client.logger.log(`Searching: ${args.join(" ")}`);
     let { result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args, player);
-    if (results.loadType == rest_1.LoadType.NoMatches) {
-        return data.channel.send(":x: **No Matches**");
+    if (!result.info.spotify) {
+        results = results;
+        if (results.loadType == rest_1.LoadType.NoMatches) {
+            return data.channel.send(":x: **No Matches**");
+        }
+        else if (results.loadType == rest_1.LoadType.LoadFailed) {
+            return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
+        }
     }
-    else if (results.loadType == rest_1.LoadType.LoadFailed) {
-        return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
+    else {
+        results = results;
     }
     if (player.queue.currentSong == null || player.queue.currentSong == undefined) {
         player.skips = [];

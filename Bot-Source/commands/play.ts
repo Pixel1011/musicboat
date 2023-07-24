@@ -1,28 +1,29 @@
 /* eslint-disable no-useless-escape */
 import type { VoiceChannel } from "discord.js";
 import type { musicBot } from "../client";
-import type { Player } from "lavaclient";
 import type { UnifiedData } from "../utils/SlashUnifier";
 import { musicHelper } from "../utils/musicHelper";
 import { EmbedBuilder } from "discord.js";
-import { Queue } from "../utils/queue";
+import { Queue } from "../utils/Queue";
 import { ArgOption, ArgType } from "../Structures/Command";
 import { TrackEnd } from "../events/PlayerEvents/trackEnd";
 import { TrackStuck } from "../events/PlayerEvents/trackStuck";
 import { TrackException } from "../events/PlayerEvents/trackException";
-import { LoadType } from "@lavaclient/types/rest";
+import { LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
+import { BPlayer } from "../Structures/Song";
+import { Item } from "@lavaclient/spotify";
 
 
 async function run(client: musicBot, data: UnifiedData, args: string[]) {
   let music = new musicHelper(client, data.guild.id);
   let vchannel = data.member.voice.channel as VoiceChannel;
   let lavalink = client.lavalink;
-  let player: Player;
+  let player: BPlayer;
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
 
   // check if player doesnt exist, or if there is no queue created or, if there is no current song
-  if (!lavalink.players.get(data.guild.id) || !lavalink.players.get(data.guild.id).queue || !lavalink.players.get(data.guild.id).queue.currentSong) {
+  if (!(lavalink.players.get(data.guild.id) as BPlayer) || !(lavalink.players.get(data.guild.id) as BPlayer).queue || !(lavalink.players.get(data.guild.id) as BPlayer).queue.currentSong) {
     // if no search term, return embed
     if (!args.join(" ")) {
       let embed = new EmbedBuilder();
@@ -98,13 +99,21 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   let {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args, player);
 
   // nothing found
-  if (results.loadType == LoadType.NoMatches) {
-    return data.channel.send(":x: **No Matches**");
-  } else
-  // failed to load
-  if (results.loadType == LoadType.LoadFailed) {
-    return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
+  if (!result.info.spotify) {
+    results = results as LoadTracksResponse;
+    if (results.loadType == LoadType.NoMatches) {
+      return data.channel.send(":x: **No Matches**");
+    } else
+    // failed to load
+    if (results.loadType == LoadType.LoadFailed) {
+      return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
+    }
+  } else {
+    results = results as Item;
+    // well, if its spotify, it shouldnt fail to load (especially as spotify search isnt a thing), and if it does, i cant produce that result so i cant create a condition for it
+    // so we do FA and continue on as nothing bad has occured while praying
   }
+
 
 
   

@@ -1,6 +1,7 @@
 // Updates lavalink jar to latest version
 
 import { spawn, exec } from "child_process";
+import { EventEmitter } from "node:events";
 import fetch from "node-fetch";
 import fs from "fs";
 import {unlink} from "fs/promises";
@@ -9,10 +10,12 @@ import type { ChildProcess } from "child_process";
 let url = "https://github.com/lavalink-devs/Lavalink/releases/latest/download/Lavalink.jar";
 let apiurl = "https://api.github.com/repos/lavalink-devs/Lavalink/releases/latest";
 
-export class LavalinkUpdater {
+export class LavalinkUpdater extends EventEmitter {
   child: ChildProcess;
-  constructor() {
+  
+  super() {
   }
+
   async download(url: string, outputPath: any) {
     let fetched = await fetch(url);
     let bytes = await fetched.buffer();
@@ -36,7 +39,9 @@ export class LavalinkUpdater {
   
     this.child.on("close", (code) => {
       console.log(`Lavalink exited with code ${code}. Restarting...`);
+      // emit event 
       this.startLavaLink();
+      this.emit("close");
     });
   
     process.on("exit", () => {

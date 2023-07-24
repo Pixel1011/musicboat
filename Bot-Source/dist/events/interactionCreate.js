@@ -6,7 +6,6 @@ exports.default = async (interaction, client) => {
         let Cmdinteraction = interaction;
         let command = Cmdinteraction.commandName;
         let data = new SlashUnifier_1.UnifiedData(client, null, Cmdinteraction);
-        console.log(await client.logger.logToHaste(data));
         let cmd = client.commands[command];
         try {
             await Cmdinteraction.deferReply();

@@ -187,8 +187,8 @@ class musicHelper {
             else if (results.loadType == rest_1.LoadType.TrackLoaded || results.loadType == rest_1.LoadType.SearchResult) {
                 result = results.tracks[0];
             }
-            return { result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks };
         }
+        return { result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks };
     }
 }
 exports.musicHelper = musicHelper;

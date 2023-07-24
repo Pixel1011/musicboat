@@ -9,7 +9,7 @@ export default async (interaction: BaseInteraction, client: musicBot) => {
 
     let data = new UnifiedData(client, null, Cmdinteraction as ChatInputCommandInteraction);
 
-    console.log(await client.logger.logToHaste(data));
+    //console.log(await client.logger.logToHaste(data));
     //console.log(await client.logger.logToHaste(Cmdinteraction));
 
     let cmd = client.commands[command];

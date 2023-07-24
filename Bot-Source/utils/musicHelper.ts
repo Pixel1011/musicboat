@@ -1,10 +1,12 @@
-import type { Item, SpotifyPlaylist, SpotifyTrack } from "@lavaclient/spotify";
+import {  Item, type SpotifyPlaylist, type SpotifyTrack } from "@lavaclient/spotify";
 import { type LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
 import { PermissionFlagsBits } from "discord.js";
-import type { Node, Player } from "lavaclient";
+import type { Node } from "lavaclient";
 import type { musicBot } from "../client";
-import type { CTrack } from "../Structures/Track";
+import { CTrack } from "../Structures/Track";
 import type { UnifiedData } from "./SlashUnifier";
+import { BPlayer } from "../Structures/Song";
+
 
 export class musicHelper {
   public client: musicBot;
@@ -101,7 +103,7 @@ export class musicHelper {
   }
 
   getPlayer() {
-    return this.lavalink.players.get(this.guildid);
+    return this.lavalink.players.get(this.guildid) as BPlayer;
   }
 
   destroyPlayer() {
@@ -132,7 +134,7 @@ export class musicHelper {
     return `${days.toLocaleString("en-GB", {minimumIntegerDigits: 1})}:${hours.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${mins.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${secs}`;
   }
 
-  async parseSearch(args: string[], player: Player<Node>) {
+  async parseSearch(args: string[], player: BPlayer<Node>) {
     let spotify = this.lavalink.spotify;
     let results: Item | LoadTracksResponse;
     
@@ -181,9 +183,9 @@ export class musicHelper {
           }
   
       }
-      // else if is not spotify
     } 
-
+    
+    // else if is not spotify
     else { 
       if (youtubeVideoRegex.test(args.join(" ")) || youtubePlaylistRegex.test(args.join(" ")) || soundcloudTrackRegex.test(args.join(" "))) {
         results = await this.search(args.join(" "));
@@ -209,7 +211,8 @@ export class musicHelper {
         result = results.tracks[0];
       } 
       
-      return {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks};
     }
+    return {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks};
   }
 }
+

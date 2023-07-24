@@ -1,5 +1,7 @@
 import type { TrackHash } from "@lavaclient/types/rest";
 import type { User } from "discord.js";
+import type { Player, Node } from "lavaclient";
+import type { Queue } from "../utils/Queue";
 
 export interface QueueSong {
   track: TrackHash;
@@ -18,4 +20,14 @@ export interface InactiveStriker {
   guild: string;
   strikes: number;
   interval: NodeJS.Timer;
+}
+
+// bplayer = boatplayer 
+export interface BPlayer<T = Node> extends Player<T> {
+  loop?: boolean;
+  queueLoop?: boolean;
+  queue?: Queue;
+  skips?: Array<string>;
+  eventsCreated?: boolean;
+  striker?: InactiveStriker;
 }

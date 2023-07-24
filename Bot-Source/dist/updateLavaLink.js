@@ -5,13 +5,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.LavalinkUpdater = void 0;
 const child_process_1 = require("child_process");
+const node_events_1 = require("node:events");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const fs_1 = __importDefault(require("fs"));
 const promises_1 = require("fs/promises");
 let url = "https://github.com/lavalink-devs/Lavalink/releases/latest/download/Lavalink.jar";
 let apiurl = "https://api.github.com/repos/lavalink-devs/Lavalink/releases/latest";
-class LavalinkUpdater {
-    constructor() {
+class LavalinkUpdater extends node_events_1.EventEmitter {
+    super() {
     }
     async download(url, outputPath) {
         let fetched = await (0, node_fetch_1.default)(url);
@@ -33,6 +34,7 @@ class LavalinkUpdater {
         this.child.on("close", (code) => {
             console.log(`Lavalink exited with code ${code}. Restarting...`);
             this.startLavaLink();
+            this.emit("close");
         });
         process.on("exit", () => {
             this.child.kill();

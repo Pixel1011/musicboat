@@ -12,7 +12,7 @@ async function run(client: musicBot, data: UnifiedData) {
   }
 
   music.destroyPlayer();
-  data.channel.send(":mailbox_with_no_mail: **Successfully disconnected**");
+  data.send(":mailbox_with_no_mail: **Successfully disconnected**");
 
 }
 export const data = {

@@ -12,6 +12,7 @@ async function main() {
   let i = 0;
   let args = minimist(process.argv.slice(2));
   let botnum: number;
+  let updater = new LavalinkUpdater();
   
   if (args.bot) {
     botnum = args.bot - 1 + i;
@@ -20,12 +21,12 @@ async function main() {
   }
 
   if (botnum == 0) {
-    await new LavalinkUpdater().dostuff();
+    await updater.dostuff();
   }
 
   // add some checks for empty config too
 
-  new musicBot(config.tokens[botnum], config.prefixes[botnum], botnum);
+  new musicBot(config.tokens[botnum], config.prefixes[botnum], botnum, updater);
 }
 
 main();

@@ -43,7 +43,7 @@ const voiceStateUpdate_js_1 = __importDefault(require("./events/voiceStateUpdate
 const Command_js_1 = require("./Structures/Command.js");
 const interactionCreate_js_1 = __importDefault(require("./events/interactionCreate.js"));
 class musicBot extends discord_js_1.Client {
-    constructor(token, prefix, num) {
+    constructor(token, prefix, num, updater) {
         super({
             intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildEmojisAndStickers, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent]
         });
@@ -54,6 +54,7 @@ class musicBot extends discord_js_1.Client {
         this.token = token;
         this.prefix = prefix;
         this.spotify = false;
+        this.updater = updater;
         this.init();
     }
     async ReloadCommands(msg) {
@@ -149,6 +150,10 @@ class musicBot extends discord_js_1.Client {
             if (packet.t === "VOICE_SERVER_UPDATE" || packet.t === "VOICE_STATE_UPDATE") {
                 this.lavalink.handleVoiceUpdate(packet.d);
             }
+        });
+        this.updater.on("close", () => {
+            this.logger.log("Lavalink closed, reconnecting...");
+            this.lavalink.connect(this.user.id);
         });
         let lavaErrorClass = new lavaError_js_1.default(this);
         this.lavalink.on("connect", () => (0, lavaConnect_js_1.default)(this));

@@ -34,6 +34,7 @@ async function main() {
     let i = 0;
     let args = (0, minimist_1.default)(process.argv.slice(2));
     let botnum;
+    let updater = new updateLavaLink_1.LavalinkUpdater();
     if (args.bot) {
         botnum = args.bot - 1 + i;
     }
@@ -41,9 +42,9 @@ async function main() {
         botnum = i;
     }
     if (botnum == 0) {
-        await new updateLavaLink_1.LavalinkUpdater().dostuff();
+        await updater.dostuff();
     }
-    new client_1.musicBot(config.tokens[botnum], config.prefixes[botnum], botnum);
+    new client_1.musicBot(config.tokens[botnum], config.prefixes[botnum], botnum, updater);
 }
 main();
 //# sourceMappingURL=index.js.map
