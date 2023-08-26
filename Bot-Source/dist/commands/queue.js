@@ -65,7 +65,7 @@ async function songString(song, guild) {
     let timeToPlaySec = Math.floor(timeToPlay / 1000 - (timeToPlayMin * 60)).toLocaleString("en-GB", { minimumIntegerDigits: 2 });
     let time = `${timeToPlayMin}:${timeToPlaySec}`;
     let displayName = guild.members.cache.get(song.requester.id).displayName;
-    let tag = song.requester.tag;
+    let tag = song.requester.tag.split("#")[0];
     return `[${songname}](${link}) | \`${time} Requested by: ${displayName} (${tag})\``;
 }
 exports.data = {

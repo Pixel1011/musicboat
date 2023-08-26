@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.musicHelper = void 0;
 const rest_1 = require("@lavaclient/types/rest");
 const discord_js_1 = require("discord.js");
+const queue_1 = require("./queue");
 class musicHelper {
     constructor(client, guildid) {
         this.client = client;
@@ -122,7 +123,7 @@ class musicHelper {
         hours = Math.floor(hours - (days * 24));
         return `${days.toLocaleString("en-GB", { minimumIntegerDigits: 1 })}:${hours.toLocaleString("en-GB", { minimumIntegerDigits: 2 })}:${mins.toLocaleString("en-GB", { minimumIntegerDigits: 2 })}:${secs}`;
     }
-    async parseSearch(args, player) {
+    async parseSearch(args) {
         let spotify = this.lavalink.spotify;
         let results;
         let result;
@@ -131,7 +132,7 @@ class musicHelper {
         let playlistName = "";
         let playlistThumb = "";
         let totalTracks = 0;
-        let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/;
+        let youtubeVideoRegex = /(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\\&?/;
         let youtubePlaylistRegex = /^.*(youtu.be\/|list=)([^#&?]*).*/;
         let soundcloudTrackRegex = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
         if (spotify.isSpotifyUrl(args.join(" "))) {
@@ -149,17 +150,24 @@ class musicHelper {
                 case "playlist": {
                     isPlaylist = true;
                     let playlist = results;
+                    for (let i = 0; i < playlist.tracks.length; i++) {
+                        if (playlist.tracks[i].data.duration_ms == 0) {
+                            playlist.tracks.splice(i, 1);
+                            i--;
+                            continue;
+                        }
+                    }
                     tracks = await playlist.resolveYoutubeTracks();
                     let i = 0;
-                    tracks.forEach(t => {
+                    for (let t of tracks) {
                         t.info.spotify = true;
                         t.info.url = playlist.tracks[i].data.external_urls.spotify;
                         t.info.thumbnail = playlist.tracks[i].data.album.images[0].url;
                         t.info.title = playlist.tracks[i].data.name;
                         i++;
-                    });
+                    }
                     playlistName = playlist.data.name;
-                    totalTracks = playlist.data.tracks.total;
+                    totalTracks = tracks.length;
                     playlistThumb = playlist.data.images[0].url;
                     result = tracks[0];
                     break;
@@ -178,7 +186,7 @@ class musicHelper {
                 tracks = results.tracks;
                 totalTracks = tracks.length;
                 playlistName = results.playlistInfo.name;
-                playlistThumb = await player.queue.getThumbnail(tracks[0]);
+                playlistThumb = await queue_1.Queue.getThumbnail(tracks[0]);
                 let selectedTrack = results.playlistInfo.selectedTrack;
                 if (selectedTrack == -1)
                     selectedTrack = 0;

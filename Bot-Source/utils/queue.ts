@@ -21,7 +21,7 @@ export class Queue {
     this.lastSong; // for replay command to be added
   }
 
-  async getThumbnail(track: CTrack) {
+  static async getThumbnail(track: CTrack) {
     let thumbnail = track.info.thumbnail;
 
     if (!thumbnail && track.info.sourceName == "youtube") {
@@ -38,7 +38,7 @@ export class Queue {
   // requester is user object
   // track is a result from lavalink rest api
   async add(track: CTrack, requester: User) {
-    let thumbnail = await this.getThumbnail(track);
+    let thumbnail = await Queue.getThumbnail(track);
     if (track.info.spotify) {
       track.info.uri = track.info.url;
     }

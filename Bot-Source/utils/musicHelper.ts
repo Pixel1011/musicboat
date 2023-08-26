@@ -6,6 +6,7 @@ import type { musicBot } from "../client";
 import { CTrack } from "../Structures/Track";
 import type { UnifiedData } from "./SlashUnifier";
 import { BPlayer } from "../Structures/Song";
+import { Queue } from "./queue";
 
 
 export class musicHelper {
@@ -111,7 +112,7 @@ export class musicHelper {
     player.destroy();
     player.disconnect();
     if (player.striker != undefined) {
-      clearInterval(player.striker.interval);
+      clearInterval(player.striker.interval as NodeJS.Timeout);
     }
     player.striker = undefined;
     player.queue = undefined;
@@ -134,7 +135,7 @@ export class musicHelper {
     return `${days.toLocaleString("en-GB", {minimumIntegerDigits: 1})}:${hours.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${mins.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${secs}`;
   }
 
-  async parseSearch(args: string[], player: BPlayer<Node>) {
+  async parseSearch(args: string[]) {
     let spotify = this.lavalink.spotify;
     let results: Item | LoadTracksResponse;
     
@@ -146,7 +147,7 @@ export class musicHelper {
     let playlistThumb = "";
     let totalTracks = 0;
 
-    let youtubeVideoRegex = /^((?:https?:)?\/\/)?((?:www|m)\.)?((?:youtube\.com|youtu.be))(\/(?:[\w-]+\?v=|embed\/|v\/)?)([\w-]+)(\S+)?$/;
+    let youtubeVideoRegex = /(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\\&?/;
     let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#&?]*).*/;
     let soundcloudTrackRegex = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
 
@@ -166,17 +167,31 @@ export class musicHelper {
           case "playlist": {
             isPlaylist = true;
             let playlist = results as SpotifyPlaylist;
+            // run before resolveYoutubeTracks otherwise very random videos get resolved into non existent songs
+            for (let i= 0; i < playlist.tracks.length; i++) {
+              // apparantly songs can be nonexistent in spotify and they have a duration of 0
+              // i swear theres an edge case if someone tries to play a playlist that only has a nonexistent song
+              // i could return another variable and handle that in play.ts
+              if (playlist.tracks[i].data.duration_ms == 0) {
+                // splice out song
+                playlist.tracks.splice(i, 1);
+                i--;
+                continue;
+              }
+            }
+
             tracks = await playlist.resolveYoutubeTracks();
             let i = 0;
-            tracks.forEach(t => {
+            for (let t of tracks) {
               t.info.spotify = true;
               t.info.url = playlist.tracks[i].data.external_urls.spotify;
               t.info.thumbnail = playlist.tracks[i].data.album.images[0].url;
               t.info.title = playlist.tracks[i].data.name;
               i++;
-            });
+            }
+
             playlistName = playlist.data.name;
-            totalTracks = playlist.data.tracks.total;
+            totalTracks = tracks.length;
             playlistThumb = playlist.data.images[0].url;
             result = tracks[0];  
             break;
@@ -199,7 +214,7 @@ export class musicHelper {
         tracks = results.tracks;
         totalTracks = tracks.length;
         playlistName = results.playlistInfo.name;
-        playlistThumb = await player.queue.getThumbnail(tracks[0]);
+        playlistThumb = await Queue.getThumbnail(tracks[0]);
   
         let selectedTrack = results.playlistInfo.selectedTrack;
         if (selectedTrack == -1) selectedTrack = 0;

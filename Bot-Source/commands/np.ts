@@ -21,7 +21,7 @@ async function run(client: musicBot, data: UnifiedData) {
   let timeToPlay = currentSong.length;
   let timeToPlaystr = music.time(timeToPlay);
 
-  let requester = currentSong.requester.tag;
+  let requester = currentSong.requester.tag.split("#")[0];
   
   let dashes = "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
   let dot = "🔘"; // WHO MADE THIS SINGLE THING 2 CHARACTERS

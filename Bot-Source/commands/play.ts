@@ -4,7 +4,7 @@ import type { musicBot } from "../client";
 import type { UnifiedData } from "../utils/SlashUnifier";
 import { musicHelper } from "../utils/musicHelper";
 import { EmbedBuilder } from "discord.js";
-import { Queue } from "../utils/Queue";
+import { Queue } from "../utils/queue";
 import { ArgOption, ArgType } from "../Structures/Command";
 import { TrackEnd } from "../events/PlayerEvents/trackEnd";
 import { TrackStuck } from "../events/PlayerEvents/trackStuck";
@@ -96,9 +96,12 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   }
   
   client.logger.log(`Searching: ${args.join(" ")}`);
-  let {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args, player);
+  let {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args);
 
   // nothing found
+  if (!result) {
+    return data.channel.send(":x: **No Matches**");
+  }
   if (!result.info.spotify) {
     results = results as LoadTracksResponse;
     if (results.loadType == LoadType.NoMatches) {
@@ -111,7 +114,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   } else {
     results = results as Item;
     // well, if its spotify, it shouldnt fail to load (especially as spotify search isnt a thing), and if it does, i cant produce that result so i cant create a condition for it
-    // so we do FA and continue on as nothing bad has occured while praying
+    // so we do nothing and continue on as nothing bad has occured while praying
   }
 
 

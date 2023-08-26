@@ -1,6 +1,5 @@
 import type { musicBot } from "../client";
 
-// stop all program execution to wait for lavalink to connect
 function sleep(ms: number) {
   const date = Date.now();
   let currentDate = null;
@@ -9,24 +8,36 @@ function sleep(ms: number) {
   } while (currentDate - date < ms);
 }
 
-export default class lavaError {
+export default class lavaEvents {
   client: musicBot;
+  connectedOnce = false
   errorNum: number = 0;
   constructor(client: musicBot) {
     this.client = client;
   }
 
-  async handle(error: Error) {
-    this.client.logger.logFrom(error.message, "LAVAERROR");
+  async handleError(error: Error) {
+    this.client.logger.logFrom(error.message, "Lavalink");
     if (error.message.includes("ECONNREFUSED")) {
 
       if (this.errorNum > 5) {
         throw "Unable to connect to the lavalink Server";
       }
-      this.client.logger.logFrom("Lavalink connection refused, attempting to reconnect", "LAVAERROR");
+      this.client.logger.logFrom("Lavalink connection refused, attempting to reconnect", "Lavalink");
       this.client.lavalink.connect(this.client.user.id);
       this.errorNum += 1;
       sleep(2000);
     }
+  }
+
+  async handleDisconnect() {
+   // if (!this.connectedOnce) {
+    //this.client.lavalink.connect(this.client.user.id);
+    //}
+    // ok this ends up causing some weird forcing alot of connections so.. i guess i leave it?
+  }
+
+  async handleConnect() {
+    this.client.logger.logFrom("Connected", "Lavalink");
   }
 }

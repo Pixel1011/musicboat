@@ -35,13 +35,12 @@ const Flags = discord_js_1.default.GatewayIntentBits;
 const lavaclient_1 = require("lavaclient");
 const spotify_1 = require("@lavaclient/spotify");
 const config_json_1 = __importDefault(require("./config.json"));
-const lavaConnect_js_1 = __importDefault(require("./events/lavaConnect.js"));
-const lavaError_js_1 = __importDefault(require("./events/lavaError.js"));
 const ready_js_1 = __importDefault(require("./events/ready.js"));
 const messageCreate_js_1 = __importDefault(require("./events/messageCreate.js"));
 const voiceStateUpdate_js_1 = __importDefault(require("./events/voiceStateUpdate.js"));
 const Command_js_1 = require("./Structures/Command.js");
 const interactionCreate_js_1 = __importDefault(require("./events/interactionCreate.js"));
+const lavaEvents_js_1 = __importDefault(require("./events/lavaEvents.js"));
 class musicBot extends discord_js_1.Client {
     constructor(token, prefix, num, updater) {
         super({
@@ -113,9 +112,9 @@ class musicBot extends discord_js_1.Client {
         const rest = new discord_js_1.REST({ version: "10" }).setToken(this.token);
         (async () => {
             try {
-                console.log("Started refreshing application (/) commands.");
+                this.logger.log("Started refreshing application (/) commands.");
                 await rest.put(discord_js_1.Routes.applicationCommands(this.user.id), { body: slashCommands });
-                console.log("Successfully reloaded application (/) commands.");
+                this.logger.log("Successfully reloaded application (/) commands.");
             }
             catch (error) {
                 console.error(error);
@@ -151,13 +150,10 @@ class musicBot extends discord_js_1.Client {
                 this.lavalink.handleVoiceUpdate(packet.d);
             }
         });
-        this.updater.on("close", () => {
-            this.logger.log("Lavalink closed, reconnecting...");
-            this.lavalink.connect(this.user.id);
-        });
-        let lavaErrorClass = new lavaError_js_1.default(this);
-        this.lavalink.on("connect", () => (0, lavaConnect_js_1.default)(this));
-        this.lavalink.on("error", async (e) => await lavaErrorClass.handle(e));
+        let LavaeventClass = new lavaEvents_js_1.default(this);
+        this.lavalink.on("connect", () => LavaeventClass.handleConnect());
+        this.lavalink.on("disconnect", () => LavaeventClass.handleDisconnect());
+        this.lavalink.on("error", async (e) => await LavaeventClass.handleError(e));
         this.on("ready", () => (0, ready_js_1.default)(this));
         this.on("messageCreate", (msg) => (0, messageCreate_js_1.default)(msg, this));
         this.on("interactionCreate", (inter) => (0, interactionCreate_js_1.default)(inter, this));

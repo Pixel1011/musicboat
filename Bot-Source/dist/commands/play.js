@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.data = void 0;
 const musicHelper_1 = require("../utils/musicHelper");
 const discord_js_1 = require("discord.js");
-const Queue_1 = require("../utils/Queue");
+const queue_1 = require("../utils/queue");
 const Command_1 = require("../Structures/Command");
 const trackEnd_1 = require("../events/PlayerEvents/trackEnd");
 const trackStuck_1 = require("../events/PlayerEvents/trackStuck");
@@ -58,7 +58,7 @@ async function run(client, data, args) {
             player = await music.join(vchannel.id);
     }
     if (!player.queue) {
-        player.queue = new Queue_1.Queue(client);
+        player.queue = new queue_1.Queue(client);
     }
     if (!data.replied) {
         await data.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
@@ -67,7 +67,10 @@ async function run(client, data, args) {
         await data.channel.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
     }
     client.logger.log(`Searching: ${args.join(" ")}`);
-    let { result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args, player);
+    let { result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args);
+    if (!result) {
+        return data.channel.send(":x: **No Matches**");
+    }
     if (!result.info.spotify) {
         results = results;
         if (results.loadType == rest_1.LoadType.NoMatches) {

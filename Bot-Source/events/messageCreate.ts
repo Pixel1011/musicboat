@@ -16,6 +16,6 @@ export default async (msg: Message, client: musicBot) => {
   try {
     await cmd.data.run(client, data, args);
   } catch (e) {
-    client.logger.log(e);
+    client.logger.log(e.stack);
   }
 };

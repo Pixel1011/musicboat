@@ -6,9 +6,6 @@ const Flags = Discord.GatewayIntentBits;
 import { Node } from "lavaclient";
 import { load } from "@lavaclient/spotify";
 import Config from "./config.json";
-
-import lavaConnect from "./events/lavaConnect.js";
-import lavaError from "./events/lavaError.js";
 import ready from "./events/ready.js";
 import messageCreate from "./events/messageCreate.js";
 import voiceStateUpdate from "./events/voiceStateUpdate.js";
@@ -16,6 +13,7 @@ import type { config } from "./Structures/Config.js";
 import { ArgType, type Command } from "./Structures/Command.js";
 import interactionCreate from "./events/interactionCreate.js";
 import { LavalinkUpdater } from "./updateLavaLink.js";
+import lavaEvents from "./events/lavaEvents.js";
 
 
 export class musicBot extends Client {
@@ -106,11 +104,11 @@ export class musicBot extends Client {
     const rest = new REST({ version: "10" }).setToken(this.token);
     (async () => {
       try {
-        console.log("Started refreshing application (/) commands.");
+        this.logger.log("Started refreshing application (/) commands.");
     
         await rest.put(Routes.applicationCommands(this.user.id), { body: slashCommands });
-    
-        console.log("Successfully reloaded application (/) commands.");
+        
+        this.logger.log("Successfully reloaded application (/) commands.");
       } catch (error) {
         console.error(error);
       }
@@ -157,13 +155,12 @@ export class musicBot extends Client {
       }
 
     });
-    this.updater.on("close", () => {
-      this.logger.log("Lavalink closed, reconnecting...");
-      this.lavalink.connect(this.user.id);
-    });
-    let lavaErrorClass = new lavaError(this);
-    this.lavalink.on("connect", () => lavaConnect(this));
-    this.lavalink.on("error", async (e) => await lavaErrorClass.handle(e));
+
+
+    let LavaeventClass = new lavaEvents(this);
+    this.lavalink.on("connect", () => LavaeventClass.handleConnect());
+    this.lavalink.on("disconnect", () => LavaeventClass.handleDisconnect());
+    this.lavalink.on("error", async (e) => await LavaeventClass.handleError(e));
     this.on("ready", () => ready(this));
     this.on("messageCreate", (msg) => messageCreate(msg, this));
     this.on("interactionCreate", (inter) => interactionCreate(inter, this));

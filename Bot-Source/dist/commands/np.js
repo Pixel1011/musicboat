@@ -18,7 +18,7 @@ async function run(client, data) {
     let timePlayedstr = music.time(timePlayed);
     let timeToPlay = currentSong.length;
     let timeToPlaystr = music.time(timeToPlay);
-    let requester = currentSong.requester.tag;
+    let requester = currentSong.requester.tag.split("#")[0];
     let dashes = "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
     let dot = "🔘";
     timePlayed = (player.position) / 1000;

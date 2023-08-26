@@ -72,7 +72,7 @@ async function songString(song: QueueSong, guild: Guild) {
   let time = `${timeToPlayMin}:${timeToPlaySec}`;
 
   let displayName = guild.members.cache.get(song.requester.id).displayName;
-  let tag = song.requester.tag;
+  let tag = song.requester.tag.split("#")[0];
 
   return `[${songname}](${link}) | \`${time} Requested by: ${displayName} (${tag})\``;
 }

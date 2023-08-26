@@ -12,7 +12,7 @@ exports.default = async (interaction, client) => {
             await cmd.data.run(client, data, data.args);
         }
         catch (e) {
-            client.logger.log(e);
+            client.logger.log(e.stack);
         }
     }
 };

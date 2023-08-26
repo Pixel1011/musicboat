@@ -37,7 +37,7 @@ class Queue {
         this.currentSong;
         this.lastSong;
     }
-    async getThumbnail(track) {
+    static async getThumbnail(track) {
         let thumbnail = track.info.thumbnail;
         if (!thumbnail && track.info.sourceName == "youtube") {
             thumbnail = `https://img.youtube.com/vi/${track.info.identifier}/hqdefault.jpg`;
@@ -50,7 +50,7 @@ class Queue {
         return thumbnail;
     }
     async add(track, requester) {
-        let thumbnail = await this.getThumbnail(track);
+        let thumbnail = await Queue.getThumbnail(track);
         if (track.info.spotify) {
             track.info.uri = track.info.url;
         }
@@ -85,4 +85,4 @@ class Queue {
     }
 }
 exports.Queue = Queue;
-//# sourceMappingURL=Queue.js.map
+//# sourceMappingURL=queue.js.map

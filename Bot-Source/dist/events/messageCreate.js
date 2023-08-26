@@ -15,7 +15,7 @@ exports.default = async (msg, client) => {
         await cmd.data.run(client, data, args);
     }
     catch (e) {
-        client.logger.log(e);
+        client.logger.log(e.stack);
     }
 };
 //# sourceMappingURL=messageCreate.js.map
