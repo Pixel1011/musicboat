@@ -23,13 +23,13 @@ export class LavalinkUpdater extends EventEmitter {
   }
   
   async updateLavaLink() {
-    /*try {
+    try {
       await unlink("Lavalink.jar");
     } catch (e) {
       // bleh
     }
 
-    await this.download(url, "Lavalink.jar");*/
+    await this.download(url, "Lavalink.jar");
   }
   
   startLavaLink() {
@@ -50,9 +50,6 @@ export class LavalinkUpdater extends EventEmitter {
   }
 
   async checkVersion() {
-    
-    // beauties of version 4 which yeets websockets
-    return true;
     // unzips the jar and checks the version
     // cd to ./JarDecomp and use jar xvf to extract
     // returns true if the version is the latest version
