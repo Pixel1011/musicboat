@@ -10,7 +10,7 @@ function sleep(ms: number) {
 
 export default class lavaEvents {
   client: musicBot;
-  connectedOnce = false
+  connectedOnce = false;
   errorNum: number = 0;
   constructor(client: musicBot) {
     this.client = client;
@@ -20,7 +20,7 @@ export default class lavaEvents {
     this.client.logger.logFrom(error.message, "Lavalink");
     if (error.message.includes("ECONNREFUSED")) {
 
-      if (this.errorNum > 5) {
+      if (this.errorNum > 10) {
         throw "Unable to connect to the lavalink Server";
       }
       this.client.logger.logFrom("Lavalink connection refused, attempting to reconnect", "Lavalink");
@@ -31,7 +31,7 @@ export default class lavaEvents {
   }
 
   async handleDisconnect() {
-   // if (!this.connectedOnce) {
+    // if (!this.connectedOnce) {
     //this.client.lavalink.connect(this.client.user.id);
     //}
     // ok this ends up causing some weird forcing alot of connections so.. i guess i leave it?

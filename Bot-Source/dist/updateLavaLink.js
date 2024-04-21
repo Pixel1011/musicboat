@@ -8,7 +8,6 @@ const child_process_1 = require("child_process");
 const node_events_1 = require("node:events");
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const fs_1 = __importDefault(require("fs"));
-const promises_1 = require("fs/promises");
 let url = "https://github.com/lavalink-devs/Lavalink/releases/latest/download/Lavalink.jar";
 let apiurl = "https://api.github.com/repos/lavalink-devs/Lavalink/releases/latest";
 class LavalinkUpdater extends node_events_1.EventEmitter {
@@ -20,12 +19,6 @@ class LavalinkUpdater extends node_events_1.EventEmitter {
         return fs_1.default.writeFileSync(outputPath, bytes);
     }
     async updateLavaLink() {
-        try {
-            await (0, promises_1.unlink)("Lavalink.jar");
-        }
-        catch (e) {
-        }
-        await this.download(url, "Lavalink.jar");
     }
     startLavaLink() {
         this.child = (0, child_process_1.spawn)("java", ["-jar", "Lavalink.jar"], {
@@ -41,6 +34,7 @@ class LavalinkUpdater extends node_events_1.EventEmitter {
         });
     }
     async checkVersion() {
+        return true;
         if (!fs_1.default.existsSync("./JarDecomp")) {
             fs_1.default.mkdirSync("./JarDecomp");
         }
