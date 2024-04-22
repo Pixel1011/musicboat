@@ -7,9 +7,9 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   const music = new musicHelper(client, data.guild.id);
   data.send(`**Searching** :mag_right: \`\`${args.join(" ")}\`\``);
   let results = await music.search(args.join(" "), "ytsearch:");
-  let result = results.tracks[0];
+  //let result = results.tracks[0];
 
-  data.send(`Search result: \`\`${result.info.title}\`\`: ${result.info.uri}`);
+  //data.send(`Search result: \`\`${result.info.title}\`\`: ${result.info.uri}`);
 }
 export const data = {
   name: "search",

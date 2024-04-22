@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import {  Item, type SpotifyPlaylist, type SpotifyTrack } from "@lavaclient/spotify";
 import { type LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
 import { PermissionFlagsBits } from "discord.js";
@@ -81,7 +82,8 @@ export class musicHelper {
   async search(searchTerm: string, type?: string) {
     if (!type) type = "";
     searchTerm = type + searchTerm;
-    return await this.lavalink.rest.loadTracks(searchTerm);
+    // who hurt you when making this type jesus
+    return await this.lavalink.api.loadTracks(searchTerm);
   }
   
   async loadSpotify(url: string) {
@@ -89,10 +91,10 @@ export class musicHelper {
   }
 
   async join(voiceid: string) {
-    if (this.lavalink.players.get(this.guildid) == null) {
-      return await this.lavalink.createPlayer(this.guildid).connect(voiceid);
+    if (!this.getPlayer()) {
+      return await this.lavalink.players.create(this.guildid).voice.connect(voiceid);
     } else {
-      return await this.lavalink.players.get(this.guildid).connect(voiceid);
+      return await this.getPlayer().voice.connect(voiceid);
     }
   }
   async skip() {
@@ -104,13 +106,12 @@ export class musicHelper {
   }
 
   getPlayer() {
-    return this.lavalink.players.get(this.guildid) as BPlayer;
+    return this.lavalink.players.cache.get(this.guildid) as BPlayer;
   }
 
-  destroyPlayer() {
+  async destroyPlayer() {
     let player = this.getPlayer();
-    player.destroy();
-    player.disconnect();
+    player.voice.disconnect();
     if (player.striker != undefined) {
       clearInterval(player.striker.interval as NodeJS.Timeout);
     }
@@ -119,6 +120,7 @@ export class musicHelper {
     player.loop = false;
     player.queueLoop = false;
     player.setVolume(100);
+    this.lavalink.players.destroy(this.guildid);
   }
 
   time(ms: number) {
@@ -135,6 +137,11 @@ export class musicHelper {
     return `${days.toLocaleString("en-GB", {minimumIntegerDigits: 1})}:${hours.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${mins.toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${secs}`;
   }
 
+
+  // updating this
+  // i should probably take this opportunity to make this function more readable
+  // and actually reunderstand what in gods name it returns,
+  // may also have to uninvent the ctrack
   async parseSearch(args: string[]) {
     let spotify = this.lavalink.spotify;
     let results: Item | LoadTracksResponse;
@@ -150,8 +157,10 @@ export class musicHelper {
     let youtubeVideoRegex = /(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\\&?/;
     let youtubePlaylistRegex =  /^.*(youtu.be\/|list=)([^#&?]*).*/;
     let soundcloudTrackRegex = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
+    return {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks};
 
-    if (spotify.isSpotifyUrl(args.join(" "))) {
+    // high chance that with lavasrc most of this will be useless
+    /*    if (spotify.isSpotifyUrl(args.join(" "))) {
       let results = await this.loadSpotify(args.join(" "));
   
       switch (results.data.type) {
@@ -228,6 +237,7 @@ export class musicHelper {
       
     }
     return {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks};
+  }*/
+
   }
 }
-

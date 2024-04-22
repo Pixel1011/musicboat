@@ -22,8 +22,8 @@
       "verbatimModuleSyntax": false,
       "preserveConstEnums": true,
 
-      "types": ["node"],
+      "types": [],
       "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["dist/**/*", "node_modules/**/*"]
+  "exclude": ["dist/**/*", "node_modules/**/*", "./node_modules/lavaclient/dist/player.ts"]
 }

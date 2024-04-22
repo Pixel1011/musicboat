@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable no-useless-escape */
 import type { VoiceChannel } from "discord.js";
 import type { musicBot } from "../client";
@@ -15,7 +16,7 @@ import { Item } from "@lavaclient/spotify";
 
 
 async function run(client: musicBot, data: UnifiedData, args: string[]) {
-  let music = new musicHelper(client, data.guild.id);
+/*  let music = new musicHelper(client, data.guild.id);
   let vchannel = data.member.voice.channel as VoiceChannel;
   let lavalink = client.lavalink;
   let player: BPlayer;
@@ -258,7 +259,8 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     }, 2 * 60 * 1000); // every 2 mins, 10 strikes = 20mins
 
     player.striker.interval = interval;
-  }
+  }*/
+  return data.send("Bot borked :p");
 }
 
 export const data = {

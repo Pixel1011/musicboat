@@ -46,6 +46,7 @@ class musicBot extends discord_js_1.Client {
         super({
             intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildEmojisAndStickers, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent]
         });
+        this.client = this;
         this.botnum = num + 1;
         this.logger = new logger_js_1.logger(this);
         this.commands = [];
@@ -139,26 +140,32 @@ class musicBot extends discord_js_1.Client {
         const info = {
             host: "127.0.0.1",
             port: 2333,
-            password: "youshallnotpass"
+            auth: "youshallnotpass"
         };
-        this.lavalink = new lavaclient_1.Node({
-            connection: info,
-            sendGatewayPayload: (id, payload) => this.guilds.cache.get(id).shard.send(payload)
-        });
-        this.on("raw", async (packet) => {
-            if (packet.t === "VOICE_SERVER_UPDATE" || packet.t === "VOICE_STATE_UPDATE") {
-                this.lavalink.handleVoiceUpdate(packet.d);
+        this.lavalink = new lavaclient_1.Node({ info,
+            ws: {
+                clientName: "musicboat",
+                resuming: false,
+                reconnecting: false
+            },
+            discord: {
+                sendGatewayCommand: (guildId, data) => {
+                    this.guilds.cache.get(guildId).shard.send(data);
+                }
             }
         });
+        this.ws.on(discord_js_1.GatewayDispatchEvents.VoiceStateUpdate, (u) => this.lavalink.players.handleVoiceUpdate(u));
+        this.ws.on(discord_js_1.GatewayDispatchEvents.VoiceServerUpdate, (u) => this.lavalink.players.handleVoiceUpdate(u));
         let LavaeventClass = new lavaEvents_js_1.default(this);
-        this.lavalink.on("connect", () => LavaeventClass.handleConnect());
-        this.lavalink.on("disconnect", () => LavaeventClass.handleDisconnect());
+        this.lavalink.on("connected", () => LavaeventClass.handleConnect());
+        this.lavalink.on("disconnected", () => LavaeventClass.handleDisconnect());
         this.lavalink.on("error", async (e) => await LavaeventClass.handleError(e));
         this.on("ready", () => (0, ready_js_1.default)(this));
         this.on("messageCreate", (msg) => (0, messageCreate_js_1.default)(msg, this));
         this.on("interactionCreate", (inter) => (0, interactionCreate_js_1.default)(inter, this));
         this.on("voiceStateUpdate", (oldState, newState) => (0, voiceStateUpdate_js_1.default)(oldState, newState, this));
-        this.lavalink.connect(this.user.id);
+        this.logger.log("connecting to lavalink..");
+        this.lavalink.connect({ userId: this.user.id });
     }
 }
 exports.musicBot = musicBot;

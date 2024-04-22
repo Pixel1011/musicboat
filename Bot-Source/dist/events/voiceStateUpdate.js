@@ -16,7 +16,7 @@ async function default_1(oldState, newState, client) {
     }
     else if ((oldState.channelId != null) && (oldState.channelId != newState.channelId)) {
         await player.pause();
-        await player.connect(newState.channelId);
+        await player.voice.connect(newState.channelId);
         await sleep(1000);
         await player.resume();
         client.logger.log("handling a move");
