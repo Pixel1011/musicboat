@@ -93,10 +93,10 @@ export class LavalinkUpdater extends EventEmitter {
   }
   
   async dostuff() {
-    let isUptoDate = await this.checkVersion();
-    if (!isUptoDate) {
-      await this.updateLavaLink();
-    }
+    //let isUptoDate = await this.checkVersion();
+    //if (!isUptoDate) {
+    // await this.updateLavaLink();
+    //}
     await this.startLavaLink();
   }
 }
