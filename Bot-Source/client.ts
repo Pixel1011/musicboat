@@ -4,7 +4,6 @@ import fs from "fs";
 import path from "path";
 const Flags = Discord.GatewayIntentBits;
 import { Node, NodeOptions } from "lavaclient";
-import { load } from "@lavaclient/spotify";
 import Config from "./config.json";
 import ready from "./events/ready.js";
 import messageCreate from "./events/messageCreate.js";
@@ -118,18 +117,6 @@ export class musicBot extends Client {
   // init
   // login, load commands, event handling etc
   async init() {
-    if (this.config.spotifyID && this.config.spotifySecret) this.spotify = true;
-    if (this.spotify) {
-      load({
-        client: {
-          id: this.config.spotifyID,
-          secret: this.config.spotifySecret,
-        },
-        autoResolveYoutubeTracks: false,
-        //loaders: [ "track", "album", "playlist" ]
-      });
-    }
-
     await this.login(this.token);
     this.logger.log("Initializing..");
 

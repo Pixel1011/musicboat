@@ -33,7 +33,6 @@ const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
 const Flags = discord_js_1.default.GatewayIntentBits;
 const lavaclient_1 = require("lavaclient");
-const spotify_1 = require("@lavaclient/spotify");
 const config_json_1 = __importDefault(require("./config.json"));
 const ready_js_1 = __importDefault(require("./events/ready.js"));
 const messageCreate_js_1 = __importDefault(require("./events/messageCreate.js"));
@@ -123,17 +122,6 @@ class musicBot extends discord_js_1.Client {
         })();
     }
     async init() {
-        if (this.config.spotifyID && this.config.spotifySecret)
-            this.spotify = true;
-        if (this.spotify) {
-            (0, spotify_1.load)({
-                client: {
-                    id: this.config.spotifyID,
-                    secret: this.config.spotifySecret,
-                },
-                autoResolveYoutubeTracks: false,
-            });
-        }
         await this.login(this.token);
         this.logger.log("Initializing..");
         await this.ReloadCommands();

@@ -1,4 +1,5 @@
 // combined spotify and normal
+// might redo as its all combined now from lavasrc
 export class CTrack {
   track: TrackHash;
   info: CTrackInfo;

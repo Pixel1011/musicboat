@@ -1,5 +1,4 @@
 /* eslint-disable no-unused-vars */
-import {  Item, type SpotifyPlaylist, type SpotifyTrack } from "@lavaclient/spotify";
 import { type LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
 import { PermissionFlagsBits } from "discord.js";
 import type { Node } from "lavaclient";
@@ -86,8 +85,9 @@ export class musicHelper {
     return await this.lavalink.api.loadTracks(searchTerm);
   }
   
+  // probably remove 
   async loadSpotify(url: string) {
-    return await this.lavalink.spotify.load(url);
+    //return await this.lavalink.spotify.load(url);
   }
 
   async join(voiceid: string) {
@@ -143,8 +143,8 @@ export class musicHelper {
   // and actually reunderstand what in gods name it returns,
   // may also have to uninvent the ctrack
   async parseSearch(args: string[]) {
-    let spotify = this.lavalink.spotify;
-    let results: Item | LoadTracksResponse;
+    //let spotify = this.lavalink.spotify;
+    let results: LoadTracksResponse;
     
     //return values
     let result: CTrack;
