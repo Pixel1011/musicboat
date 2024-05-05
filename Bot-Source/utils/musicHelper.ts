@@ -116,7 +116,7 @@ export class musicHelper {
     player.queue = undefined;
     player.loop = false;
     player.queueLoop = false;
-    player.setVolume(10);
+    this.setVolume(100);
     this.lavalink.players.destroy(this.guildid);
   }
 
@@ -338,5 +338,12 @@ export class musicHelper {
     embed.setThumbnail(parsed.playlistThumb);
     embed.setColor(0x202225);
     data.channel.send({embeds: [embed]});
+  }
+  async setVolume(volume: number): Promise<void> {
+    let player = this.getPlayer();
+    // volume is extremely loud at 100 so its no longer seemingly 0-100 as a percentage, sounds roughly normal at 10 so divide by 10
+    // and i mean if your going above "10000%" i think your asking for it (and theres basically no difference in sound at that point so it wont sound 10x louder at 10001)
+    if (volume < 10000) volume = volume / 10;
+    player.setVolume(volume);
   }
 }
