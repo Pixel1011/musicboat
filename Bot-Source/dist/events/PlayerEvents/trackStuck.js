@@ -7,7 +7,7 @@ class TrackStuck {
         this.music = music;
     }
     async handle(track, threshold) {
-        this.client.logger.log("Threshold: " + threshold);
+        this.client.logger.log(`Threshold playing ${track.info.title}: ` + threshold);
     }
 }
 exports.TrackStuck = TrackStuck;

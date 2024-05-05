@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.musicHelper = void 0;
-const rest_1 = require("@lavaclient/types/rest");
 const discord_js_1 = require("discord.js");
 const queue_1 = require("./queue");
 class musicHelper {
@@ -74,17 +73,16 @@ class musicHelper {
         if (!type)
             type = "";
         searchTerm = type + searchTerm;
-        return await this.lavalink.rest.loadTracks(searchTerm);
-    }
-    async loadSpotify(url) {
-        return await this.lavalink.spotify.load(url);
+        return await this.lavalink.api.loadTracks(searchTerm);
     }
     async join(voiceid) {
-        if (this.lavalink.players.get(this.guildid) == null) {
-            return await this.lavalink.createPlayer(this.guildid).connect(voiceid);
+        if (!this.getPlayer()) {
+            await this.lavalink.players.create(this.guildid).voice.connect(voiceid);
+            return this.getPlayer();
         }
         else {
-            return await this.lavalink.players.get(this.guildid).connect(voiceid);
+            await this.getPlayer().voice.connect(voiceid);
+            return this.getPlayer();
         }
     }
     async skip() {
@@ -95,12 +93,11 @@ class musicHelper {
         await player.stop();
     }
     getPlayer() {
-        return this.lavalink.players.get(this.guildid);
+        return this.lavalink.players.cache.get(this.guildid);
     }
-    destroyPlayer() {
+    async destroyPlayer() {
         let player = this.getPlayer();
-        player.destroy();
-        player.disconnect();
+        player.voice.disconnect();
         if (player.striker != undefined) {
             clearInterval(player.striker.interval);
         }
@@ -109,6 +106,7 @@ class musicHelper {
         player.loop = false;
         player.queueLoop = false;
         player.setVolume(100);
+        this.lavalink.players.destroy(this.guildid);
     }
     time(ms) {
         var mins = Math.floor(ms / 1000 / 60);
@@ -124,79 +122,96 @@ class musicHelper {
         return `${days.toLocaleString("en-GB", { minimumIntegerDigits: 1 })}:${hours.toLocaleString("en-GB", { minimumIntegerDigits: 2 })}:${mins.toLocaleString("en-GB", { minimumIntegerDigits: 2 })}:${secs}`;
     }
     async parseSearch(args) {
-        let spotify = this.lavalink.spotify;
         let results;
-        let result;
-        let isPlaylist = false;
-        let tracks;
-        let playlistName = "";
-        let playlistThumb = "";
-        let totalTracks = 0;
-        let youtubeVideoRegex = /(?:https?:\/\/)?(?:www\.)?youtu\.?be(?:\.com)?\/?.*(?:watch|embed)?(?:.*v=|v\/|\/)([\w\-_]+)\\&?/;
-        let youtubePlaylistRegex = /^.*(youtu.be\/|list=)([^#&?]*).*/;
-        let soundcloudTrackRegex = /^https?:\/\/(soundcloud\.com|snd\.sc)\/(.*)$/;
-        if (spotify.isSpotifyUrl(args.join(" "))) {
-            let results = await this.loadSpotify(args.join(" "));
-            switch (results.data.type) {
-                case "track": {
-                    let track = results;
-                    result = await track.resolveYoutubeTrack();
-                    result.info.url = results.data.external_urls.spotify;
-                    result.info.thumbnail = results.data.album.images[0].url;
-                    result.info.title = results.data.name;
-                    result.info.spotify = true;
-                    break;
-                }
-                case "playlist": {
-                    isPlaylist = true;
-                    let playlist = results;
-                    for (let i = 0; i < playlist.tracks.length; i++) {
-                        if (playlist.tracks[i].data.duration_ms == 0) {
-                            playlist.tracks.splice(i, 1);
-                            i--;
-                            continue;
-                        }
-                    }
-                    tracks = await playlist.resolveYoutubeTracks();
-                    let i = 0;
-                    for (let t of tracks) {
-                        t.info.spotify = true;
-                        t.info.url = playlist.tracks[i].data.external_urls.spotify;
-                        t.info.thumbnail = playlist.tracks[i].data.album.images[0].url;
-                        t.info.title = playlist.tracks[i].data.name;
-                        i++;
-                    }
-                    playlistName = playlist.data.name;
-                    totalTracks = tracks.length;
-                    playlistThumb = playlist.data.images[0].url;
-                    result = tracks[0];
-                    break;
-                }
-            }
+        let returnVals = {
+            result: undefined,
+            error: false,
+            exception: undefined,
+            isPlaylist: false,
+            tracks: [],
+            playlistName: "",
+            playlistThumb: ""
+        };
+        let urlregex = /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/(?:watch\?(?=.*v=\w+)(?:\S+)?v=|embed\/|v\/|watch\?v=|youtube.com\/\S+\/|youtube.com\/c\/\S+\/|youtu\.be\/|playlist\?list=)([\w-]+)|youtu\.be\/([\w-]+))|(?:https?:\/\/)?(?:open\.spotify\.com\/(track|album|playlist)\/|spotify:(track|album|playlist):)([\w\d]+)|(?:https?:\/\/)?(?:www\.)?(?:soundcloud\.com\/(?:[\w\d-]+\/)?(?:sets\/)?|soundcloud.app.goo.gl\/)([\w\d-]+)\/([\w\d-]+)/gm;
+        if (urlregex.test(args.join(" "))) {
+            results = await this.search(args.join(" ").trim());
         }
         else {
-            if (youtubeVideoRegex.test(args.join(" ")) || youtubePlaylistRegex.test(args.join(" ")) || soundcloudTrackRegex.test(args.join(" "))) {
-                results = await this.search(args.join(" "));
+            results = await this.search(args.join(" "), "ytsearch:");
+        }
+        switch (results.loadType) {
+            case "track": {
+                returnVals.result = results.data;
+                break;
             }
-            else {
-                results = await this.search(args.join(" "), "ytsearch:");
+            case "playlist": {
+                returnVals.isPlaylist = true;
+                let playlist = results;
+                returnVals.playlistName = playlist.data.info.name;
+                if (playlist.data.tracks[0].info.sourceName == "spotify") {
+                    returnVals.playlistThumb = playlist.data.pluginInfo.artworkUrl;
+                }
+                else {
+                    returnVals.playlistThumb = queue_1.Queue.getThumbnail(playlist.data.tracks[0]);
+                }
+                let tracks = [...playlist.data.tracks];
+                for (let i = 0; i < tracks.length; i++) {
+                    if (tracks[i].info.length == 0) {
+                        tracks.splice(i, 1);
+                        i--;
+                        continue;
+                    }
+                }
+                let firstTrackidx = results.data.info.selectedTrack;
+                if (firstTrackidx == -1)
+                    firstTrackidx = 0;
+                returnVals.result = tracks[firstTrackidx];
+                tracks.splice(firstTrackidx, 1);
+                if (firstTrackidx != 0) {
+                    tracks = tracks.concat(tracks.splice(0, firstTrackidx));
+                }
+                returnVals.tracks = tracks;
+                break;
             }
-            if (results.loadType == rest_1.LoadType.PlaylistLoaded) {
-                isPlaylist = true;
-                tracks = results.tracks;
-                totalTracks = tracks.length;
-                playlistName = results.playlistInfo.name;
-                playlistThumb = await queue_1.Queue.getThumbnail(tracks[0]);
-                let selectedTrack = results.playlistInfo.selectedTrack;
-                if (selectedTrack == -1)
-                    selectedTrack = 0;
-                result = tracks[selectedTrack];
+            case "search": {
+                returnVals.result = results.data[0];
+                break;
             }
-            else if (results.loadType == rest_1.LoadType.TrackLoaded || results.loadType == rest_1.LoadType.SearchResult) {
-                result = results.tracks[0];
+            case "empty": {
+                break;
+            }
+            case "error": {
+                returnVals.error = true;
+                returnVals.exception = results.data;
+                break;
             }
         }
-        return { result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks };
+        return returnVals;
+    }
+    async addPlaylist(tracks, data) {
+        let totalTracks = 1;
+        for (let i = 0; i < tracks.length; i++) {
+            let t = tracks[i];
+            if (!t)
+                continue;
+            await this.getPlayer().queue.add(t, data.author);
+            totalTracks++;
+        }
+        return totalTracks;
+    }
+    async sendPlaylistEmbed(data, timeTillPlaying, totalTracks, position, parsed) {
+        let avatarURL = data.author.avatarURL({ size: 4096 });
+        let embed = new discord_js_1.EmbedBuilder();
+        embed.setAuthor({ name: "Playlist added to queue", iconURL: avatarURL });
+        embed.setDescription(`**${parsed.playlistName}**`);
+        embed.addFields([
+            { name: "Estimated time until playing", value: timeTillPlaying, inline: true },
+            { name: "Position in queue", value: `${position}`, inline: true },
+            { name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true }
+        ]);
+        embed.setThumbnail(parsed.playlistThumb);
+        embed.setColor(0x202225);
+        data.channel.send({ embeds: [embed] });
     }
 }
 exports.musicHelper = musicHelper;

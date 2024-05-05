@@ -4,7 +4,6 @@ import { musicHelper } from "../utils/musicHelper";
 import type { musicBot } from "../client";
 import type { UnifiedData } from "../utils/SlashUnifier";
 import { ArgOption, ArgType } from "../Structures/Command";
-import { mayStartNext } from "@lavaclient/types/payloads";
 
 async function run(client: musicBot, data: UnifiedData, args: string[]) {
   if (data.author.id !== client.config.ownerid) {
