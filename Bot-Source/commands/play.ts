@@ -4,7 +4,7 @@ import type { VoiceChannel } from "discord.js";
 import type { musicBot } from "../client";
 import type { UnifiedData } from "../utils/SlashUnifier";
 import { musicHelper } from "../utils/musicHelper";
-import { EmbedBuilder } from "discord.js";
+import { EmbedBuilder, time } from "discord.js";
 import { Queue } from "../utils/queue";
 import { ArgOption, ArgType } from "../Structures/Command";
 import { TrackEnd } from "../events/PlayerEvents/trackEnd";
@@ -12,19 +12,18 @@ import { TrackStuck } from "../events/PlayerEvents/trackStuck";
 import { TrackException } from "../events/PlayerEvents/trackException";
 import { LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
 import { BPlayer } from "../Structures/Song";
-import { Item } from "@lavaclient/spotify";
 
 
 async function run(client: musicBot, data: UnifiedData, args: string[]) {
-/*  let music = new musicHelper(client, data.guild.id);
+  let music = new musicHelper(client, data.guild.id);
   let vchannel = data.member.voice.channel as VoiceChannel;
   let lavalink = client.lavalink;
-  let player: BPlayer;
+  let player: BPlayer = music.getPlayer();
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
 
   // check if player doesnt exist, or if there is no queue created or, if there is no current song
-  if (!(lavalink.players.get(data.guild.id) as BPlayer) || !(lavalink.players.get(data.guild.id) as BPlayer).queue || !(lavalink.players.get(data.guild.id) as BPlayer).queue.currentSong) {
+  if (!player || !player.queue || !player.queue.currentSong) {
     // if no search term, return embed
     if (!args.join(" ")) {
       let embed = new EmbedBuilder();
@@ -37,17 +36,12 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   } else {
     // there is a player but no args so unpause
     if (!args.join(" ")) {
-      if (lavalink.players.get(data.guild.id).paused) {
-        await lavalink.players.get(data.guild.id).resume();
+      if (player.paused) {
+        await player.resume();
         data.send(":play_pause: **Resuming** :thumbsup:");
         return;
       } else {
-        // otherwise tell user its already playing or theyre not using command properly. not sure which
         return data.send(":x: **The player is not paused**");
-        // let embed = new EmbedBuilder();    
-        // embed.setTitle(":x: Invalid usage");
-        // embed.setDescription(`${client.prefix}play [Link or query]`);
-        // return data.send({embeds: [embed]});
       }
     }
   }
@@ -77,7 +71,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     player = await music.join(vchannel.id);
     data.send(`:thumbsup: **Joined** \`\`${vchannel.name}\`\` **and bound to** <#${data.channel.id}>`); // store channel somewhere for queues
   } else {
-    player = await lavalink.players.get(data.guild.id);
+    player = await music.getPlayer();
     if (!player) player = await music.join(vchannel.id);
   }
 
@@ -97,66 +91,32 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   }
   
   client.logger.log(`Searching: ${args.join(" ")}`);
-  let {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args);
-
+  let parsed = await music.parseSearch(args);
+  let result = parsed.result;
+  
   // nothing found
+  if (parsed.error) {
+    return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(parsed.exception))}`);
+  }
   if (!result) {
     return data.channel.send(":x: **No Matches**");
   }
-  if (!result.info.spotify) {
-    results = results as LoadTracksResponse;
-    if (results.loadType == LoadType.NoMatches) {
-      return data.channel.send(":x: **No Matches**");
-    } else
-    // failed to load
-    if (results.loadType == LoadType.LoadFailed) {
-      return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
-    }
-  } else {
-    results = results as Item;
-    // well, if its spotify, it shouldnt fail to load (especially as spotify search isnt a thing), and if it does, i cant produce that result so i cant create a condition for it
-    // so we do nothing and continue on as nothing bad has occured while praying
-  }
-
-
-
+  
   
   // play
   // if nothing in queue/nothing playing
-  if (player.queue.currentSong == null || player.queue.currentSong == undefined) {
+  if (!player.queue.currentSong) {
     player.skips = [];
-    let success = await player.queue.add(result, data.author);
-    if (!success) {
-      return data.channel.send(":x: **This video cannot be played**");
-    }
-
-    // if playlist with more than 1 song
-    if (isPlaylist && tracks[1]) {
-      tracks.shift();
-
-      for (let i in tracks) {
-        let t = tracks[i];
-        if (!t) break;
-        await player.queue.add(t, data.author);
-      }
-      // playlist embed
-      let avatarURL = data.author.avatarURL({size: 4096});
+    await player.queue.add(result, data.author);
+    
+    // if playlist
+    if (parsed.isPlaylist) {
+      let totalTracks = await music.addPlaylist(parsed.tracks, data);
       let timeTillPlaying = "Now!"; // nothing else in queue
-
-      let embed = new EmbedBuilder();
-      embed.setAuthor({name: "Playlist added to queue", iconURL: avatarURL});
-      embed.setDescription(`**${playlistName}**`);
-      embed.addFields([
-        {name: "Estimated time until playing", value: timeTillPlaying, inline: true},
-        {name: "Position in queue", value: "1", inline: true},
-        {name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true}
-      ]);
-      embed.setThumbnail(playlistThumb);
-      embed.setColor(0x202225);
-      data.channel.send({embeds: [embed]});
-
+      let position = "1";
+      await music.sendPlaylistEmbed(data, timeTillPlaying, totalTracks, position, parsed);
     }
-    // nothing playing and single result
+    // nothing playing
     player.play(result);
     data.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
     
@@ -164,64 +124,42 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     if (!player.eventsCreated) {
       let EndClass = new TrackEnd(music);
       player.on("trackEnd", async (track, reason) => EndClass.handle(track, reason));
-
+      
       let ExceptionClass = new TrackException(music);
       player.on("trackException", (track, error) => ExceptionClass.handle(track, error));
-
+      
       let StuckClass = new TrackStuck(music);
       player.on("trackStuck", (track, threshold) => StuckClass.handle(track, threshold));
       player.eventsCreated = true;
     }
   } else {     
     // if is already playing
+    
+    await player.queue.add(result, data.author);
+    let song = player.queue.songs.at(-1);
+    // embed
+    let avatarURL = song.requester.avatarURL({size: 4096});
+    
+    let songLength = music.time(song.length);
+    
+    let timeTillPlaying = 0;
+    
+    player.queue.songs.forEach(sng => {
+      timeTillPlaying = timeTillPlaying + sng.length;
+    });
 
-    let success = await player.queue.add(result, data.author);
-    if (!success) {
-      return data.channel.send(":x: **This video cannot be played**");
-    }
-
+    timeTillPlaying = timeTillPlaying + player.queue.currentSong.length - player.position;
+    // time to play whole queue including whats currently playing
+    timeTillPlaying = timeTillPlaying - song.length;
 
     // adding playlist
-    if (isPlaylist && tracks[0]) {
-      tracks.forEach(async t => {
-        await player.queue.add(t, data.author);
-      });
-      // playlist embed
-      let avatarURL = data.author.avatarURL({size: 4096});
-      let timeTillPlaying = "Now!"; // nothing else in queue
-
-      let embed = new EmbedBuilder();
-      embed.setAuthor({name: "Playlist added to queue", iconURL: avatarURL});
-      embed.setDescription(`**${playlistName}**`);
-      embed.addFields([
-        {name: "Estimated time until playing", value: `${timeTillPlaying}`, inline: true},
-        {name: "Position in queue", value: `${player.queue.songs.length + 1}`, inline: true},
-        {name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true}
-      ]);
-
-      embed.setThumbnail(playlistThumb);
-      embed.setColor(0x202225);
-      data.channel.send({embeds: [embed]});
-
-    } else { 
-
-
-      // adding 1 song
-      let song = player.queue.songs.at(-1);
-      // embed
-      let avatarURL = song.requester.avatarURL({size: 4096});
-
-      let songLength = music.time(song.length);
-
+    if (parsed.isPlaylist) {
+      let totalTracks = await music.addPlaylist(parsed.tracks, data);
       let timeTillPlaying = 0;
-
-      player.queue.songs.forEach(sng => {
-        timeTillPlaying = timeTillPlaying + sng.length;
-      });
-
-      timeTillPlaying = timeTillPlaying + (player.queue.currentSong.length - player.position);
-      timeTillPlaying = timeTillPlaying - song.length;
-
+      await music.sendPlaylistEmbed(data, music.time(timeTillPlaying), totalTracks, player.queue.songs.length + 1, parsed);
+    } else {
+      // not playlist (single song), already added to queue so just send embed
+      
       let embed = new EmbedBuilder();
       embed.setAuthor({name: "Added to queue", iconURL: avatarURL});
       embed.setDescription(`[**${song.title}**](${song.url})`);
@@ -234,12 +172,12 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
       embed.setThumbnail(song.thumbnail);
       embed.setColor(0x202225);
       data.channel.send({embeds: [embed]});
-
+      
     }
   }
-
-
-  // inactive timer
+  
+  
+  // register inactive timer if not already
   if (player.striker == undefined) {
     player.striker = {
       guild: data.guild.id,
@@ -248,7 +186,6 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     };
 
     let interval = setInterval(function () {
-      // really gotta rewrite this and just set to player like holy it keeps failing
       if (player.playing && vchannel.members.size > 1) return player.striker.strikes = 0;
 
       player.striker.strikes++;
@@ -259,8 +196,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     }, 2 * 60 * 1000); // every 2 mins, 10 strikes = 20mins
 
     player.striker.interval = interval;
-  }*/
-  return data.send("Bot borked :p");
+  }
 }
 
 export const data = {

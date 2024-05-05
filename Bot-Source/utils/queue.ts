@@ -2,9 +2,7 @@ import type { musicBot } from "../client";
 import type { Node } from "lavaclient";
 import type { User } from "discord.js";
 import type { QueueSong } from "../Structures/Song";
-import type { CTrack } from "../Structures/Track";
-import * as cheerio from "cheerio";
-import fetch from "node-fetch";
+import { Track } from "../Structures/Search";
 
 export class Queue {
   public client: musicBot;
@@ -21,30 +19,17 @@ export class Queue {
     this.lastSong; // for replay command to be added
   }
 
-  static async getThumbnail(track: CTrack) {
-    let thumbnail = track.info.thumbnail;
-
-    if (!thumbnail && track.info.sourceName == "youtube") {
-      thumbnail = `https://img.youtube.com/vi/${track.info.identifier}/hqdefault.jpg`;
-    }
-    if (track.info.sourceName == "soundcloud") {
-      let html = await fetch(track.info.uri).then((res) => res.text());
-      let $ = cheerio.load(html);
-      thumbnail = $("meta[property='og:image']").attr("content");
-
-    }
+  static getThumbnail(track: Track) {
+    let thumbnail = track.info.artworkUrl;
     return thumbnail;
   }
   // requester is user object
   // track is a result from lavalink rest api
-  async add(track: CTrack, requester: User) {
+  async add(track: Track, requester: User) {
     let thumbnail = await Queue.getThumbnail(track);
-    if (track.info.spotify) {
-      track.info.uri = track.info.url;
-    }
 
-    let song = {
-      track: track.track,
+    let song: QueueSong = {
+      encoded: track.encoded,
       identifier: track.info.identifier,
       seekable: track.info.isSeekable,
       length: track.info.length,

@@ -25,5 +25,5 @@
       "types": [],
       "forceConsistentCasingInFileNames": true
   },
-  "exclude": ["dist/**/*", "node_modules/**/*", "./node_modules/lavaclient/dist/player.ts"]
+  "exclude": ["dist/**/*", "node_modules/**/*"]
 }

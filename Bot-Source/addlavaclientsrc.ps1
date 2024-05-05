@@ -13,5 +13,9 @@ mv * ../../../../../node_modules/lavaclient/dist
 cd ../../../../../
 
 mv ./temp/lavaclient/packages/client/ws/src/* ./node_modules/lavalink-ws-client/dist
+mv ./temp/lavaclient/packages/client/api/src/api/* ./node_modules/lavalink-api-client/dist/api
+mv ./temp/lavaclient/packages/client/api/src/endpoint/* ./node_modules/lavalink-api-client/dist/endpoint
+mv ./temp/lavaclient/packages/protocol/src/* ./node_modules/lavalink-protocol/dist
+
 
 rm -Recurse -Force temp

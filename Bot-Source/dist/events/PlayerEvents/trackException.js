@@ -7,7 +7,7 @@ class TrackException {
         this.music = music;
     }
     async handle(track, error) {
-        this.client.logger.log(error.message);
+        this.client.logger.log(`Error playing ${track.info.title}:\n` + error.message + "\n" + error.cause + "\n" + error.severity);
     }
 }
 exports.TrackException = TrackException;
