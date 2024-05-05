@@ -73,10 +73,6 @@ class LavalinkUpdater extends node_events_1.EventEmitter {
         }
     }
     async dostuff() {
-        let isUptoDate = await this.checkVersion();
-        if (!isUptoDate) {
-            await this.updateLavaLink();
-        }
         await this.startLavaLink();
     }
 }

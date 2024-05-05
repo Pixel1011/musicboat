@@ -1,4 +1,5 @@
 import type { musicBot } from "../../client";
+import { Track } from "../../Structures/Search";
 import type { musicHelper } from "../../utils/musicHelper";
 
 export class TrackStuck {
@@ -9,7 +10,7 @@ export class TrackStuck {
     this.music = music;
   }
 
-  async handle(track: string, threshold: number) {
-    this.client.logger.log("Threshold: " + threshold);
+  async handle(track: Track, threshold: number) {
+    this.client.logger.log(`Threshold playing ${track.info.title}: ` + threshold);
   }
 }

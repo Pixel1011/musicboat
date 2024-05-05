@@ -8,13 +8,12 @@ const Command_1 = require("../Structures/Command");
 const trackEnd_1 = require("../events/PlayerEvents/trackEnd");
 const trackStuck_1 = require("../events/PlayerEvents/trackStuck");
 const trackException_1 = require("../events/PlayerEvents/trackException");
-const rest_1 = require("@lavaclient/types/rest");
 async function run(client, data, args) {
     let music = new musicHelper_1.musicHelper(client, data.guild.id);
     let vchannel = data.member.voice.channel;
     let lavalink = client.lavalink;
-    let player;
-    if (!lavalink.players.get(data.guild.id) || !lavalink.players.get(data.guild.id).queue || !lavalink.players.get(data.guild.id).queue.currentSong) {
+    let player = music.getPlayer();
+    if (!player || !player.queue || !player.queue.currentSong) {
         if (!args.join(" ")) {
             let embed = new discord_js_1.EmbedBuilder();
             embed.setTitle(":x: Invalid usage");
@@ -26,8 +25,8 @@ async function run(client, data, args) {
     }
     else {
         if (!args.join(" ")) {
-            if (lavalink.players.get(data.guild.id).paused) {
-                await lavalink.players.get(data.guild.id).resume();
+            if (player.paused) {
+                await player.resume();
                 data.send(":play_pause: **Resuming** :thumbsup:");
                 return;
             }
@@ -53,7 +52,7 @@ async function run(client, data, args) {
         data.send(`:thumbsup: **Joined** \`\`${vchannel.name}\`\` **and bound to** <#${data.channel.id}>`);
     }
     else {
-        player = await lavalink.players.get(data.guild.id);
+        player = await music.getPlayer();
         if (!player)
             player = await music.join(vchannel.id);
     }
@@ -67,49 +66,22 @@ async function run(client, data, args) {
         await data.channel.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
     }
     client.logger.log(`Searching: ${args.join(" ")}`);
-    let { result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks } = await music.parseSearch(args);
+    let parsed = await music.parseSearch(args);
+    let result = parsed.result;
+    if (parsed.error) {
+        return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(parsed.exception))}`);
+    }
     if (!result) {
         return data.channel.send(":x: **No Matches**");
     }
-    if (!result.info.spotify) {
-        results = results;
-        if (results.loadType == rest_1.LoadType.NoMatches) {
-            return data.channel.send(":x: **No Matches**");
-        }
-        else if (results.loadType == rest_1.LoadType.LoadFailed) {
-            return data.channel.send(`:x: **load failed: debug:** ${await client.logger.logToHaste(JSON.stringify(results))}`);
-        }
-    }
-    else {
-        results = results;
-    }
-    if (player.queue.currentSong == null || player.queue.currentSong == undefined) {
+    if (!player.queue.currentSong) {
         player.skips = [];
-        let success = await player.queue.add(result, data.author);
-        if (!success) {
-            return data.channel.send(":x: **This video cannot be played**");
-        }
-        if (isPlaylist && tracks[1]) {
-            tracks.shift();
-            for (let i in tracks) {
-                let t = tracks[i];
-                if (!t)
-                    break;
-                await player.queue.add(t, data.author);
-            }
-            let avatarURL = data.author.avatarURL({ size: 4096 });
+        await player.queue.add(result, data.author);
+        if (parsed.isPlaylist) {
+            let totalTracks = await music.addPlaylist(parsed.tracks, data);
             let timeTillPlaying = "Now!";
-            let embed = new discord_js_1.EmbedBuilder();
-            embed.setAuthor({ name: "Playlist added to queue", iconURL: avatarURL });
-            embed.setDescription(`**${playlistName}**`);
-            embed.addFields([
-                { name: "Estimated time until playing", value: timeTillPlaying, inline: true },
-                { name: "Position in queue", value: "1", inline: true },
-                { name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true }
-            ]);
-            embed.setThumbnail(playlistThumb);
-            embed.setColor(0x202225);
-            data.channel.send({ embeds: [embed] });
+            let position = "1";
+            await music.sendPlaylistEmbed(data, timeTillPlaying, totalTracks, position, parsed);
         }
         player.play(result);
         data.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
@@ -124,38 +96,22 @@ async function run(client, data, args) {
         }
     }
     else {
-        let success = await player.queue.add(result, data.author);
-        if (!success) {
-            return data.channel.send(":x: **This video cannot be played**");
-        }
-        if (isPlaylist && tracks[0]) {
-            tracks.forEach(async (t) => {
-                await player.queue.add(t, data.author);
-            });
-            let avatarURL = data.author.avatarURL({ size: 4096 });
-            let timeTillPlaying = "Now!";
-            let embed = new discord_js_1.EmbedBuilder();
-            embed.setAuthor({ name: "Playlist added to queue", iconURL: avatarURL });
-            embed.setDescription(`**${playlistName}**`);
-            embed.addFields([
-                { name: "Estimated time until playing", value: `${timeTillPlaying}`, inline: true },
-                { name: "Position in queue", value: `${player.queue.songs.length + 1}`, inline: true },
-                { name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true }
-            ]);
-            embed.setThumbnail(playlistThumb);
-            embed.setColor(0x202225);
-            data.channel.send({ embeds: [embed] });
+        await player.queue.add(result, data.author);
+        let song = player.queue.songs.at(-1);
+        let avatarURL = song.requester.avatarURL({ size: 4096 });
+        let songLength = music.time(song.length);
+        let timeTillPlaying = 0;
+        player.queue.songs.forEach(sng => {
+            timeTillPlaying = timeTillPlaying + sng.length;
+        });
+        timeTillPlaying = timeTillPlaying + player.queue.currentSong.length - player.position;
+        timeTillPlaying = timeTillPlaying - song.length;
+        if (parsed.isPlaylist) {
+            let totalTracks = await music.addPlaylist(parsed.tracks, data);
+            let timeTillPlaying = 0;
+            await music.sendPlaylistEmbed(data, music.time(timeTillPlaying), totalTracks, player.queue.songs.length + 1, parsed);
         }
         else {
-            let song = player.queue.songs.at(-1);
-            let avatarURL = song.requester.avatarURL({ size: 4096 });
-            let songLength = music.time(song.length);
-            let timeTillPlaying = 0;
-            player.queue.songs.forEach(sng => {
-                timeTillPlaying = timeTillPlaying + sng.length;
-            });
-            timeTillPlaying = timeTillPlaying + (player.queue.currentSong.length - player.position);
-            timeTillPlaying = timeTillPlaying - song.length;
             let embed = new discord_js_1.EmbedBuilder();
             embed.setAuthor({ name: "Added to queue", iconURL: avatarURL });
             embed.setDescription(`[**${song.title}**](${song.url})`);

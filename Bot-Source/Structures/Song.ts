@@ -4,7 +4,7 @@ import type { Player, Node } from "lavaclient";
 import type { Queue } from "../utils/queue";
 
 export interface QueueSong {
-  track: TrackHash;
+  encoded: TrackHash;
   identifier: string;
   seekable: boolean;
   length: number;

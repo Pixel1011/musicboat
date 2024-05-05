@@ -23,7 +23,7 @@ export default async function (oldState: any, newState: any, client: musicBot) {
   // handle being moved
   if ((oldState.channelId != null) && (oldState.channelId != newState.channelId)) {
     await player.pause();
-    await player.connect(newState.channelId);
+    await player.voice.connect(newState.channelId);
     await sleep(1000); // wait for connect?
     await player.resume();
     client.logger.log("handling a move");

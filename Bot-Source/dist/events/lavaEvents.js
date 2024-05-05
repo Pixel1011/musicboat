@@ -9,17 +9,18 @@ function sleep(ms) {
 }
 class lavaEvents {
     constructor(client) {
+        this.connectedOnce = false;
         this.errorNum = 0;
         this.client = client;
     }
     async handleError(error) {
-        this.client.logger.logFrom(error.message, "Lavalink");
+        this.client.logger.logFrom(error.message, "Lavalink Error");
         if (error.message.includes("ECONNREFUSED")) {
-            if (this.errorNum > 5) {
+            if (this.errorNum > 10) {
                 throw "Unable to connect to the lavalink Server";
             }
             this.client.logger.logFrom("Lavalink connection refused, attempting to reconnect", "Lavalink");
-            this.client.lavalink.connect(this.client.user.id);
+            this.client.lavalink.connect({ userId: this.client.user.id, force: true });
             this.errorNum += 1;
             sleep(2000);
         }

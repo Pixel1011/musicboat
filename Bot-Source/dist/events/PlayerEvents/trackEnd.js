@@ -9,14 +9,14 @@ class TrackEnd {
     async handle(track, reason) {
         this.client.logger.logFrom(reason, "TrackEnd");
         let player = this.music.getPlayer();
-        if (reason == "REPLACED")
+        if (reason == "replaced")
             return;
         if (!player.queue)
             return;
         if ((player.queue.songs[0] || player.loop || player.queueLoop) && player.queue.currentSong) {
             if (!player.loop)
                 await player.queue.shift(player.queueLoop);
-            await player.play(player.queue.currentSong.track);
+            await player.play(player.queue.currentSong.encoded);
         }
         else {
             player.loop = false;

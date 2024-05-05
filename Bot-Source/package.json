@@ -26,11 +26,10 @@
   },
   "homepage": "https://github.com/Pixel1011/musicboat#readme",
   "dependencies": {
-    "@lavaclient/spotify": "^3.1.0",
     "cheerio": "^1.0.0-rc.12",
     "concurrently": "^7.5.0",
     "discord.js": "^14.6.0",
-    "lavaclient": "^4.1.1",
+    "lavaclient": "5.0.0-rc.3",
     "minimist": "^1.2.6",
     "node-fetch": "^2.6.7"
   },
@@ -42,6 +41,7 @@
     "@typescript-eslint/eslint-plugin": "^5.39.0",
     "@typescript-eslint/parser": "^5.39.0",
     "eslint": "^8.27.0",
+    "ts-essentials": "^9.4.2",
     "typescript": "^5.1.3"
   }
 }

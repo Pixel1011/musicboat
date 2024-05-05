@@ -7,8 +7,6 @@ async function run(client, data, args) {
     const music = new musicHelper_1.musicHelper(client, data.guild.id);
     data.send(`**Searching** :mag_right: \`\`${args.join(" ")}\`\``);
     let results = await music.search(args.join(" "), "ytsearch:");
-    let result = results.tracks[0];
-    data.send(`Search result: \`\`${result.info.title}\`\`: ${result.info.uri}`);
 }
 exports.data = {
     name: "search",
