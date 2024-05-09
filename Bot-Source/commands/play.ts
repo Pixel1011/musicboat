@@ -1,23 +1,20 @@
-/* eslint-disable no-unused-vars */
 /* eslint-disable no-useless-escape */
 import type { VoiceChannel } from "discord.js";
 import type { musicBot } from "../client";
 import type { UnifiedData } from "../utils/SlashUnifier";
 import { musicHelper } from "../utils/musicHelper";
-import { EmbedBuilder, time } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { Queue } from "../utils/queue";
 import { ArgOption, ArgType } from "../Structures/Command";
 import { TrackEnd } from "../events/PlayerEvents/trackEnd";
 import { TrackStuck } from "../events/PlayerEvents/trackStuck";
 import { TrackException } from "../events/PlayerEvents/trackException";
-import { LoadTracksResponse, LoadType } from "@lavaclient/types/rest";
 import { BPlayer } from "../Structures/Song";
 
 
 async function run(client: musicBot, data: UnifiedData, args: string[]) {
   let music = new musicHelper(client, data.guild.id);
   let vchannel = data.member.voice.channel as VoiceChannel;
-  let lavalink = client.lavalink;
   let player: BPlayer = music.getPlayer();
 
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
@@ -116,6 +113,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
       let position = "1";
       await music.sendPlaylistEmbed(data, timeTillPlaying, totalTracks, position, parsed);
     }
+    music.setVolume(100);
     // nothing playing
     player.play(result);
     data.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
@@ -155,7 +153,6 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
     // adding playlist
     if (parsed.isPlaylist) {
       let totalTracks = await music.addPlaylist(parsed.tracks, data);
-      let timeTillPlaying = 0;
       await music.sendPlaylistEmbed(data, music.time(timeTillPlaying), totalTracks, player.queue.songs.length + 1, parsed);
     } else {
       // not playlist (single song), already added to queue so just send embed

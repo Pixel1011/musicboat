@@ -10,6 +10,9 @@ import type { ChildProcess } from "child_process";
 let url = "https://github.com/lavalink-devs/Lavalink/releases/latest/download/Lavalink.jar";
 let apiurl = "https://api.github.com/repos/lavalink-devs/Lavalink/releases/latest";
 
+// stop updating if true
+const brick = true;
+
 // would also update lavasrc automatically but is less easy as the file names have the version in them
 // i mean it makes checking version easier but downloading the correct version harder
 
@@ -93,10 +96,12 @@ export class LavalinkUpdater extends EventEmitter {
   }
   
   async dostuff() {
-    //let isUptoDate = await this.checkVersion();
-    //if (!isUptoDate) {
-    // await this.updateLavaLink();
-    //}
+    if (!brick) {
+      let isUptoDate = await this.checkVersion();
+      if (!isUptoDate) {
+        await this.updateLavaLink();
+      }
+    }
     await this.startLavaLink();
   }
 }

@@ -17,8 +17,8 @@ async function run(client: musicBot, data: UnifiedData) {
 
   let timePlayed = player.position;
   let timePlayedstr = music.time(timePlayed);
-
-  let timeToPlay = currentSong.length;
+  if (currentSong.isStream) timePlayedstr = "LIVE";
+  let timeToPlay: number | string = currentSong.length;
   let timeToPlaystr = music.time(timeToPlay);
 
   let requester = currentSong.requester.tag.split("#")[0];
@@ -28,15 +28,15 @@ async function run(client: musicBot, data: UnifiedData) {
 
   timePlayed = (player.position) / 1000;
   timeToPlay = currentSong.length / 1000;
-  let index = Math.floor((timePlayed/timeToPlay) * 30);
+  let index = Math.floor((timePlayed/ timeToPlay) * 30);
   if (index >= 30) index = 29; // just incase
   dashes = dashes.substr(0, index) + dot + dashes.substr(index + dot.length);
   if (index != 29) dashes = dashes.replace(dot, dot + "▬"); // grr
 
   let embed = new EmbedBuilder(); 
-  embed.setAuthor({name: "Now Playing :musical_note:", iconURL: avatarURL});
+  embed.setAuthor({name: "Now Playing ♪", iconURL: avatarURL});
   embed.setThumbnail(currentSong.thumbnail);
-  embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedstr} / ${timeToPlaystr}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
+  embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedstr} / ${timeToPlaystr}\`\`\n\n \`\`Requested by: ${requester}\`\``);
   data.send({embeds: [embed]});
 
 

@@ -1,11 +1,10 @@
-/* eslint-disable no-unused-vars */
 import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
 import type { Node } from "lavaclient";
 import type { musicBot } from "../client";
 import type { UnifiedData } from "./SlashUnifier";
 import { BPlayer } from "../Structures/Song";
 import { Queue } from "./queue";
-import { loadResult, ParsedResult, playlistLoaded, Track } from "../Structures/Search";
+import { loadResult, ParsedResult, Track } from "../Structures/Search";
 
 
 
@@ -37,7 +36,7 @@ export class musicHelper {
     }
     // check if playing
     if (checkPlayer) {
-      if (!player.playing && (!player.queue || !player.queue.currentSong)) {
+      if (!player || (!player.playing && (!player.queue || !player.queue.currentSong))) {
         data.send(":x: **Bot is not currently playing**");
         return false;
       }
@@ -344,6 +343,7 @@ export class musicHelper {
     // volume is extremely loud at 100 so its no longer seemingly 0-100 as a percentage, sounds roughly normal at 10 so divide by 10
     // and i mean if your going above "10000%" i think your asking for it (and theres basically no difference in sound at that point so it wont sound 10x louder at 10001)
     if (volume < 10000) volume = volume / 10;
+    volume = Math.round(volume);
     player.setVolume(volume);
   }
 }

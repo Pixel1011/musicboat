@@ -20,7 +20,7 @@ async function run(client, data, args) {
     let Ivol = Number(vol);
     if (Ivol > 2147483647)
         return data.send(":x: **The volume cannot be set this high!**");
-    await player.setVolume(Ivol);
+    await music.setVolume(Ivol);
     return data.send(`🎵 **Set volume to ${vol}%** 👍`);
 }
 exports.data = {

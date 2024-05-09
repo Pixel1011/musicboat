@@ -11,6 +11,7 @@ const fs_1 = __importDefault(require("fs"));
 const promises_1 = require("fs/promises");
 let url = "https://github.com/lavalink-devs/Lavalink/releases/latest/download/Lavalink.jar";
 let apiurl = "https://api.github.com/repos/lavalink-devs/Lavalink/releases/latest";
+const brick = true;
 class LavalinkUpdater extends node_events_1.EventEmitter {
     super() {
     }
@@ -73,6 +74,12 @@ class LavalinkUpdater extends node_events_1.EventEmitter {
         }
     }
     async dostuff() {
+        if (!brick) {
+            let isUptoDate = await this.checkVersion();
+            if (!isUptoDate) {
+                await this.updateLavaLink();
+            }
+        }
         await this.startLavaLink();
     }
 }

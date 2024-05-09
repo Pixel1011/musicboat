@@ -27,7 +27,7 @@ class musicHelper {
             }
         }
         if (checkPlayer) {
-            if (!player.playing && (!player.queue || !player.queue.currentSong)) {
+            if (!player || (!player.playing && (!player.queue || !player.queue.currentSong))) {
                 data.send(":x: **Bot is not currently playing**");
                 return false;
             }
@@ -105,7 +105,7 @@ class musicHelper {
         player.queue = undefined;
         player.loop = false;
         player.queueLoop = false;
-        player.setVolume(100);
+        this.setVolume(100);
         this.lavalink.players.destroy(this.guildid);
     }
     time(ms) {
@@ -212,6 +212,13 @@ class musicHelper {
         embed.setThumbnail(parsed.playlistThumb);
         embed.setColor(0x202225);
         data.channel.send({ embeds: [embed] });
+    }
+    async setVolume(volume) {
+        let player = this.getPlayer();
+        if (volume < 10000)
+            volume = volume / 10;
+        volume = Math.round(volume);
+        player.setVolume(volume);
     }
 }
 exports.musicHelper = musicHelper;

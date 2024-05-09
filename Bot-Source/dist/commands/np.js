@@ -16,6 +16,8 @@ async function run(client, data) {
     let url = currentSong.url;
     let timePlayed = player.position;
     let timePlayedstr = music.time(timePlayed);
+    if (currentSong.isStream)
+        timePlayedstr = "LIVE";
     let timeToPlay = currentSong.length;
     let timeToPlaystr = music.time(timeToPlay);
     let requester = currentSong.requester.tag.split("#")[0];
@@ -30,9 +32,9 @@ async function run(client, data) {
     if (index != 29)
         dashes = dashes.replace(dot, dot + "▬");
     let embed = new discord_js_1.EmbedBuilder();
-    embed.setAuthor({ name: "Now Playing :musical_note:", iconURL: avatarURL });
+    embed.setAuthor({ name: "Now Playing ♪", iconURL: avatarURL });
     embed.setThumbnail(currentSong.thumbnail);
-    embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedstr} / ${timeToPlaystr}\`\`\n\n \`\`Requested by:\`\` ${requester}`);
+    embed.setDescription(`[${title}](${url})\n\n\`\`${dashes}\`\`\n\n\`\`${timePlayedstr} / ${timeToPlaystr}\`\`\n\n \`\`Requested by: ${requester}\`\``);
     data.send({ embeds: [embed] });
 }
 exports.data = {

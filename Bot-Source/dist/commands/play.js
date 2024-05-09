@@ -11,7 +11,6 @@ const trackException_1 = require("../events/PlayerEvents/trackException");
 async function run(client, data, args) {
     let music = new musicHelper_1.musicHelper(client, data.guild.id);
     let vchannel = data.member.voice.channel;
-    let lavalink = client.lavalink;
     let player = music.getPlayer();
     if (!player || !player.queue || !player.queue.currentSong) {
         if (!args.join(" ")) {
@@ -83,6 +82,7 @@ async function run(client, data, args) {
             let position = "1";
             await music.sendPlaylistEmbed(data, timeTillPlaying, totalTracks, position, parsed);
         }
+        music.setVolume(100);
         player.play(result);
         data.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
         if (!player.eventsCreated) {
@@ -108,7 +108,6 @@ async function run(client, data, args) {
         timeTillPlaying = timeTillPlaying - song.length;
         if (parsed.isPlaylist) {
             let totalTracks = await music.addPlaylist(parsed.tracks, data);
-            let timeTillPlaying = 0;
             await music.sendPlaylistEmbed(data, music.time(timeTillPlaying), totalTracks, player.queue.songs.length + 1, parsed);
         }
         else {

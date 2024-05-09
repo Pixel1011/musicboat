@@ -70,11 +70,10 @@ async function songString(song: QueueSong, guild: Guild) {
   let timeToPlayMin = Math.floor(timeToPlay / 1000 / 60);
   let timeToPlaySec = Math.floor(timeToPlay / 1000 - (timeToPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
   let time = `${timeToPlayMin}:${timeToPlaySec}`;
-
+  if (song.isStream) time = "LIVE";
   let displayName = guild.members.cache.get(song.requester.id).displayName;
-  let tag = song.requester.tag.split("#")[0];
 
-  return `[${songname}](${link}) | \`${time} Requested by: ${displayName} (${tag})\``;
+  return `[${songname}](${link}) | \`${time} Requested by: ${displayName}\``;
 }
 
 export const data = {

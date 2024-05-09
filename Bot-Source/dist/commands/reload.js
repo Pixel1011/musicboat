@@ -12,7 +12,7 @@ async function run(client, data, args) {
     try {
         let cmdFile = require("./" + command);
         client.commands[command] = cmdFile;
-        if (cmdFile.aliases[0]) {
+        if (cmdFile.aliases && cmdFile.aliases[0]) {
             cmdFile.aliases.forEach(alias => {
                 client.commands[alias] = cmdFile;
             });
