@@ -16,7 +16,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   let music = new musicHelper(client, data.guild.id);
   let vchannel = data.member.voice.channel as VoiceChannel;
   let player: BPlayer = music.getPlayer();
-
+  
   // check if given search term and if not, see if a player already exists and see if user is trying to unpause
 
   // check if player doesnt exist, or if there is no queue created or, if there is no current song

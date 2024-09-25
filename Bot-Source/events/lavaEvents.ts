@@ -20,7 +20,7 @@ export default class lavaEvents {
     this.client.logger.logFrom(error.message, "Lavalink Error");
     if (error.message.includes("ECONNREFUSED")) {
 
-      if (this.errorNum > 10) {
+      if (this.errorNum > 50) {
         throw "Unable to connect to the lavalink Server";
       }
       this.client.logger.logFrom("Lavalink connection refused, attempting to reconnect", "Lavalink");

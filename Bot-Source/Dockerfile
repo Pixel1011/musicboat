@@ -13,6 +13,7 @@ COPY ./commands ./commands
 COPY ./events ./events
 COPY ./Structures ./Structures
 COPY ./utils ./utils
+COPY ./plugins ./plugins
 COPY ./index.ts ./index.ts
 COPY ./client.ts ./client.ts
 COPY ./updateLavaLink.ts ./updateLavaLink.ts

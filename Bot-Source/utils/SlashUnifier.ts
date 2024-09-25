@@ -48,7 +48,7 @@ export class UnifiedData {
 
   async send(content: string | object): Promise<Message<boolean>> {
     if (this.isMsg) {
-      return await this.msg.channel.send(content);
+      return await (this.msg.channel as TextChannel).send(content);
     } else {
       this.replied = true;
       if (typeof content == "string") {
