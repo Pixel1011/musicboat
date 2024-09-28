@@ -5,7 +5,7 @@ lavalink:
   server:
     password: "youshallnotpass"
     sources:
-      youtube: true
+      youtube: false
       bandcamp: true
       soundcloud: true
       twitch: true
@@ -25,8 +25,8 @@ lavalink:
       searchTriggersFail: true # Whether a search 429 should trigger marking the ip as failing
       retryLimit: 10 # -1 = use default lavaplayer value | 0 = infinity | >0 = retry will happen this numbers times
   plugins:
-    - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.0.1"
-
+    - dependency: "com.github.topi314.lavasrc:lavasrc-plugin:4.2.0"
+    - dependency: "dev.lavalink.youtube:youtube-plugin:1.8.2"
 metrics:
   prometheus:
     enabled: false
@@ -63,7 +63,7 @@ plugins:
       deezer: false # Enable Deezer source
       yandexmusic: false # Enable Yandex Music source
       flowerytts: false # Enable Flowery TTS source
-      youtube: true # Enable YouTube search source (https://github.com/topi314/LavaSearch)
+      youtube: false # Enable YouTube search source (https://github.com/topi314/LavaSearch)
     spotify:
       clientId: "spotifyclientsecret"
       clientSecret: "spotifyclientsecret"
@@ -92,3 +92,14 @@ plugins:
       silence: 0 # the silence parameter is in milliseconds. Range is 0 to 10000. The default is 0.
       speed: 1.0 # the speed parameter is a float between 0.5 and 10. The default is 1.0. (0.5 is half speed, 2.0 is double speed, etc.)
       audioFormat: "mp3" # supported formats are: mp3, ogg_opus, ogg_vorbis, aac, wav, and flac. Default format is mp3
+  youtube:
+    enabled: true # Whether this source can be used.
+    allowSearch: true # Whether "ytsearch:" and "ytmsearch:" can be used.
+    allowDirectVideoIds: true # Whether just video IDs can match. If false, only complete URLs will be loaded.
+    allowDirectPlaylistIds: true # Whether just playlist IDs can match. If false, only complete URLs will be loaded.
+    # The clients to use for track loading. See below for a list of valid clients.
+    # Clients are queried in the order they are given (so the first client is queried first and so on...)
+    clients:
+      - WEB
+      - ANDROID_TESTSUITE
+      - TVHTML5EMBEDDED
