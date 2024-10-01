@@ -215,9 +215,6 @@ class musicHelper {
     }
     async setVolume(volume) {
         let player = this.getPlayer();
-        if (volume < 10000)
-            volume = volume / 10;
-        volume = Math.round(volume);
         player.setVolume(volume);
     }
 }

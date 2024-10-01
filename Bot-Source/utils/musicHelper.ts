@@ -340,10 +340,6 @@ export class musicHelper {
   }
   async setVolume(volume: number): Promise<void> {
     let player = this.getPlayer();
-    // volume is extremely loud at 100 so its no longer seemingly 0-100 as a percentage, sounds roughly normal at 10 so divide by 10
-    // and i mean if your going above "10000%" i think your asking for it (and theres basically no difference in sound at that point so it wont sound 10x louder at 10001)
-    if (volume < 10000) volume = volume / 10;
-    volume = Math.round(volume);
     player.setVolume(volume);
   }
 }
