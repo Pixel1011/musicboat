@@ -100,6 +100,8 @@ plugins:
     # The clients to use for track loading. See below for a list of valid clients.
     # Clients are queried in the order they are given (so the first client is queried first and so on...)
     clients:
-      - WEB
-      - ANDROID_TESTSUITE
-      - TVHTML5EMBEDDED
+      - TV
+      - ANDROID_VR
+      - MWEB
+      - MUSIC
+      - WEBEMBEDDED
