@@ -1,4 +1,4 @@
-FROM node:20-alpine
+FROM node:24-alpine
 USER root
 
 # Install dependencies
@@ -26,4 +26,4 @@ COPY ./Lavalink.jar ./Lavalink.jar
 # install dependenciesw
 RUN npm install
 
-CMD ["npm", "run", "start"];
+CMD npm run start

@@ -18,14 +18,18 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   var codeGiven = args.join(" ");
   if (codeGiven == "") return;
 
+  let outputText = "Output";
+  let embedColour = 0xa0d4ff;
   try {
     var res = await eval(`(async function(){${codeGiven}}).call()`);
     res = require("util").inspect(res);
   } catch (e) {
     res = e.message;
+    outputText = "Error";
+    embedColour = 0xcc1010;
   }
   let r = `**Input:** ${codeGiven}
-  **Output:**\n ${res.replace(client.token, "Token")}`;
+  **${outputText}:**\n ${res.replace(client.token, "Token")}`;
   let message = "input:\n\n" + codeGiven + "\n\noutput:\n\n" + res.replace(client.token, "Token");
 
   if (res.length > 1500) {
@@ -33,7 +37,7 @@ async function run(client: musicBot, data: UnifiedData, args: string[]) {
   }
 
   const embed = new Discord.EmbedBuilder();
-  embed.setColor(0xa0d4ff);
+  embed.setColor(embedColour);
   embed.setDescription(r);
   data.send({embeds: [embed]});
 }

@@ -69,7 +69,7 @@ export class musicBot extends Client {
     if(msg) (msg.channel as TextChannel).send(`**${Object.keys(this.commands).length - aliasnum}** Commands loaded with **${aliasnum}** aliases.`);
     // load up slash commands
     let slashCommands: Discord.SlashCommandBuilder[] = [];
-    // register slash commands but not aliances
+    // register slash commands but not aliases
 
     for (let file of files) {
       file = file.replace("ts", "js");

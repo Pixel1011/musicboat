@@ -6,7 +6,7 @@ import EventEmitter from "node:events";
 import fetch from "node-fetch";
 import fs from "fs";
 import {unlink} from "fs/promises";
-import type { ChildProcess } from "child_process";
+import { ChildProcess } from "child_process";
 
 let url = "https://github.com/lavalink-devs/Lavalink/releases/latest/download/Lavalink.jar";
 let apiurl = "https://api.github.com/repos/lavalink-devs/Lavalink/releases/latest";

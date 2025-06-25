@@ -19,7 +19,7 @@ export interface QueueSong {
 export interface InactiveStriker {
   guild: string;
   strikes: number;
-  interval: NodeJS.Timer;
+  interval: NodeJS.Timeout;
 }
 
 // bplayer = boatplayer 
