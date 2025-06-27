@@ -9,7 +9,7 @@ exports.default = async (interaction, client) => {
         let cmd = client.commands[command];
         try {
             await Cmdinteraction.deferReply();
-            await cmd.data.run(client, data, data.args);
+            await cmd.run(client, data, data.args);
         }
         catch (e) {
             client.logger.log(e.stack);

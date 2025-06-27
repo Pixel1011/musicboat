@@ -28,7 +28,10 @@ export class musicBot extends Client {
 
   constructor(token : string, prefix : string, num : number, updater: LavalinkUpdater) {
     super({
-      intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildEmojisAndStickers, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent] // thats probably fine.. jesus
+      intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildExpressions, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent], // thats probably fine.. jesus
+      rest: {
+        rejectOnRateLimit: (r) => {this.logger.log(r.url + "  : " + r.timeToReset); return false;}
+      }
     });
     
     this.botnum = num + 1;
@@ -47,16 +50,20 @@ export class musicBot extends Client {
     let aliasnum = 0;
     // load normal commands and aliases
     const files = fs.readdirSync(path.resolve("./", "commands"));
-    files.forEach(file => {
+    files.forEach(async file => {
       try {
         file = file.replace("ts", "js"); // someone please tell me why i have to do this
-        let cmd: Command = require(`./commands/${file}`);
-        this.commands[cmd.data.name] = cmd;
+
+        let cmdClass = (await import(`./commands/${file}`)).default.default;
+        let cmd:Command  = new cmdClass();
+
+
+        this.commands[cmd.name] = cmd;
         // register aliases the command may have
-        if (cmd.data.aliases != null && cmd.data.aliases.length != 0) {
-          cmd.data.aliases.forEach(alias => {
+        if (cmd.aliases != null && cmd.aliases.length != 0) {
+          cmd.aliases.forEach(alias => {
             this.commands[alias] = cmd;
-            this.commands[alias].data.alias = true;
+            this.commands[alias].alias = true;
             aliasnum++;
           });
         }
@@ -73,15 +80,15 @@ export class musicBot extends Client {
 
     for (let file of files) {
       file = file.replace("ts", "js");
-      let cmd: Command = require(`./commands/${file}`);
+      let cmdClass = (await import(`./commands/${file}`)).default.default;
+      let cmd:Command  = new cmdClass();
+      if (cmd.hide) continue;
 
-      if (cmd.data.hide) continue;
-
-      let slash = new SlashCommandBuilder().setName(cmd.data.name).setDescription(cmd.data.description);
+      let slash = new SlashCommandBuilder().setName(cmd.name).setDescription(cmd.description);
       
-      if (cmd.data.arguments.length != 0) {
+      if (cmd.arguments.length != 0) {
         // add all different types of arguments
-        cmd.data.arguments.forEach(async arg => {
+        cmd.arguments.forEach(async arg => {
           function setOption(option: any) {
             option.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
             return option;

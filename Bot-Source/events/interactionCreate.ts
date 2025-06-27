@@ -15,7 +15,7 @@ export default async (interaction: BaseInteraction, client: musicBot) => {
     let cmd = client.commands[command];
     try {
       await Cmdinteraction.deferReply();
-      await cmd.data.run(client, data, data.args);
+      await cmd.run(client, data, data.args);
     } catch (e) {
       client.logger.log(e.stack);
     }

@@ -43,7 +43,10 @@ const lavaEvents_js_1 = __importDefault(require("./events/lavaEvents.js"));
 class musicBot extends discord_js_1.Client {
     constructor(token, prefix, num, updater) {
         super({
-            intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildEmojisAndStickers, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent]
+            intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildEmojisAndStickers, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent],
+            rest: {
+                rejectOnRateLimit: (r) => { this.logger.log(r.url + "  : " + r.timeToReset); return false; }
+            }
         });
         this.client = this;
         this.botnum = num + 1;
@@ -60,15 +63,16 @@ class musicBot extends discord_js_1.Client {
         this.commands = [];
         let aliasnum = 0;
         const files = fs_1.default.readdirSync(path_1.default.resolve("./", "commands"));
-        files.forEach(file => {
+        files.forEach(async (file) => {
             try {
                 file = file.replace("ts", "js");
-                let cmd = require(`./commands/${file}`);
-                this.commands[cmd.data.name] = cmd;
-                if (cmd.data.aliases != null && cmd.data.aliases.length != 0) {
-                    cmd.data.aliases.forEach(alias => {
+                let cmdClass = (await import(`./commands/${file}`)).default.default;
+                let cmd = new cmdClass();
+                this.commands[cmd.name] = cmd;
+                if (cmd.aliases != null && cmd.aliases.length != 0) {
+                    cmd.aliases.forEach(alias => {
                         this.commands[alias] = cmd;
-                        this.commands[alias].data.alias = true;
+                        this.commands[alias].alias = true;
                         aliasnum++;
                     });
                 }
@@ -83,12 +87,13 @@ class musicBot extends discord_js_1.Client {
         let slashCommands = [];
         for (let file of files) {
             file = file.replace("ts", "js");
-            let cmd = require(`./commands/${file}`);
-            if (cmd.data.hide)
+            let cmdClass = (await import(`./commands/${file}`)).default.default;
+            let cmd = new cmdClass();
+            if (cmd.hide)
                 continue;
-            let slash = new discord_js_1.SlashCommandBuilder().setName(cmd.data.name).setDescription(cmd.data.description);
-            if (cmd.data.arguments.length != 0) {
-                cmd.data.arguments.forEach(async (arg) => {
+            let slash = new discord_js_1.SlashCommandBuilder().setName(cmd.name).setDescription(cmd.description);
+            if (cmd.arguments.length != 0) {
+                cmd.arguments.forEach(async (arg) => {
                     function setOption(option) {
                         option.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
                         return option;

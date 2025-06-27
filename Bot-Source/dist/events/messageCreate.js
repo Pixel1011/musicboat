@@ -12,7 +12,7 @@ exports.default = async (msg, client) => {
     let cmd = client.commands[command];
     let data = new SlashUnifier_1.UnifiedData(client, msg, null);
     try {
-        await cmd.data.run(client, data, args);
+        await cmd.run(client, data, args);
     }
     catch (e) {
         client.logger.log(e.stack);

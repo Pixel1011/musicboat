@@ -1,6 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ArgOption = exports.ArgType = void 0;
+exports.ArgOption = exports.ArgType = exports.Command = void 0;
+class Command {
+    async run(client, data, args) { }
+}
+exports.Command = Command;
 var ArgType;
 (function (ArgType) {
     ArgType["ATTACHMENT"] = "attachment";

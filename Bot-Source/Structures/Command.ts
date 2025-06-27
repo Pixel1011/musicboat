@@ -1,17 +1,16 @@
 /* eslint-disable no-unused-vars */
+import { Message } from "discord.js";
 import type { musicBot } from "../client";
 import type { UnifiedData } from "../utils/SlashUnifier";
 
-export interface Command {
-  data: {
-    name: string;
-    description: string;
-    aliases: string[];
-    hide: boolean;
-    alias?: boolean;
-    arguments?: ArgOption[];
-    run: (client: musicBot, data: UnifiedData, args: string[]) => Promise<void>;
-  };
+export class Command {
+  name: string;
+  description: string;
+  aliases: string[];
+  hide: boolean;
+  alias?: boolean;
+  arguments?: ArgOption[];
+  async run(client: musicBot, data: UnifiedData, args: string[]): Promise<void | Message<boolean>> {}
 }
 
 export enum ArgType {

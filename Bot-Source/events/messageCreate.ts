@@ -1,6 +1,7 @@
 import type { Message } from "discord.js";
 import type { musicBot } from "../client";
 import { UnifiedData } from "../utils/SlashUnifier";
+import { Command } from "../Structures/Command";
 
 export default async (msg: Message, client: musicBot) => {
   let prefix = client.prefix;
@@ -9,12 +10,12 @@ export default async (msg: Message, client: musicBot) => {
   const command = args.shift().slice(prefix.length).toLowerCase();
 
   if (!client.commands[command]) return;
-  let cmd = client.commands[command];
+  let cmd: Command = client.commands[command];
 
   let data = new UnifiedData(client, msg, null);
 
   try {
-    await cmd.data.run(client, data, args);
+    await cmd.run(client, data, args);
   } catch (e) {
     client.logger.log(e.stack);
   }

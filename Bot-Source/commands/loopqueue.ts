@@ -1,29 +1,30 @@
 import { musicHelper } from "../utils/musicHelper";
 import type { musicBot } from "../client";
 import type { UnifiedData } from "../utils/SlashUnifier";
+import { Command } from "../Structures/Command";
 
-async function run(client: musicBot, data: UnifiedData) {
-  const music = new musicHelper(client, data.guild.id);
-  if (!await music.check(data, true)) return;
-  let player = music.getPlayer();
-
-  if (player.queueLoop == undefined || player.queueLoop == false) {
-    player.queueLoop = true;
-    return data.send(":repeat: **Queue loop enabled**");
-  } else {
-    player.queueLoop = false;
-    return data.send(":repeat: **Queue loop disabled**");
+export default class LoopqueueCmd extends Command {
+  constructor() {
+    super();
+    this.name =  "loopqueue";
+    this.description =  "Toggles looping for the whole queue.";
+    this.aliases =  ["qloop", "lq", "queueloop"];
+    this.hide =  false;
+    this.arguments = [];
+  
   }
 
+  async run(client: musicBot, data: UnifiedData) {
+    const music = new musicHelper(client, data.guild.id);
+    if (!await music.check(data, true)) return;
+    let player = music.getPlayer();
 
-
-
+    if (player.queueLoop == undefined || player.queueLoop == false) {
+      player.queueLoop = true;
+      return data.send(":repeat: **Queue loop enabled**");
+    } else {
+      player.queueLoop = false;
+      return data.send(":repeat: **Queue loop disabled**");
+    }
+  }
 }
-export const data = {
-  name: "loopqueue",
-  description: "Toggles looping for the whole queue.",
-  aliases: ["qloop", "lq", "queueloop"],
-  hide: false,
-  arguments: [],
-  run: run
-};
