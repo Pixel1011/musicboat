@@ -40,15 +40,19 @@ const voiceStateUpdate_js_1 = __importDefault(require("./events/voiceStateUpdate
 const Command_js_1 = require("./Structures/Command.js");
 const interactionCreate_js_1 = __importDefault(require("./events/interactionCreate.js"));
 const lavaEvents_js_1 = __importDefault(require("./events/lavaEvents.js"));
+const PlayerData_js_1 = require("./utils/PlayerData.js");
+const musicHelper_js_1 = require("./utils/musicHelper.js");
+const zlib_1 = __importDefault(require("zlib"));
 class musicBot extends discord_js_1.Client {
     constructor(token, prefix, num, updater) {
         super({
-            intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildEmojisAndStickers, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent],
+            intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildExpressions, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent],
             rest: {
                 rejectOnRateLimit: (r) => { this.logger.log(r.url + "  : " + r.timeToReset); return false; }
             }
         });
         this.client = this;
+        this.playerBackups = new Map();
         this.botnum = num + 1;
         this.logger = new logger_js_1.logger(this);
         this.commands = [];
@@ -125,6 +129,34 @@ class musicBot extends discord_js_1.Client {
                 console.error(error);
             }
         })();
+    }
+    async reloadPlayers() {
+        let fp = musicHelper_js_1.musicHelper.playerfilepath.replace(".json", ".json.gz");
+        let i = 0;
+        if (!fs_1.default.existsSync(fp)) {
+            this.client.logger.log("No cache file to reload players from!");
+            return;
+        }
+        let gzbuff = fs_1.default.readFileSync(fp);
+        let text = zlib_1.default.gunzipSync(gzbuff).toString();
+        this.playerBackups = JSON.parse(text, (key, value) => {
+            if (typeof value === "object" && value !== null) {
+                if (value.dataType === "Map") {
+                    return new Map(value.value);
+                }
+            }
+            return value;
+        });
+        this.playerBackups.forEach((val, key, map) => {
+            if (!(val instanceof PlayerData_js_1.PlayerData)) {
+                val = Object.assign(new PlayerData_js_1.PlayerData(val.vchannelid, val.boundChannelid, val.guildid, val.q_songs, val.q_currentSong, val.q_lastSong, val.volume, val.loop, val.queueLoop, val.paused), val);
+                map.set(key, val);
+            }
+            let music = new musicHelper_js_1.musicHelper(this, key);
+            val.restore(music);
+            i++;
+        });
+        this.logger.log(`Reloaded ${i} Players`);
     }
     async init() {
         await this.login(this.token);

@@ -17,11 +17,13 @@ class TrackEnd {
             if (!player.loop)
                 await player.queue.shift(player.queueLoop);
             await player.play(player.queue.currentSong.encoded);
+            this.music.save();
         }
         else {
             player.loop = false;
             player.queueLoop = false;
             player.queue.shift(player.queueLoop);
+            this.music.save();
         }
     }
 }

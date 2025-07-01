@@ -24,7 +24,7 @@ export default class JoinCmd extends Command {
     if (data.guild.members.me.voice.channelId == vchannel.id && player) {
       return data.send(":x: **I am already connected to your channel**");
     }
-    if (data.guild.members.me.voice.channelId && player) {
+    if ((data.guild.members.me.voice.channelId && player && data.guild.members.me.voice.channel.members.size >= 2) || !(await music.PermsOrAloneCheck(data,false,false))) {
       return data.send(":x: **You cannot summon the bot as it is playing elsewhere**");
     }
 

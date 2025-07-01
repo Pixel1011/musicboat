@@ -104,7 +104,7 @@ export class LavalinkUpdater extends EventEmitter {
     // get latest version
     const dotregex = /\./g;
     let lavasrc = await (await fetch(lavasrc_api)).json();
-    let youtube = await (await fetch(youtube_api)).json();
+    let youtube = await (await fetch(youtube_api, {headers: {Authorization: ""}})).json();
 
     let latest_lavasrc_version: Number = Number((lavasrc.tag_name as String).replace(dotregex, ""));
     let latest_youtube_version: Number = Number((youtube.tag_name as String).replace(dotregex, ""));

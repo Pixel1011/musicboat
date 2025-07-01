@@ -28,6 +28,7 @@ class ReplayCmd extends Command_1.Command {
             player.queue.shift(false);
             player.play(lastSong.encoded);
             data.send(":musical_note: **Song progress reset** :track_previous:");
+            music.save();
         }
     }
 }

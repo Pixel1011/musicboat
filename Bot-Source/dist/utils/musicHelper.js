@@ -1,9 +1,19 @@
 "use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.musicHelper = void 0;
 const discord_js_1 = require("discord.js");
 const queue_1 = require("./queue");
+const trackEnd_1 = require("../events/PlayerEvents/trackEnd");
+const trackException_1 = require("../events/PlayerEvents/trackException");
+const trackStuck_1 = require("../events/PlayerEvents/trackStuck");
+const PlayerData_1 = require("./PlayerData");
+const fs_1 = __importDefault(require("fs"));
+const zlib_1 = __importDefault(require("zlib"));
 class musicHelper {
+    static { this.playerfilepath = "./cache/playing.json"; }
     constructor(client, guildid) {
         this.client = client;
         this.guildid = guildid;
@@ -105,7 +115,9 @@ class musicHelper {
         player.queue = undefined;
         player.loop = false;
         player.queueLoop = false;
+        player.boundChannel = undefined;
         this.setVolume(100);
+        this.save(true);
         this.lavalink.players.destroy(this.guildid);
     }
     time(ms) {
@@ -216,6 +228,72 @@ class musicHelper {
     async setVolume(volume) {
         let player = this.getPlayer();
         player.setVolume(volume);
+    }
+    registerEvents() {
+        let player = this.getPlayer();
+        if (!player.eventsCreated) {
+            let EndClass = new trackEnd_1.TrackEnd(this);
+            player.on("trackEnd", async (track, reason) => EndClass.handle(track, reason));
+            let ExceptionClass = new trackException_1.TrackException(this);
+            player.on("trackException", (track, error) => ExceptionClass.handle(track, error));
+            let StuckClass = new trackStuck_1.TrackStuck(this);
+            player.on("trackStuck", (track, threshold) => StuckClass.handle(track, threshold));
+            player.eventsCreated = true;
+        }
+    }
+    registerInactivityStriker(vchannel) {
+        let player = this.getPlayer();
+        let music = this;
+        if (player.striker == undefined) {
+            player.striker = {
+                guild: this.guildid,
+                strikes: 0,
+                interval: null
+            };
+            let interval = setInterval(function () {
+                if (player.playing && vchannel.members.size > 1)
+                    return player.striker.strikes = 0;
+                player.striker.strikes++;
+                if (player.striker.strikes == 10) {
+                    music.destroyPlayer();
+                }
+            }, 2 * 60 * 1000);
+            player.striker.interval = interval;
+        }
+    }
+    async save(destroy = false) {
+        let player = this.getPlayer();
+        if (!destroy) {
+            let saveobj = new PlayerData_1.PlayerData(player.voice.channelId, player.boundChannel, this.guildid, player.queue.songs, player.queue.currentSong, player.queue.lastSong, player.volume, player.loop, player.queueLoop, player.paused);
+            this.client.playerBackups.set(this.guildid, saveobj);
+        }
+        else {
+            this.client.playerBackups.delete(this.guildid);
+        }
+        let directory = musicHelper.playerfilepath.split("playing.json")[0];
+        if (!fs_1.default.existsSync(directory)) {
+            fs_1.default.mkdirSync(directory, { recursive: true });
+        }
+        let gzpath = musicHelper.playerfilepath.replace(".json", ".json.gz");
+        if (!fs_1.default.existsSync(gzpath)) {
+            fs_1.default.writeFileSync(gzpath, "{}");
+        }
+        let content = fs_1.default.readFileSync(gzpath);
+        let toWrite = JSON.stringify(this.client.playerBackups, (key, value) => {
+            if (value instanceof Map) {
+                return {
+                    dataType: "Map",
+                    value: Array.from(value.entries()),
+                };
+            }
+            else {
+                return value;
+            }
+        });
+        let toWritegz = zlib_1.default.gzipSync(toWrite);
+        if (content != toWritegz) {
+            fs_1.default.writeFileSync(gzpath, toWritegz);
+        }
     }
 }
 exports.musicHelper = musicHelper;

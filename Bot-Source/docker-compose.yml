@@ -7,3 +7,5 @@ services:
     build:
       context: ./
       dockerfile: ./Dockerfile
+    volumes:
+      - ./cache:/home/node/musicboat/cache

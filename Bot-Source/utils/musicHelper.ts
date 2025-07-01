@@ -1,23 +1,34 @@
-import { EmbedBuilder, PermissionFlagsBits } from "discord.js";
+import { EmbedBuilder, PermissionFlagsBits, VoiceChannel } from "discord.js";
 import type { Node } from "lavaclient";
 import type { musicBot } from "../client";
 import type { UnifiedData } from "./SlashUnifier";
 import { BPlayer } from "../Structures/Song";
 import { Queue } from "./queue";
 import { loadResult, ParsedResult, Track } from "../Structures/Search";
-
-
+import { TrackEnd } from "../events/PlayerEvents/trackEnd";
+import { TrackException } from "../events/PlayerEvents/trackException";
+import { TrackStuck } from "../events/PlayerEvents/trackStuck";
+import { PlayerData } from "./PlayerData";
+import fs from "fs";
+import zlib from "zlib";
 
 export class musicHelper {
   public client: musicBot;
   public guildid: string;
   public lavalink: Node;
+  public static playerfilepath = "./cache/playing.json";
 
   constructor(client : musicBot, guildid: string) {
     this.client = client;
     this.guildid = guildid;
     this.lavalink = client.lavalink;
   }
+  /**
+   * @param checkPlayer - Whether to check if the player is currently playing (default: true).
+   * @param checkPlaying - Whether to check if the player exists (default: true).
+   * @param checkVC - Whether to check if the user is in a voice channel (default: true).
+   * @param checkSameVC - Whether to check if the user is in the same voice channel as the bot (default: true).
+   */
   async check(data: UnifiedData, checkPlayer?: boolean, checkPlaying?: boolean, checkVC?: boolean, checkSameVC?: boolean): Promise<boolean> {
     if (checkPlaying == undefined) checkPlaying = true;
     if (checkPlayer == undefined) checkPlayer = true;
@@ -115,7 +126,9 @@ export class musicHelper {
     player.queue = undefined;
     player.loop = false;
     player.queueLoop = false;
+    player.boundChannel = undefined;
     this.setVolume(100);
+    this.save(true);
     this.lavalink.players.destroy(this.guildid);
   }
 
@@ -342,4 +355,93 @@ export class musicHelper {
     let player = this.getPlayer();
     player.setVolume(volume);
   }
+
+  registerEvents() {
+    let player = this.getPlayer();
+
+    if (!player.eventsCreated) {
+      let EndClass = new TrackEnd(this);
+      player.on("trackEnd", async (track, reason) => EndClass.handle(track, reason));
+          
+      let ExceptionClass = new TrackException(this);
+      player.on("trackException", (track, error) => ExceptionClass.handle(track, error));
+          
+      let StuckClass = new TrackStuck(this);
+      player.on("trackStuck", (track, threshold) => StuckClass.handle(track, threshold));
+      player.eventsCreated = true;
+    }
+  }
+
+  registerInactivityStriker(vchannel: VoiceChannel) {
+    let player = this.getPlayer();
+    let music = this;
+    if (player.striker == undefined) {
+      player.striker = {
+        guild: this.guildid,
+        strikes: 0,
+        interval: null
+      };
+
+      let interval = setInterval(function () {
+        if (player.playing && vchannel.members.size > 1) return player.striker.strikes = 0;
+
+        player.striker.strikes++;
+
+        if (player.striker.strikes == 10) {
+          music.destroyPlayer();
+        }
+      }, 2 * 60 * 1000); // every 2 mins, 10 strikes = 20mins
+
+      player.striker.interval = interval;
+    }
+  }
+
+  async save(destroy: boolean = false) {
+    let player = this.getPlayer();
+    if (!destroy) {
+      let saveobj: PlayerData = new PlayerData(
+        player.voice.channelId,
+        player.boundChannel,
+        this.guildid,
+        player.queue.songs,
+        player.queue.currentSong,
+        player.queue.lastSong,
+        player.volume,
+        player.loop,
+        player.queueLoop,
+        player.paused
+      );
+
+      this.client.playerBackups.set(this.guildid, saveobj);
+    } else {
+      this.client.playerBackups.delete(this.guildid);
+    }
+
+    let directory = musicHelper.playerfilepath.split("playing.json")[0];
+
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, {recursive: true});
+    }
+    let gzpath = musicHelper.playerfilepath.replace(".json", ".json.gz");
+    if (!fs.existsSync(gzpath)) {
+      fs.writeFileSync(gzpath, "{}");
+    }
+    let content = fs.readFileSync(gzpath);
+    let toWrite = JSON.stringify(this.client.playerBackups, (key, value) => {
+      if(value instanceof Map) {
+        return {
+          dataType: "Map",
+          value: Array.from(value.entries()),
+        };
+      } else {
+        return value;
+      }
+    });
+    // arguably could make faster by making not reading the entire file and reading each part until theres a difference but is usually ok
+    let toWritegz = zlib.gzipSync(toWrite);
+    if (content != toWritegz) {
+      fs.writeFileSync(gzpath, toWritegz);
+    }
+  }
 }
+

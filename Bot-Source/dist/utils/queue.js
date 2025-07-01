@@ -2,9 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Queue = void 0;
 class Queue {
-    constructor(client) {
-        this.client = client;
-        this.lavalink = client.lavalink;
+    constructor() {
         this.songs = [];
         this.currentSong;
         this.lastSong;

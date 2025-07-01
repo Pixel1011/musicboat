@@ -6,9 +6,6 @@ import { musicHelper } from "../utils/musicHelper";
 import { EmbedBuilder } from "discord.js";
 import { Queue } from "../utils/queue";
 import { ArgOption, ArgType, Command } from "../Structures/Command";
-import { TrackEnd } from "../events/PlayerEvents/trackEnd";
-import { TrackStuck } from "../events/PlayerEvents/trackStuck";
-import { TrackException } from "../events/PlayerEvents/trackException";
 import { BPlayer } from "../Structures/Song";
 
 export default class PlayCmd extends Command {
@@ -84,8 +81,12 @@ export default class PlayCmd extends Command {
       if (!player) player = await music.join(vchannel.id);
     }
 
+    if (!player.boundChannel) {
+      player.boundChannel = data.channel.id;
+    }
+
     if (!player.queue) {
-      player.queue = new Queue(client);
+      player.queue = new Queue();
     }
 
 
@@ -131,17 +132,8 @@ export default class PlayCmd extends Command {
       data.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
     
       // register player events if not already
-      if (!player.eventsCreated) {
-        let EndClass = new TrackEnd(music);
-        player.on("trackEnd", async (track, reason) => EndClass.handle(track, reason));
-      
-        let ExceptionClass = new TrackException(music);
-        player.on("trackException", (track, error) => ExceptionClass.handle(track, error));
-      
-        let StuckClass = new TrackStuck(music);
-        player.on("trackStuck", (track, threshold) => StuckClass.handle(track, threshold));
-        player.eventsCreated = true;
-      }
+      music.registerEvents();
+
     } else {     
     // if is already playing
     
@@ -185,27 +177,9 @@ export default class PlayCmd extends Command {
       }
     }
   
-  
     // register inactive timer if not already
-    if (player.striker == undefined) {
-      player.striker = {
-        guild: data.guild.id,
-        strikes: 0,
-        interval: null
-      };
-
-      let interval = setInterval(function () {
-        if (player.playing && vchannel.members.size > 1) return player.striker.strikes = 0;
-
-        player.striker.strikes++;
-
-        if (player.striker.strikes == 10) {
-          music.destroyPlayer();
-        }
-      }, 2 * 60 * 1000); // every 2 mins, 10 strikes = 20mins
-
-      player.striker.interval = interval;
-    }
+    music.registerInactivityStriker(vchannel);
+    music.save();
   }
   
 }

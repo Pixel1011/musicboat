@@ -13,6 +13,9 @@ import { ArgType, type Command } from "./Structures/Command.js";
 import interactionCreate from "./events/interactionCreate.js";
 import { LavalinkUpdater } from "./updateLavaLink.js";
 import lavaEvents from "./events/lavaEvents.js";
+import { PlayerData } from "./utils/PlayerData.js";
+import { musicHelper } from "./utils/musicHelper.js";
+import zlib from "zlib";
 
 export class musicBot extends Client {
 
@@ -25,6 +28,7 @@ export class musicBot extends Client {
   lavalink: Node;
   updater: LavalinkUpdater;
   client: musicBot = this;
+  playerBackups: Map<string, PlayerData> = new Map<string, PlayerData>();
 
   constructor(token : string, prefix : string, num : number, updater: LavalinkUpdater) {
     super({
@@ -121,6 +125,49 @@ export class musicBot extends Client {
     })();
 
   }
+  
+  async reloadPlayers() {
+    let fp = musicHelper.playerfilepath.replace(".json", ".json.gz");
+    let i = 0;
+    if (!fs.existsSync(fp)) {
+      this.client.logger.log("No cache file to reload players from!");
+      return; 
+    }
+    let gzbuff = fs.readFileSync(fp);
+    let text = zlib.gunzipSync(gzbuff).toString();
+    
+    this.playerBackups = JSON.parse(text, (key, value) => {
+      if(typeof value === "object" && value !== null) {
+        if (value.dataType === "Map") {
+          return new Map(value.value);
+        }
+      }
+      return value;
+    });
+
+    this.playerBackups.forEach((val: any, key: string, map: Map<string, any>) => {
+      if (!(val instanceof PlayerData)) {
+        val = Object.assign(new PlayerData(
+          val.vchannelid,
+          val.boundChannelid,
+          val.guildid,
+          val.q_songs,
+          val.q_currentSong,
+          val.q_lastSong,
+          val.volume,
+          val.loop,
+          val.queueLoop,
+          val.paused
+        ), val);
+        map.set(key, val);
+      }
+      let music = new musicHelper(this, key);
+      //prayge
+      val.restore(music);
+      i++;
+    });
+    this.logger.log(`Reloaded ${i} Players`);
+  }
   // init
   // login, load commands, event handling etc
   async init() {
@@ -166,7 +213,6 @@ export class musicBot extends Client {
     //
     this.logger.log("connecting to lavalink..");
     this.lavalink.connect({ userId: this.user.id });
-
   }
 
 }

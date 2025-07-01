@@ -23,11 +23,12 @@ export default class LoopCmd extends Command {
 
     if (player.loop == undefined || player.loop == false) {
       player.loop = true;
-      return data.send(":repeat_one: **Enabled!**");
+      data.send(":repeat_one: **Enabled!**");
     } else {
       player.loop = false;
-      return data.send(":repeat_one: **Disabled!**");
+      data.send(":repeat_one: **Disabled!**");
     }
+    music.save();
   }
 
 }

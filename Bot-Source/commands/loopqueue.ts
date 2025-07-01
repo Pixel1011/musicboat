@@ -21,10 +21,11 @@ export default class LoopqueueCmd extends Command {
 
     if (player.queueLoop == undefined || player.queueLoop == false) {
       player.queueLoop = true;
-      return data.send(":repeat: **Queue loop enabled**");
+      data.send(":repeat: **Queue loop enabled**");
     } else {
       player.queueLoop = false;
-      return data.send(":repeat: **Queue loop disabled**");
+      data.send(":repeat: **Queue loop disabled**");
     }
+    music.save();
   }
 }

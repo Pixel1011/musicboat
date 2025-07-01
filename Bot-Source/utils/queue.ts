@@ -1,19 +1,13 @@
-import type { musicBot } from "../client";
-import type { Node } from "lavaclient";
 import type { User } from "discord.js";
 import type { QueueSong } from "../Structures/Song";
 import { Track } from "../Structures/Search";
 
 export class Queue {
-  public client: musicBot;
-  public lavalink: Node;
   public songs: Array<QueueSong>;
   public currentSong: QueueSong;
   public lastSong: QueueSong;
 
-  constructor(client: musicBot) {
-    this.client = client;
-    this.lavalink = client.lavalink;
+  constructor() {
     this.songs = [];
     this.currentSong;
     this.lastSong; // for replay command to be added
@@ -47,6 +41,7 @@ export class Queue {
     }
     return true;
   }
+
   async shift(queueLoop: boolean) {
     if (queueLoop) this.songs.push(this.currentSong);
 

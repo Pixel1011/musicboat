@@ -29,6 +29,13 @@ class lavaEvents {
     }
     async handleConnect() {
         this.client.logger.logFrom("Connected", "Lavalink");
+        if (!this.connectedOnce) {
+            this.client.logger.log("Reloading players...");
+            setTimeout(() => {
+                this.client.reloadPlayers();
+            }, 5000);
+            this.connectedOnce = true;
+        }
     }
 }
 exports.default = lavaEvents;

@@ -4,9 +4,6 @@ const musicHelper_1 = require("../utils/musicHelper");
 const discord_js_1 = require("discord.js");
 const queue_1 = require("../utils/queue");
 const Command_1 = require("../Structures/Command");
-const trackEnd_1 = require("../events/PlayerEvents/trackEnd");
-const trackStuck_1 = require("../events/PlayerEvents/trackStuck");
-const trackException_1 = require("../events/PlayerEvents/trackException");
 class PlayCmd extends Command_1.Command {
     constructor() {
         super();
@@ -65,8 +62,11 @@ class PlayCmd extends Command_1.Command {
             if (!player)
                 player = await music.join(vchannel.id);
         }
+        if (!player.boundChannel) {
+            player.boundChannel = data.channel.id;
+        }
         if (!player.queue) {
-            player.queue = new queue_1.Queue(client);
+            player.queue = new queue_1.Queue();
         }
         if (!data.replied) {
             await data.send(`:musical_note: **Searching** :mag_right: \`\`${args.join(" ")}\`\``);
@@ -95,15 +95,7 @@ class PlayCmd extends Command_1.Command {
             music.setVolume(100);
             player.play(result);
             data.channel.send(`**Playing** :notes: \`\`${result.info.title}\`\` - Now!`);
-            if (!player.eventsCreated) {
-                let EndClass = new trackEnd_1.TrackEnd(music);
-                player.on("trackEnd", async (track, reason) => EndClass.handle(track, reason));
-                let ExceptionClass = new trackException_1.TrackException(music);
-                player.on("trackException", (track, error) => ExceptionClass.handle(track, error));
-                let StuckClass = new trackStuck_1.TrackStuck(music);
-                player.on("trackStuck", (track, threshold) => StuckClass.handle(track, threshold));
-                player.eventsCreated = true;
-            }
+            music.registerEvents();
         }
         else {
             await player.queue.add(result, data.author);
@@ -135,22 +127,8 @@ class PlayCmd extends Command_1.Command {
                 data.channel.send({ embeds: [embed] });
             }
         }
-        if (player.striker == undefined) {
-            player.striker = {
-                guild: data.guild.id,
-                strikes: 0,
-                interval: null
-            };
-            let interval = setInterval(function () {
-                if (player.playing && vchannel.members.size > 1)
-                    return player.striker.strikes = 0;
-                player.striker.strikes++;
-                if (player.striker.strikes == 10) {
-                    music.destroyPlayer();
-                }
-            }, 2 * 60 * 1000);
-            player.striker.interval = interval;
-        }
+        music.registerInactivityStriker(vchannel);
+        music.save();
     }
 }
 exports.default = PlayCmd;

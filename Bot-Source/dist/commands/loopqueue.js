@@ -18,12 +18,13 @@ class LoopqueueCmd extends Command_1.Command {
         let player = music.getPlayer();
         if (player.queueLoop == undefined || player.queueLoop == false) {
             player.queueLoop = true;
-            return data.send(":repeat: **Queue loop enabled**");
+            data.send(":repeat: **Queue loop enabled**");
         }
         else {
             player.queueLoop = false;
-            return data.send(":repeat: **Queue loop disabled**");
+            data.send(":repeat: **Queue loop disabled**");
         }
+        music.save();
     }
 }
 exports.default = LoopqueueCmd;

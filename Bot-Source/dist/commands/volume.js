@@ -31,7 +31,8 @@ class TestCmd extends Command_1.Command {
         if (Ivol > 2147483647)
             return data.send(":x: **The volume cannot be set this high!**");
         await music.setVolume(Ivol);
-        return data.send(`🎵 **Set volume to ${vol}%** 👍`);
+        data.send(`🎵 **Set volume to ${vol}%** 👍`);
+        music.save();
     }
 }
 exports.default = TestCmd;

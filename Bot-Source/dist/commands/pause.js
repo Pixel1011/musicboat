@@ -23,6 +23,7 @@ class PauseCmd extends Command_1.Command {
             await player.pause();
             data.send("**Paused** :pause_button:");
         }
+        music.save();
     }
 }
 exports.default = PauseCmd;

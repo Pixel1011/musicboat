@@ -81,7 +81,7 @@ class LavalinkUpdater extends node_events_1.default {
     async updatePlugins() {
         const dotregex = /\./g;
         let lavasrc = await (await (0, node_fetch_1.default)(lavasrc_api)).json();
-        let youtube = await (await (0, node_fetch_1.default)(youtube_api)).json();
+        let youtube = await (await (0, node_fetch_1.default)(youtube_api, { headers: { Authorization: "" } })).json();
         let latest_lavasrc_version = Number(lavasrc.tag_name.replace(dotregex, ""));
         let latest_youtube_version = Number(youtube.tag_name.replace(dotregex, ""));
         let current_lavasrc_version = 0;
