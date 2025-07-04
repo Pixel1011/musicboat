@@ -6,6 +6,9 @@ RUN apk update
 
 RUN apk add --no-cache openjdk17
 
+RUN npm install -g pnpm
+USER node
+
 WORKDIR /home/node/musicboat
 
 # copy source
@@ -23,7 +26,11 @@ COPY ./config.json ./config.json
 COPY ./application.yml ./application.yml
 COPY ./Lavalink.jar ./Lavalink.jar
 
-# install dependenciesw
-RUN npm install
+USER root
+RUN chown -R node:node /home/node/musicboat
 
-CMD npm run start
+USER node
+# install dependencies
+RUN pnpm install
+
+CMD pnpm run start
