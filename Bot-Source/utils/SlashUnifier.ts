@@ -1,4 +1,4 @@
-import type { ChatInputCommandInteraction, EmbedBuilder, Guild, GuildMember, Message, TextChannel, User } from "discord.js";
+import type { BaseMessageOptionsWithPoll, ChatInputCommandInteraction, EmbedBuilder, Guild, GuildMember, InteractionReplyOptions, Message, TextChannel, User } from "discord.js";
 import type { musicBot } from "../client";
 
 export class UnifiedData {
@@ -46,7 +46,7 @@ export class UnifiedData {
     }
   }
 
-  async send(content: string | object): Promise<Message<boolean>> {
+  async send(content: string | BaseMessageOptionsWithPoll): Promise<Message<boolean>> {
     if (this.isMsg) {
       return await (this.msg.channel as TextChannel).send(content);
     } else {
@@ -54,16 +54,9 @@ export class UnifiedData {
       if (typeof content == "string") {
         return await this.inter.followUp({ content: content, fetchReply: true });
       } else {
-        // i like typescript
-        interface CContent {
-          embed?: EmbedBuilder[];
-          fetchReply?: boolean;
-        }
-        let Ccontent = content as CContent;
-        Ccontent.fetchReply = true;
-
-        // its just so great
-        return await this.inter.followUp(Ccontent);
+        let interContent = content as InteractionReplyOptions;
+        interContent.withResponse = true;
+        return await this.inter.followUp(interContent);
       }
     }
   }

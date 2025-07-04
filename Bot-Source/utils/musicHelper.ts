@@ -398,6 +398,7 @@ export class musicHelper {
 
   async save(destroy: boolean = false) {
     let player = this.getPlayer();
+    if (!player || !player.voice) destroy = true;
     if (!destroy) {
       let saveobj: PlayerData = new PlayerData(
         player.voice.channelId,

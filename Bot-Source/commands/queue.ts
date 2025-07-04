@@ -1,9 +1,10 @@
-import { Guild, EmbedBuilder } from "discord.js";
+import { Guild, EmbedBuilder, ButtonInteraction, ComponentType, ReadonlyCollection, Snowflake, Interaction } from "discord.js";
 import type { musicBot } from "../client";
 import { musicHelper } from "../utils/musicHelper";
-import type { QueueSong } from "../Structures/Song";
+import type { BPlayer, QueueSong } from "../Structures/Song";
 import type { UnifiedData } from "../utils/SlashUnifier";
 import { ArgOption, ArgType, Command } from "../Structures/Command";
+import { getPagesRow } from "../utils/interactions";
 
 export default class QueueCmd extends Command {
   constructor() {
@@ -29,12 +30,83 @@ export default class QueueCmd extends Command {
     if(isNaN(page)) page = 1;
     if (page > pages) return data.send(`:x: **There is no page \`\`${page}\`\`**`);
 
+    let rightDisabled = false;
+    if (pages == 1) rightDisabled = true;
+    let leftDisabled = false;
+    if (page == pages) leftDisabled = true;
+    let disabledMap = new Map<string, boolean>([["cancel", false], ["left", leftDisabled], ["right", rightDisabled]]);
+    let row = getPagesRow(disabledMap, false);
+    let original = await data.send({embeds: [this.getEmbed(client, data, player, music, page, pages)], components: [row.toJSON()]});
+
+    let filter = async (inter: ButtonInteraction) => inter.customId !== undefined && inter.user.id === data.author.id && inter.message.id == original.id;
+    let compCollector = original.createMessageComponentCollector<ComponentType.Button>({ filter: filter, time: 300000});
+    let thisgetembed = this.getEmbed;
+    
+    compCollector.on("collect", async (inter: ButtonInteraction) => {
+      let id = inter.customId;
+
+      if (id == "right") {
+        page++;
+        if (page > pages) page = pages;
+        if (page + 1 > pages) {
+          disabledMap.set("right", true);
+        }
+
+        disabledMap.set("left", false);
+        
+        let row = getPagesRow(disabledMap, false).toJSON();
+        let newembed = thisgetembed(client, data, player, music, page, pages);
+        
+        original.edit({embeds: [newembed], components: [row]});
+        
+        await inter.deferUpdate();
+      } else
+        
+      if (id == "left") {
+        page--;
+        if (page < 1) page = 1;
+
+        if (page - 1 < 1) {
+          disabledMap.set("left", true);
+        }
+          
+        disabledMap.set("right", false);
+          
+        let row = getPagesRow(disabledMap, false).toJSON();
+          
+        let newembed = thisgetembed(client, data, player, music, page, pages);
+        original.edit({embeds: [newembed], components: [row]});
+
+        await inter.deferUpdate();
+      } 
+    });
+
+    compCollector.on("end", (collected: ReadonlyCollection<Snowflake, Interaction>) => {
+      original.edit({components: []}); 
+    });
+  }
+
+  static songString(song: QueueSong, guild: Guild) {
+    let songname = song.title;
+    let link = song.url;
+
+    let timeToPlay = song.length;
+    let timeToPlayMin = Math.floor(timeToPlay / 1000 / 60);
+    let timeToPlaySec = Math.floor(timeToPlay / 1000 - (timeToPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
+    let time = `${timeToPlayMin}:${timeToPlaySec}`;
+    if (song.isStream) time = "LIVE";
+    let displayName = guild.members.cache.get(song.requester.id).displayName;
+
+    return `[${songname}](${link}) | \`${time} Requested by: ${displayName}\``;
+  }
+
+  getEmbed(client: musicBot, data: UnifiedData, player: BPlayer, music: musicHelper, page: number, pages:number) {
     let currentSong = player.queue.currentSong;
     let desc = [];
 
     if (page == 1) {
       desc.push("__Now Playing:__");
-      desc.push(await this.songString(currentSong, data.guild));
+      desc.push(QueueCmd.songString(currentSong, data.guild));
     }
     if (player.queue.songs[0]) {
       if (page == 1) desc.push("\n__Up Next:__");
@@ -42,7 +114,7 @@ export default class QueueCmd extends Command {
       for (let i = (page * 10) - 10; i < (page * 10); i++) {
         let song = player.queue.songs[i];
         if (!song) break; 
-        desc.push("\n" + `\`\`${i+1}.\`\` ` + await this.songString(song, data.guild));
+        desc.push("\n" + `\`\`${i+1}.\`\` ` + QueueCmd.songString(song, data.guild));
       }
 
       let queueLength = 0;
@@ -69,23 +141,7 @@ export default class QueueCmd extends Command {
       text: `Page ${page}/${pages} | Loop: ${loopEmote} | Queue Loop: ${queueLoopEmote}`,
       iconURL: data.author.avatarURL({size:2048})
     });
-
-    data.send({embeds: [embed]});
-
-  }
-
-  async songString(song: QueueSong, guild: Guild) {
-    let songname = song.title;
-    let link = song.url;
-
-    let timeToPlay = song.length;
-    let timeToPlayMin = Math.floor(timeToPlay / 1000 / 60);
-    let timeToPlaySec = Math.floor(timeToPlay / 1000 - (timeToPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
-    let time = `${timeToPlayMin}:${timeToPlaySec}`;
-    if (song.isStream) time = "LIVE";
-    let displayName = guild.members.cache.get(song.requester.id).displayName;
-
-    return `[${songname}](${link}) | \`${time} Requested by: ${displayName}\``;
+    return embed;
   }
 
 }
