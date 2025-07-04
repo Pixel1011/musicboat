@@ -19,10 +19,16 @@ class PlayerData {
         if (!this.q_currentSong)
             return;
         let client = music.client;
-        let player = await music.join(this.vchannelid);
         let guild = client.guilds.cache.get(this.guildid);
         let tchannel = guild.channels.cache.get(this.boundChannelid);
         let vchannel = guild.channels.cache.get(this.vchannelid);
+        if (!vchannel)
+            return;
+        if (!vchannel.joinable)
+            return;
+        if (!vchannel.speakable)
+            return;
+        let player = await music.join(this.vchannelid);
         player.boundChannel = this.boundChannelid;
         player.queue = new queue_1.Queue();
         player.queue.songs = this.q_songs;

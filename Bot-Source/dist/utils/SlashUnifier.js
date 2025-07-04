@@ -38,9 +38,9 @@ class UnifiedData {
                 return await this.inter.followUp({ content: content, fetchReply: true });
             }
             else {
-                let Ccontent = content;
-                Ccontent.fetchReply = true;
-                return await this.inter.followUp(Ccontent);
+                let interContent = content;
+                interContent.withResponse = true;
+                return await this.inter.followUp(interContent);
             }
         }
     }

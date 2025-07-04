@@ -263,6 +263,8 @@ class musicHelper {
     }
     async save(destroy = false) {
         let player = this.getPlayer();
+        if (!player || !player.voice)
+            destroy = true;
         if (!destroy) {
             let saveobj = new PlayerData_1.PlayerData(player.voice.channelId, player.boundChannel, this.guildid, player.queue.songs, player.queue.currentSong, player.queue.lastSong, player.volume, player.loop, player.queueLoop, player.paused);
             this.client.playerBackups.set(this.guildid, saveobj);

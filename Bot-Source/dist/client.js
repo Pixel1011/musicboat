@@ -70,7 +70,7 @@ class musicBot extends discord_js_1.Client {
         files.forEach(async (file) => {
             try {
                 file = file.replace("ts", "js");
-                let cmdClass = (await import(`./commands/${file}`)).default.default;
+                let cmdClass = require(`./commands/${file}`).default;
                 let cmd = new cmdClass();
                 this.commands[cmd.name] = cmd;
                 if (cmd.aliases != null && cmd.aliases.length != 0) {
@@ -91,7 +91,7 @@ class musicBot extends discord_js_1.Client {
         let slashCommands = [];
         for (let file of files) {
             file = file.replace("ts", "js");
-            let cmdClass = (await import(`./commands/${file}`)).default.default;
+            let cmdClass = require(`./commands/${file}`).default;
             let cmd = new cmdClass();
             if (cmd.hide)
                 continue;
