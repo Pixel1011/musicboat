@@ -58,9 +58,8 @@ export class musicBot extends Client {
       try {
         file = file.replace("ts", "js"); // someone please tell me why i have to do this
 
-        let cmdClass = (await import(`./commands/${file}`)).default.default;
+        let cmdClass = require(`./commands/${file}`).default;
         let cmd:Command  = new cmdClass();
-
 
         this.commands[cmd.name] = cmd;
         // register aliases the command may have
@@ -84,7 +83,7 @@ export class musicBot extends Client {
 
     for (let file of files) {
       file = file.replace("ts", "js");
-      let cmdClass = (await import(`./commands/${file}`)).default.default;
+      let cmdClass = require(`./commands/${file}`).default;
       let cmd:Command  = new cmdClass();
       if (cmd.hide) continue;
 
@@ -163,7 +162,7 @@ export class musicBot extends Client {
       }
       let music = new musicHelper(this, key);
       //prayge
-      val.restore(music);
+      (val as PlayerData).restore(music);
       i++;
     });
     this.logger.log(`Reloaded ${i} Players`);
