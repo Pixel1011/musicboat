@@ -1,5 +1,5 @@
 /* eslint-disable no-unused-vars */
-import { Message } from "discord.js";
+import { ApplicationCommandOptionAllowedChannelTypes, ChannelType, Message } from "discord.js";
 import type { musicBot } from "../client";
 import type { UnifiedData } from "../utils/SlashUnifier";
 
@@ -13,6 +13,7 @@ export class Command {
   async run(client: musicBot, data: UnifiedData, args: string[]): Promise<void | Message<boolean>> {}
 }
 
+
 export enum ArgType {
   ATTACHMENT = "attachment",
   BOOLEAN = "boolean",
@@ -25,17 +26,31 @@ export enum ArgType {
   USER = "user"
 }
 
-export class ArgOption {
+type ArgExtras = {
+  [ArgType.ATTACHMENT]: null;
+  [ArgType.BOOLEAN]: null;
+  [ArgType.CHANNEL]: { channelTypes?: ApplicationCommandOptionAllowedChannelTypes[] } | null;
+  [ArgType.INTEGER]: { choices?: number[]; minValue?: number; maxValue?: number, autocomplete?: boolean } | null;
+  [ArgType.MENTIONABLE]: null;
+  [ArgType.NUMBER]: { choices?: number[]; minValue?: number; maxValue?: number, autocomplete?: boolean } | null;
+  [ArgType.ROLE]: null;
+  [ArgType.STRING]: { choices?: string[]; minLength?: number; maxLength?: number, autocomplete?: boolean } | null;
+  [ArgType.USER]: null;
+};
+
+export class ArgOption<T extends ArgType = ArgType> {
   name: string;
   description: string;
   required: boolean;
-  type: ArgType;
-
-  constructor(name: string, description: string, required: boolean, type: ArgType) {
+  type: T;
+  extras?: ArgExtras[T];
+  
+  constructor(name: string, description: string, required: boolean, type: T, extras: ArgExtras[T] = null) {
     this.name = name;
     this.description = description;
     this.required = required;
     this.type = type;
+    this.extras = extras;
   }
 
 }

@@ -33,9 +33,17 @@ class Queue {
         }
         return true;
     }
-    async shift(queueLoop) {
+    async shift(queueLoop, shuffle) {
         if (queueLoop)
             this.songs.push(this.currentSong);
+        if (shuffle) {
+            let songslen = this.songs.length;
+            let randomidx = Math.floor(Math.random() * songslen);
+            if (this.songs[0]) {
+                let toPlay = this.songs.splice(randomidx, 1);
+                this.songs.unshift(toPlay[0]);
+            }
+        }
         let song = this.songs.shift();
         if (this.currentSong != null || this.currentSong != undefined) {
             this.lastSong = this.currentSong;

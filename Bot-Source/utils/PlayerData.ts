@@ -16,10 +16,11 @@ export class PlayerData {
   public loop?: boolean;
   public queueLoop?: boolean;
   public paused?: boolean;
+  public shuffle?: boolean;
 
   // arguably could add position in song and skips but eh
 
-  constructor(vcid: string, bcid: string, gid: string, q_songs: Array<QueueSong>, q_currentSong: QueueSong, q_lastSong: QueueSong, volume: number, loop: boolean, queueLoop: boolean, paused: boolean) {
+  constructor(vcid: string, bcid: string, gid: string, q_songs: Array<QueueSong>, q_currentSong: QueueSong, q_lastSong: QueueSong, volume: number, loop: boolean, queueLoop: boolean, paused: boolean, shuffle: boolean) {
     this.vchannelid = vcid;
     this.guildid = gid;
     this.boundChannelid = bcid;
@@ -30,6 +31,7 @@ export class PlayerData {
     this.loop = loop;
     this.queueLoop = queueLoop;
     this.paused = paused;
+    this.shuffle = shuffle;
   }
 
   async restore(music: musicHelper): Promise<void> {
@@ -45,12 +47,12 @@ export class PlayerData {
     player.queue.songs = this.q_songs;
     player.queue.currentSong = this.q_currentSong;
     player.queue.lastSong = this.q_lastSong;
-
     player.skips = [];
 
     music.setVolume(this.volume);
     player.loop = this.loop;
     player.queueLoop = this.queueLoop;
+    player.shuffle = this.shuffle;
     player.play(player.queue.currentSong.encoded);
     if (this.paused) {
       setTimeout(() => {

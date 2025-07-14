@@ -22,14 +22,15 @@ export class TrackEnd {
 
     if ((player.queue.songs[0] || player.loop || player.queueLoop) && player.queue.currentSong) {       
     
-      if (!player.loop) await player.queue.shift(player.queueLoop);
+      if (!player.loop) await player.queue.shift(player.queueLoop, player.shuffle);
       await player.play(player.queue.currentSong.encoded);
       this.music.save();
     } else {
     // shift one last time to null currentSong from queue
       player.loop = false;
       player.queueLoop = false;
-      player.queue.shift(player.queueLoop);
+      player.shuffle = false;
+      player.queue.shift(player.queueLoop, false);
       this.music.save();
     }
   }

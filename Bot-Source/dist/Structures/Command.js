@@ -18,11 +18,12 @@ var ArgType;
     ArgType["USER"] = "user";
 })(ArgType || (exports.ArgType = ArgType = {}));
 class ArgOption {
-    constructor(name, description, required, type) {
+    constructor(name, description, required, type, extras = null) {
         this.name = name;
         this.description = description;
         this.required = required;
         this.type = type;
+        this.extras = extras;
     }
 }
 exports.ArgOption = ArgOption;

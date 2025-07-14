@@ -100,6 +100,52 @@ class musicBot extends discord_js_1.Client {
                 cmd.arguments.forEach(async (arg) => {
                     function setOption(option) {
                         option.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
+                        if (!arg.extras)
+                            return option;
+                        if (option instanceof discord_js_1.SlashCommandStringOption) {
+                            if ("autocomplete" in arg.extras && arg.extras.autocomplete)
+                                option.setAutocomplete(arg.extras.autocomplete);
+                            if ("minLength" in arg.extras)
+                                option.setMinLength(arg.extras.minLength);
+                            if ("maxLength" in arg.extras)
+                                option.setMaxLength(arg.extras.maxLength);
+                            if ("choices" in arg.extras)
+                                option.setChoices(arg.extras.choices.map(s => ({ name: s, value: s })));
+                        }
+                        else if (option instanceof discord_js_1.SlashCommandIntegerOption) {
+                            if ("autocomplete" in arg.extras && arg.extras.autocomplete)
+                                option.setAutocomplete(arg.extras.autocomplete);
+                            if ("minValue" in arg.extras)
+                                option.setMinValue(arg.extras.minValue);
+                            if ("maxValue" in arg.extras)
+                                option.setMaxValue(arg.extras.maxValue);
+                            if ("choices" in arg.extras)
+                                option.setChoices(arg.extras.choices.map(s => ({ name: s, value: s })));
+                        }
+                        else if (option instanceof discord_js_1.SlashCommandUserOption) {
+                        }
+                        else if (option instanceof discord_js_1.SlashCommandChannelOption) {
+                            if ("channelTypes" in arg.extras)
+                                option.addChannelTypes(arg.extras.channelTypes);
+                        }
+                        else if (option instanceof discord_js_1.SlashCommandRoleOption) {
+                        }
+                        else if (option instanceof discord_js_1.SlashCommandBooleanOption) {
+                        }
+                        else if (option instanceof discord_js_1.SlashCommandMentionableOption) {
+                        }
+                        else if (option instanceof discord_js_1.SlashCommandAttachmentOption) {
+                        }
+                        else if (option instanceof discord_js_1.SlashCommandNumberOption) {
+                            if ("autocomplete" in arg.extras && arg.extras.autocomplete)
+                                option.setAutocomplete(arg.extras.autocomplete);
+                            if ("minValue" in arg.extras)
+                                option.setMinValue(arg.extras.minValue);
+                            if ("maxValue" in arg.extras)
+                                option.setMaxValue(arg.extras.maxValue);
+                            if ("choices" in arg.extras)
+                                option.setChoices(arg.extras.choices.map(s => ({ name: s, value: s })));
+                        }
                         return option;
                     }
                     if (arg.type == Command_js_1.ArgType.STRING)
@@ -114,21 +160,25 @@ class musicBot extends discord_js_1.Client {
                         slash.addRoleOption(option => setOption(option));
                     if (arg.type == Command_js_1.ArgType.BOOLEAN)
                         slash.addBooleanOption(option => setOption(option));
+                    if (arg.type == Command_js_1.ArgType.MENTIONABLE)
+                        slash.addMentionableOption(option => setOption(option));
+                    if (arg.type == Command_js_1.ArgType.ATTACHMENT)
+                        slash.addAttachmentOption(option => setOption(option));
+                    if (arg.type == Command_js_1.ArgType.NUMBER)
+                        slash.addNumberOption(option => setOption(option));
                 });
             }
             slashCommands.push(slash);
         }
         const rest = new discord_js_1.REST({ version: "10" }).setToken(this.token);
-        (async () => {
-            try {
-                this.logger.log("Started refreshing application (/) commands.");
-                await rest.put(discord_js_1.Routes.applicationCommands(this.user.id), { body: slashCommands });
-                this.logger.log("Successfully reloaded application (/) commands.");
-            }
-            catch (error) {
-                console.error(error);
-            }
-        })();
+        try {
+            this.logger.log("Started refreshing application (/) commands.");
+            let res = await rest.put(discord_js_1.Routes.applicationCommands(this.user.id), { body: slashCommands });
+            this.logger.log(`Successfully reloaded application (/) commands.\n ${res.json()}`);
+        }
+        catch (error) {
+            console.error(error);
+        }
     }
     async reloadPlayers() {
         let fp = musicHelper_js_1.musicHelper.playerfilepath.replace(".json", ".json.gz");
@@ -149,7 +199,7 @@ class musicBot extends discord_js_1.Client {
         });
         this.playerBackups.forEach((val, key, map) => {
             if (!(val instanceof PlayerData_js_1.PlayerData)) {
-                val = Object.assign(new PlayerData_js_1.PlayerData(val.vchannelid, val.boundChannelid, val.guildid, val.q_songs, val.q_currentSong, val.q_lastSong, val.volume, val.loop, val.queueLoop, val.paused), val);
+                val = Object.assign(new PlayerData_js_1.PlayerData(val.vchannelid, val.boundChannelid, val.guildid, val.q_songs, val.q_currentSong, val.q_lastSong, val.volume, val.loop, val.queueLoop, val.paused, val.shuffle), val);
                 map.set(key, val);
             }
             let music = new musicHelper_js_1.musicHelper(this, key);

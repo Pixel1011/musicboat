@@ -27,6 +27,7 @@ export default async function (oldState: any, newState: any, client: musicBot) {
     await sleep(1000); // wait for connect?
     await player.resume();
     client.logger.log("handling a move");
+    music.save();
   }
   // so uh i have now figured out that i dont need to this because player has its own events which arent documented... but this works so its staying :)
 

@@ -20,6 +20,7 @@ async function default_1(oldState, newState, client) {
         await sleep(1000);
         await player.resume();
         client.logger.log("handling a move");
+        music.save();
     }
 }
 exports.default = default_1;

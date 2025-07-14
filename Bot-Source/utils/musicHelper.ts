@@ -107,7 +107,7 @@ export class musicHelper {
   async skip(): Promise<void> {
     let player = this.getPlayer();
     if (player.loop) {
-      await player.queue.shift(player.queueLoop);
+      await player.queue.shift(player.queueLoop, false);
     }
     await player.stop();
   }
@@ -127,6 +127,7 @@ export class musicHelper {
     player.loop = false;
     player.queueLoop = false;
     player.boundChannel = undefined;
+    player.shuffle = false;
     this.setVolume(100);
     this.save(true);
     this.lavalink.players.destroy(this.guildid);
@@ -410,7 +411,8 @@ export class musicHelper {
         player.volume,
         player.loop,
         player.queueLoop,
-        player.paused
+        player.paused,
+        player.shuffle
       );
 
       this.client.playerBackups.set(this.guildid, saveobj);

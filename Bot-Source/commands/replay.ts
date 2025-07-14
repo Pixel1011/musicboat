@@ -26,7 +26,7 @@ export default class ReplayCmd extends Command {
     // if not playing, play last song
       let lastSong = player.queue.lastSong;
       player.queue.songs.unshift(lastSong);
-      player.queue.shift(false);
+      player.queue.shift(false, false);
       player.play(lastSong.encoded);
       data.send(":musical_note: **Song progress reset** :track_previous:");
       music.save();

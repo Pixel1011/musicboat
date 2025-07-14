@@ -1,4 +1,4 @@
-import Discord, { Client, GatewayDispatchEvents, Message, REST, Routes, SlashCommandBuilder, TextChannel } from "discord.js";
+import Discord, { Client, GatewayDispatchEvents, Message, REST, Routes, SlashCommandAttachmentOption, SlashCommandBooleanOption, SlashCommandBuilder, SlashCommandChannelOption, SlashCommandIntegerOption, SlashCommandMentionableOption, SlashCommandNumberOption, SlashCommandRoleOption, SlashCommandStringOption, SlashCommandUserOption, TextChannel } from "discord.js";
 import {logger} from "./utils/logger.js";
 import fs from "fs";
 import path from "path";
@@ -88,40 +88,89 @@ export class musicBot extends Client {
       if (cmd.hide) continue;
 
       let slash = new SlashCommandBuilder().setName(cmd.name).setDescription(cmd.description);
-      
+      // add slash command contexts later because rn they can be ran in dms which isnt good
       if (cmd.arguments.length != 0) {
+
+        type SlashCmdOptions = SlashCommandStringOption | 
+        SlashCommandIntegerOption | 
+        SlashCommandUserOption | 
+        SlashCommandChannelOption | 
+        SlashCommandRoleOption | 
+        SlashCommandBooleanOption | 
+        SlashCommandMentionableOption | 
+        SlashCommandAttachmentOption | 
+        SlashCommandNumberOption
+
         // add all different types of arguments
         cmd.arguments.forEach(async arg => {
-          function setOption(option: any) {
+          function setOption<T extends SlashCmdOptions>(option: T): T {
             option.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
+            if (!arg.extras) return option;
+            if (option instanceof SlashCommandStringOption) {
+              if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
+              if ("minLength" in arg.extras) option.setMinLength(arg.extras.minLength);
+              if ("maxLength" in arg.extras) option.setMaxLength(arg.extras.maxLength);
+              if ("choices" in arg.extras) option.setChoices(arg.extras.choices.map(s => ({name: s, value: s})));
+            } else
+            if (option instanceof SlashCommandIntegerOption) {
+              if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
+              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue);
+              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue);
+              if ("choices" in arg.extras) option.setChoices(arg.extras.choices.map(s => ({name: s, value: s})));
+            } else
+            if (option instanceof SlashCommandUserOption) {
+              // no extras
+            } else
+            if (option instanceof SlashCommandChannelOption) {
+              if ("channelTypes" in arg.extras) option.addChannelTypes(arg.extras.channelTypes);
+            } else
+            if (option instanceof SlashCommandRoleOption) {
+              // no extras
+            } else
+            if (option instanceof SlashCommandBooleanOption) {
+              // no extras
+            } else
+            if (option instanceof SlashCommandMentionableOption) {
+              // no extras
+            } else
+            if (option instanceof SlashCommandAttachmentOption) {
+              // no extras
+            } else
+            if (option instanceof SlashCommandNumberOption) {
+              if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
+              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue);
+              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue);
+              if ("choices" in arg.extras) option.setChoices(arg.extras.choices.map(s => ({name: s, value: s})));
+            } 
             return option;
           }
+
           if (arg.type == ArgType.STRING) slash.addStringOption(option => setOption(option));
           if (arg.type == ArgType.INTEGER) slash.addIntegerOption(option => setOption(option));
           if (arg.type == ArgType.USER) slash.addUserOption(option => setOption(option));
           if (arg.type == ArgType.CHANNEL) slash.addChannelOption(option => setOption(option));
           if (arg.type == ArgType.ROLE) slash.addRoleOption(option => setOption(option));
           if (arg.type == ArgType.BOOLEAN) slash.addBooleanOption(option => setOption(option));
+          if (arg.type == ArgType.MENTIONABLE) slash.addMentionableOption(option => setOption(option));
+          if (arg.type == ArgType.ATTACHMENT) slash.addAttachmentOption(option => setOption(option));
+          if (arg.type == ArgType.NUMBER) slash.addNumberOption(option => setOption(option));
         });
 
       }
-      // in future slash command permissions?
 
       slashCommands.push(slash);
     }
 
     const rest = new REST({ version: "10" }).setToken(this.token);
-    (async () => {
-      try {
-        this.logger.log("Started refreshing application (/) commands.");
+    try {
+      this.logger.log("Started refreshing application (/) commands.");
     
-        await rest.put(Routes.applicationCommands(this.user.id), { body: slashCommands });
+      let res: any = await rest.put(Routes.applicationCommands(this.user.id), { body: slashCommands });
         
-        this.logger.log("Successfully reloaded application (/) commands.");
-      } catch (error) {
-        console.error(error);
-      }
-    })();
+      this.logger.log(`Successfully reloaded application (/) commands.\n ${res.json()}`);
+    } catch (error) {
+      console.error(error);
+    }
 
   }
   
@@ -156,7 +205,8 @@ export class musicBot extends Client {
           val.volume,
           val.loop,
           val.queueLoop,
-          val.paused
+          val.paused,
+          val.shuffle
         ), val);
         map.set(key, val);
       }

@@ -116,12 +116,15 @@ class QueueCmd extends Command_1.Command {
         let queueLoopEmote = "❌";
         if (player.queueLoop)
             queueLoopEmote = "✅";
+        let shuffleEmote = "❌";
+        if (player.shuffle)
+            shuffleEmote = "✅";
         let embed = new discord_js_1.EmbedBuilder();
         embed.setTitle(`Queue for ${data.guild.name}`);
         embed.setURL(client.config.website);
         embed.setDescription(desc.join("\n"));
         embed.setFooter({
-            text: `Page ${page}/${pages} | Loop: ${loopEmote} | Queue Loop: ${queueLoopEmote}`,
+            text: `Page ${page}/${pages} | Loop: ${loopEmote} | Queue Loop: ${queueLoopEmote} | Shuffle: ${shuffleEmote}`,
             iconURL: data.author.avatarURL({ size: 2048 })
         });
         return embed;

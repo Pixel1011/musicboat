@@ -8,7 +8,7 @@ export default class PauseCmd extends Command {
     super();
     this.name =  "pause";
     this.description =  "Pauses the current playing track.";
-    this.aliases =  ["stop"];
+    this.aliases =  [];
     this.hide =  false;
     this.arguments =  [];
   }

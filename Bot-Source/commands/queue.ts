@@ -132,13 +132,15 @@ export default class QueueCmd extends Command {
     if(player.loop) loopEmote = "✅";
     let queueLoopEmote = "❌";
     if(player.queueLoop) queueLoopEmote = "✅";
+    let shuffleEmote = "❌";
+    if(player.shuffle) shuffleEmote = "✅";
     
     let embed = new EmbedBuilder();
     embed.setTitle(`Queue for ${data.guild.name}`);
     embed.setURL(client.config.website);
     embed.setDescription(desc.join("\n"));
     embed.setFooter({
-      text: `Page ${page}/${pages} | Loop: ${loopEmote} | Queue Loop: ${queueLoopEmote}`,
+      text: `Page ${page}/${pages} | Loop: ${loopEmote} | Queue Loop: ${queueLoopEmote} | Shuffle: ${shuffleEmote}`,
       iconURL: data.author.avatarURL({size:2048})
     });
     return embed;

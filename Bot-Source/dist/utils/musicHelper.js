@@ -98,7 +98,7 @@ class musicHelper {
     async skip() {
         let player = this.getPlayer();
         if (player.loop) {
-            await player.queue.shift(player.queueLoop);
+            await player.queue.shift(player.queueLoop, false);
         }
         await player.stop();
     }
@@ -116,6 +116,7 @@ class musicHelper {
         player.loop = false;
         player.queueLoop = false;
         player.boundChannel = undefined;
+        player.shuffle = false;
         this.setVolume(100);
         this.save(true);
         this.lavalink.players.destroy(this.guildid);
@@ -266,7 +267,7 @@ class musicHelper {
         if (!player || !player.voice)
             destroy = true;
         if (!destroy) {
-            let saveobj = new PlayerData_1.PlayerData(player.voice.channelId, player.boundChannel, this.guildid, player.queue.songs, player.queue.currentSong, player.queue.lastSong, player.volume, player.loop, player.queueLoop, player.paused);
+            let saveobj = new PlayerData_1.PlayerData(player.voice.channelId, player.boundChannel, this.guildid, player.queue.songs, player.queue.currentSong, player.queue.lastSong, player.volume, player.loop, player.queueLoop, player.paused, player.shuffle);
             this.client.playerBackups.set(this.guildid, saveobj);
         }
         else {

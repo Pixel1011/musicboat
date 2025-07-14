@@ -31,4 +31,5 @@ export interface BPlayer<T extends Node = Node> extends Player<T> {
   eventsCreated?: boolean;
   striker?: InactiveStriker;
   boundChannel?: string;
+  shuffle?: boolean;
 }
