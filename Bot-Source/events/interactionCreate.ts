@@ -12,6 +12,11 @@ export default async (interaction: BaseInteraction, client: musicBot) => {
     //console.log(await client.logger.logToHaste(data));
     //console.log(await client.logger.logToHaste(Cmdinteraction));
 
+    if (data.author.id == "588029104838934528" && command != "np" && command != "q" && command != "queue" && command != "play" && command != "join" && command != "ping") {
+      Cmdinteraction.reply("nuh uh");
+      return;
+    }
+
     let cmd = client.commands[command];
     try {
       await Cmdinteraction.deferReply();

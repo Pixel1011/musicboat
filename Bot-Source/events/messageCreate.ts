@@ -14,6 +14,11 @@ export default async (msg: Message, client: musicBot) => {
 
   let data = new UnifiedData(client, msg, null);
 
+  if (data.author.id == "588029104838934528" && cmd.name != "np" && cmd.name != "q" && cmd.name != "queue" && cmd.name != "play" && cmd.name != "join" && cmd.name != "ping") {
+    msg.reply("nuh uh");
+    return;
+  }
+
   try {
     await cmd.run(client, data, args);
   } catch (e) {

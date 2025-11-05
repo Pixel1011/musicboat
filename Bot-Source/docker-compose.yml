@@ -1,5 +1,3 @@
-version: "3.7"
-
 services:
   musicboat:
     container_name: musicboat

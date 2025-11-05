@@ -165,9 +165,9 @@ export class musicBot extends Client {
     try {
       this.logger.log("Started refreshing application (/) commands.");
     
-      let res: any = await rest.put(Routes.applicationCommands(this.user.id), { body: slashCommands });
+      await rest.put(Routes.applicationCommands(this.user.id), { body: slashCommands });
         
-      this.logger.log(`Successfully reloaded application (/) commands.\n ${res.json()}`);
+      this.logger.log("Successfully reloaded application (/) commands.");
     } catch (error) {
       console.error(error);
     }

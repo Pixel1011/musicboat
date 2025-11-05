@@ -4,6 +4,7 @@ command=$1
 
 case $command in
   "build")
+    export COMPOSE_BAKE=true
     docker compose up -d --no-deps --build musicboat
     if [ $? -eq 0 ]; then
       docker compose logs -f musicboat
