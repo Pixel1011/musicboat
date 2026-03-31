@@ -4,8 +4,8 @@ import { Track } from "../Structures/Search";
 
 export class Queue {
   public songs: Array<QueueSong>;
-  public currentSong: QueueSong;
-  public lastSong: QueueSong;
+  public currentSong?: QueueSong;
+  public lastSong?: QueueSong;
 
   constructor() {
     this.songs = [];
@@ -14,7 +14,7 @@ export class Queue {
   }
 
   static getThumbnail(track: Track) {
-    let thumbnail = track.info.artworkUrl;
+    let thumbnail = track.info.artworkUrl!;
     return thumbnail;
   }
   // requester is user object
@@ -29,7 +29,7 @@ export class Queue {
       length: track.info.length,
       isStream: track.info.isStream,
       title: track.info.title,
-      url: track.info.uri,
+      url: track.info.uri!,
       channel: track.info.author,
       thumbnail: thumbnail,
       requester: requester
@@ -43,7 +43,7 @@ export class Queue {
   }
 
   async shift(queueLoop: boolean, shuffle: boolean) {
-    if (queueLoop) this.songs.push(this.currentSong);
+    if (queueLoop) this.songs.push(this.currentSong!);
     if (shuffle) {
       let songslen = this.songs.length;
       let randomidx = Math.floor(Math.random() * songslen);

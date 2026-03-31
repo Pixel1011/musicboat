@@ -18,7 +18,7 @@ export default class RemoveCmd extends Command {
   
   }
 
-  isInt(value) {
+  isInt(value: any) {
     return !isNaN(value) && parseInt(value) == value && !isNaN(parseInt(value, 10));
   }
 
@@ -53,19 +53,19 @@ export default class RemoveCmd extends Command {
 
     for (let i in INums) {
       let num = INums[i] - 1;
-      removedSong = player.queue.songs[num];
+      removedSong = player.queue!.songs[num];
 
       if (!music.PermsOrAloneCheck(data, true, false) || removedSong.requester.id != data.author.id) {
         data.send(":x: **The song you attempted to remove either does not exist, or you lack permission to remove songs.**");
         continue;
       }
-      player.queue.songs.splice(num, 1);
+      player.queue!.songs.splice(num, 1);
       songsRemoved++;
 
     }
 
     if (nums.length == 1) {
-      data.send(`✅ **Removed** \`\`${removedSong.title}\`\``);
+      data.send(`✅ **Removed** \`\`${removedSong!.title}\`\``);
     } else {
       data.send(`✅ **Removed** \`\`${songsRemoved}\`\` songs`);
     }

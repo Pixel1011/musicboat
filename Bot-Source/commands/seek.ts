@@ -16,9 +16,11 @@ export default class SeekCmd extends Command {
     ];
   
   }
-  isInt(value) {
+  
+  isInt(value: any) {
     return !isNaN(value) && parseInt(value) == value && !isNaN(parseInt(value, 10));
   }
+
   validateTimestr(split: string[]) {
     if (split.length > 3) return false;
     for (let i = 0; i < split.length; i++) {
@@ -31,7 +33,10 @@ export default class SeekCmd extends Command {
     const music = new musicHelper(client, data.guild.id);
     if (!await music.check(data, true)) return;
     //if (!await music.PermsOrAloneCheck(data, true, true)) return;
-    let player = music.getPlayer();
+    const player = music.getPlayer();
+    if (!player.queue?.currentSong) {
+      return data.send(":x: Nothing is currently playing.");
+    }
     let timestr = args.join("").toLowerCase();
     let split = timestr.split(":");
 
@@ -42,7 +47,9 @@ export default class SeekCmd extends Command {
       return data.send({embeds: [failEmbed]});
     }
     let time = 0;
-    let hours: string, mins: string, secs: string;
+    let hours: string | undefined;
+    let mins: string | undefined;
+    let secs: string | undefined;
     if (split.length == 3) {
       hours = split[0];
       mins = split[1];
@@ -54,9 +61,9 @@ export default class SeekCmd extends Command {
       secs = split[0];
     }
     
-    if (hours) time += parseInt(hours) * 60 * 60;
-    if (mins) time += parseInt(mins) * 60;
-    if (secs) time += parseInt(secs);
+    if (hours) time += parseInt(hours, 10) * 60 * 60;
+    if (mins) time += parseInt(mins, 10) * 60;
+    if (secs) time += parseInt(secs, 10);
     if (time * 1000 > player.queue.currentSong.length) {
       time = player.queue.currentSong.length / 1000;
     }

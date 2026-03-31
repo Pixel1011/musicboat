@@ -21,6 +21,8 @@ class PlayerData {
             return;
         let client = music.client;
         let guild = client.guilds.cache.get(this.guildid);
+        if (!guild)
+            return;
         let tchannel = guild.channels.cache.get(this.boundChannelid);
         let vchannel = guild.channels.cache.get(this.vchannelid);
         if (!vchannel || !vchannel.joinable || !vchannel.speakable)

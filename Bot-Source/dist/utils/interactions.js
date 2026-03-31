@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getPagesRow = void 0;
+exports.getPagesRow = getPagesRow;
 const discord_js_1 = require("discord.js");
 function getPagesRow(disabledMap, addCancel = true) {
     const components = [
@@ -13,5 +13,4 @@ function getPagesRow(disabledMap, addCancel = true) {
     let row = new discord_js_1.ActionRowBuilder().addComponents(components);
     return row;
 }
-exports.getPagesRow = getPagesRow;
 //# sourceMappingURL=interactions.js.map

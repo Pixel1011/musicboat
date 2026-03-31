@@ -7,6 +7,7 @@ export default async function (oldState: any, newState: any, client: musicBot) {
   // if there is channel change
   if (newState.channelId == oldState.channelId) return;
   // if it is bot
+  if (!client.user) return;
   if ((newState.id != client.user.id) || (oldState.id != client.user.id)) return;
   const music = new musicHelper(client, newState.guild.id);
 

@@ -40,7 +40,7 @@ export default class ReloadCmd extends Command {
           client.commands[alias] = cmd; 
         });
       }
-    } catch (e) {
+    } catch (e: any) {
       data.send(`Failed to load ${command}\n ${e.stack}`);
       return;
     }

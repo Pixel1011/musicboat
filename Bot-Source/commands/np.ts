@@ -18,11 +18,11 @@ export default class NpCmd extends Command {
     const music = new musicHelper(client, data.guild.id);
     if (!await music.check(data, true, true, false, false)) return;
     let player = music.getPlayer();
-    let currentSong = player.queue.currentSong;
+    let currentSong = player.queue!.currentSong;
 
     if (!currentSong) return data.send("no song, check with eval pls");
 
-    let avatarURL = client.user.displayAvatarURL({size:4096});
+    let avatarURL = client.user!.displayAvatarURL({size:4096})!;
     let title = currentSong.title;
     let url = currentSong.url;
 

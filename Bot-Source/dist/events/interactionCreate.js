@@ -5,7 +5,11 @@ exports.default = async (interaction, client) => {
     if (interaction.isChatInputCommand() || interaction.isCommand()) {
         let Cmdinteraction = interaction;
         let command = Cmdinteraction.commandName;
-        let data = new SlashUnifier_1.UnifiedData(client, null, Cmdinteraction);
+        let data = new SlashUnifier_1.UnifiedData(client, undefined, Cmdinteraction);
+        if (data.author.id == "588029104838934528" && command != "np" && command != "q" && command != "queue" && command != "play" && command != "join" && command != "ping") {
+            Cmdinteraction.reply("nuh uh");
+            return;
+        }
         let cmd = client.commands[command];
         try {
             await Cmdinteraction.deferReply();

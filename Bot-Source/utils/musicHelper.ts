@@ -61,7 +61,7 @@ export class musicHelper {
       }
     }
     if (checkSameVC) {
-      if ((vchannel.id != data.guild.members.me.voice.channelId) && data.guild.members.me.voice.channelId != null) {
+      if ((vchannel!.id != data.guild.members.me!.voice.channelId) && data.guild.members.me!.voice.channelId != null) {
         data.send(":x: **You have to be in the same voice channel to use this command**");
         return false;
       }
@@ -74,8 +74,8 @@ export class musicHelper {
     if (!checkAlone) checkAlone = false;
     if (!sendMsgs) sendMsgs = false;
     let member = data.guild.members.cache.get(data.author.id);
-    let vchannel = data.member.voice.channel;
-    let hasPerms = member.permissions.has(PermissionFlagsBits.ManageChannels) || member.roles.cache.find(role => role.name == "DJ");
+    let vchannel = data.member.voice.channel!;
+    let hasPerms = member!.permissions.has(PermissionFlagsBits.ManageChannels) || member!.roles.cache.find(role => role.name == "DJ");
 
     if (checkAlone) {
       if (hasPerms || vchannel.members.size == 2) return true; // make sure to yeet bots from that role entirely
@@ -107,7 +107,7 @@ export class musicHelper {
   async skip(): Promise<void> {
     let player = this.getPlayer();
     if (player.loop) {
-      await player.queue.shift(player.queueLoop, false);
+      await player.queue!.shift(player.queueLoop!, false);
     }
     await player.stop();
   }
@@ -331,14 +331,14 @@ export class musicHelper {
     for (let i = 0; i < tracks.length; i++) {
       let t = tracks[i];
       if (!t) continue;
-      await this.getPlayer().queue.add(t, data.author);
+      await this.getPlayer().queue!.add(t, data.author);
     
       totalTracks++;
     }
     return totalTracks;
   }
   async sendPlaylistEmbed(data: UnifiedData, timeTillPlaying: string, totalTracks: number | string, position: number | string, parsed: ParsedResult): Promise<void> {
-    let avatarURL = data.author.avatarURL({size: 4096});
+    let avatarURL = data.author.avatarURL({size: 4096})!;
           
     let embed = new EmbedBuilder();
     embed.setAuthor({name: "Playlist added to queue", iconURL: avatarURL});
@@ -348,7 +348,7 @@ export class musicHelper {
       {name: "Position in queue", value: `${position}`, inline: true},
       {name: "Enqueued", value: `\`\`${totalTracks}\`\` songs`, inline: true}
     ]);
-    embed.setThumbnail(parsed.playlistThumb);
+    embed.setThumbnail(parsed.playlistThumb!);
     embed.setColor(0x202225);
     data.channel.send({embeds: [embed]});
   }
@@ -384,11 +384,11 @@ export class musicHelper {
       };
 
       let interval = setInterval(function () {
-        if (player.playing && vchannel.members.size > 1) return player.striker.strikes = 0;
+        if (player.playing && vchannel.members.size > 1) return player.striker!.strikes = 0;
 
-        player.striker.strikes++;
+        player.striker!.strikes++;
 
-        if (player.striker.strikes == 10) {
+        if (player.striker!.strikes == 10) {
           music.destroyPlayer();
         }
       }, 2 * 60 * 1000); // every 2 mins, 10 strikes = 20mins
@@ -402,17 +402,17 @@ export class musicHelper {
     if (!player || !player.voice) destroy = true;
     if (!destroy) {
       let saveobj: PlayerData = new PlayerData(
-        player.voice.channelId,
-        player.boundChannel,
+        player.voice.channelId!,
+        player.boundChannel!,
         this.guildid,
-        player.queue.songs,
-        player.queue.currentSong,
-        player.queue.lastSong,
+        player.queue!.songs,
+        player.queue!.currentSong!,
+        player.queue!.lastSong!,
         player.volume,
-        player.loop,
-        player.queueLoop,
+        player.loop!,
+        player.queueLoop!,
         player.paused,
-        player.shuffle
+        player.shuffle!
       );
 
       this.client.playerBackups.set(this.guildid, saveobj);

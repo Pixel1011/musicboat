@@ -19,7 +19,7 @@ class SkipCmd extends Command_1.Command {
         let vchannel = data.member.voice.channel;
         let skipsRequired = Math.floor((vchannel.members.size - 1) / 2);
         if (player.skips.includes(data.author.id)) {
-            if (music.PermsOrAloneCheck(data)) {
+            if (await music.PermsOrAloneCheck(data)) {
                 return data.send(`**Skipping?** (${player.skips.length}/${skipsRequired} people) \`\`${client.prefix}forceskip\`\` **or** \`\`${client.prefix}fs\`\` **to force**`);
             }
             else {
@@ -33,7 +33,7 @@ class SkipCmd extends Command_1.Command {
             data.send(":fast_forward: **Skipped** :thumbsup:");
         }
         else {
-            if (music.PermsOrAloneCheck(data)) {
+            if (await music.PermsOrAloneCheck(data)) {
                 return data.send(`**Skipping?** (${player.skips.length}/${skipsRequired} people) \`\`${client.prefix}forceskip\`\` **or** \`\`${client.prefix}fs\`\` **to force**`);
             }
             else {

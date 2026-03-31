@@ -23,7 +23,7 @@ export default class QueueCmd extends Command {
     if (!await music.check(data, true, true, false, false)) return;
     let player = music.getPlayer();
 
-    let pages = Math.ceil(player.queue.songs.length / 10);
+    let pages = Math.ceil(player.queue!.songs.length / 10);
     if (pages == 0) pages = 1;
     let page = 1;
     if(args.join(" ")) page = Number(args.join(" "));
@@ -95,37 +95,37 @@ export default class QueueCmd extends Command {
     let timeToPlaySec = Math.floor(timeToPlay / 1000 - (timeToPlayMin * 60)).toLocaleString("en-GB", {minimumIntegerDigits: 2});
     let time = `${timeToPlayMin}:${timeToPlaySec}`;
     if (song.isStream) time = "LIVE";
-    let displayName = guild.members.cache.get(song.requester.id).displayName;
+    let displayName = guild.members.cache.get(song!.requester.id)!.displayName;
 
     return `[${songname}](${link}) | \`${time} Requested by: ${displayName}\``;
   }
 
   getEmbed(client: musicBot, data: UnifiedData, player: BPlayer, music: musicHelper, page: number, pages:number) {
-    let currentSong = player.queue.currentSong;
+    let currentSong = player.queue!.currentSong;
     let desc = [];
 
     if (page == 1) {
       desc.push("__Now Playing:__");
-      desc.push(QueueCmd.songString(currentSong, data.guild));
+      desc.push(QueueCmd.songString(currentSong!, data.guild));
     }
-    if (player.queue.songs[0]) {
+    if (player.queue!.songs[0]) {
       if (page == 1) desc.push("\n__Up Next:__");
 
       for (let i = (page * 10) - 10; i < (page * 10); i++) {
-        let song = player.queue.songs[i];
+        let song = player.queue!.songs[i];
         if (!song) break; 
         desc.push("\n" + `\`\`${i+1}.\`\` ` + QueueCmd.songString(song, data.guild));
       }
 
       let queueLength = 0;
 
-      player.queue.songs.forEach(sng => {
+      player.queue!.songs.forEach(sng => {
         queueLength = queueLength + sng.length;
       });
 
       //queueLength = queueLength + (player.queue.currentSong.length - player.position);
-      let text = player.queue.songs.length > 1 ? "songs" : "song";
-      desc.push("\n" + `**${player.queue.songs.length} ${text} in queue | ${music.time(queueLength)} total length**`);
+      let text = player.queue!.songs.length > 1 ? "songs" : "song";
+      desc.push("\n" + `**${player.queue!.songs.length} ${text} in queue | ${music.time(queueLength)} total length**`);
     }
 
     let loopEmote = "❌";
@@ -141,7 +141,7 @@ export default class QueueCmd extends Command {
     embed.setDescription(desc.join("\n"));
     embed.setFooter({
       text: `Page ${page}/${pages} | Loop: ${loopEmote} | Queue Loop: ${queueLoopEmote} | Shuffle: ${shuffleEmote}`,
-      iconURL: data.author.avatarURL({size:2048})
+      iconURL: data.author.avatarURL({size:2048})!
     });
     return embed;
   }

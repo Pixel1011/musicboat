@@ -22,7 +22,7 @@ export class TrackEnd {
 
     if ((player.queue.songs[0] || player.loop || player.queueLoop) && player.queue.currentSong) {       
     
-      if (!player.loop) await player.queue.shift(player.queueLoop, player.shuffle);
+      if (!player.loop) await player.queue.shift(player.queueLoop!, player.shuffle!);
       await player.play(player.queue.currentSong.encoded);
       this.music.save();
     } else {

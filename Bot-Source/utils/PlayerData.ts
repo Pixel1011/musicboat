@@ -38,18 +38,19 @@ export class PlayerData {
     if (!this.q_currentSong) return;
     let client = music.client;
     let guild = client.guilds.cache.get(this.guildid);
+    if (!guild) return;
     let tchannel = guild.channels.cache.get(this.boundChannelid) as TextChannel;
     let vchannel = guild.channels.cache.get(this.vchannelid) as VoiceChannel;
     if (!vchannel || !vchannel.joinable || !vchannel.speakable) return;
     let player = await music.join(this.vchannelid);
     player.boundChannel = this.boundChannelid;
     player.queue = new Queue();
-    player.queue.songs = this.q_songs;
+    player.queue.songs = this.q_songs!;
     player.queue.currentSong = this.q_currentSong;
     player.queue.lastSong = this.q_lastSong;
     player.skips = [];
 
-    music.setVolume(this.volume);
+    music.setVolume(this.volume!);
     player.loop = this.loop;
     player.queueLoop = this.queueLoop;
     player.shuffle = this.shuffle;
@@ -62,9 +63,9 @@ export class PlayerData {
     music.registerEvents();
     music.registerInactivityStriker(vchannel);
     if (tchannel.isSendable()) {
-      let s = this.q_songs.length == 0 ? "" : "s";
-      tchannel.send(`Rejoining \`\`${vchannel.name}\`\` with ${this.q_songs.length + 1} loaded song${s}`);
-      client.logger.log(`Rejoining ${vchannel.name} with ${this.q_songs.length + 1} loaded song${s}`);
+      let s = this.q_songs!.length == 0 ? "" : "s";
+      tchannel.send(`Rejoining \`\`${vchannel.name}\`\` with ${this.q_songs!.length + 1} loaded song${s}`);
+      client.logger.log(`Rejoining ${vchannel.name} with ${this.q_songs!.length + 1} loaded song${s}`);
     }
   }
 }

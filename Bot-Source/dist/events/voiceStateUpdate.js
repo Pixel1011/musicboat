@@ -1,9 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.default = default_1;
 const musicHelper_1 = require("../utils/musicHelper");
 async function default_1(oldState, newState, client) {
     const sleep = (ms) => new Promise(res => setTimeout(res, ms));
     if (newState.channelId == oldState.channelId)
+        return;
+    if (!client.user)
         return;
     if ((newState.id != client.user.id) || (oldState.id != client.user.id))
         return;
@@ -23,5 +26,4 @@ async function default_1(oldState, newState, client) {
         music.save();
     }
 }
-exports.default = default_1;
 //# sourceMappingURL=voiceStateUpdate.js.map

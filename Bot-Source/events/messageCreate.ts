@@ -7,21 +7,16 @@ export default async (msg: Message, client: musicBot) => {
   let prefix = client.prefix;
   if (!msg.content.startsWith(prefix)) return;
   const args = msg.content.split(" ");
-  const command = args.shift().slice(prefix.length).toLowerCase();
+  const command = args.shift()!.slice(prefix.length).toLowerCase();
 
   if (!client.commands[command]) return;
   let cmd: Command = client.commands[command];
 
-  let data = new UnifiedData(client, msg, null);
-
-  if (data.author.id == "588029104838934528" && cmd.name != "np" && cmd.name != "q" && cmd.name != "queue" && cmd.name != "play" && cmd.name != "join" && cmd.name != "ping") {
-    msg.reply("nuh uh");
-    return;
-  }
+  let data = new UnifiedData(client, msg);
 
   try {
     await cmd.run(client, data, args);
-  } catch (e) {
+  } catch (e: any) {
     client.logger.log(e.stack);
   }
 };

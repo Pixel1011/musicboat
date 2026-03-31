@@ -30,7 +30,10 @@ class SeekCmd extends Command_1.Command {
         const music = new musicHelper_1.musicHelper(client, data.guild.id);
         if (!await music.check(data, true))
             return;
-        let player = music.getPlayer();
+        const player = music.getPlayer();
+        if (!player.queue?.currentSong) {
+            return data.send(":x: Nothing is currently playing.");
+        }
         let timestr = args.join("").toLowerCase();
         let split = timestr.split(":");
         let failEmbed = new discord_js_1.EmbedBuilder();
@@ -40,7 +43,9 @@ class SeekCmd extends Command_1.Command {
             return data.send({ embeds: [failEmbed] });
         }
         let time = 0;
-        let hours, mins, secs;
+        let hours;
+        let mins;
+        let secs;
         if (split.length == 3) {
             hours = split[0];
             mins = split[1];
@@ -54,11 +59,11 @@ class SeekCmd extends Command_1.Command {
             secs = split[0];
         }
         if (hours)
-            time += parseInt(hours) * 60 * 60;
+            time += parseInt(hours, 10) * 60 * 60;
         if (mins)
-            time += parseInt(mins) * 60;
+            time += parseInt(mins, 10) * 60;
         if (secs)
-            time += parseInt(secs);
+            time += parseInt(secs, 10);
         if (time * 1000 > player.queue.currentSong.length) {
             time = player.queue.currentSong.length / 1000;
         }

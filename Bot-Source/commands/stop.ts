@@ -25,7 +25,7 @@ export default class StopCmd extends Command {
     if (toLeave == "true" || toLeave == "leave" || toLeave == "yes") {
       music.destroyPlayer();
     } else {
-      player.queue.songs = [];
+      player.queue!.songs = [];
       player.loop = false;
       player.queueLoop = false;
       player.shuffle = false;

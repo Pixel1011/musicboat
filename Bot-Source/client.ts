@@ -16,16 +16,17 @@ import lavaEvents from "./events/lavaEvents.js";
 import { PlayerData } from "./utils/PlayerData.js";
 import { musicHelper } from "./utils/musicHelper.js";
 import zlib from "zlib";
+import guildMemberAdd from "./events/guildMemberAdd.js";
 
 export class musicBot extends Client {
 
   logger: logger;
-  commands: Command[];
+  commands: Record<string, Command>;
   config: config;
   prefix: string;
   spotify: boolean;
   botnum: number;
-  lavalink: Node;
+  lavalink!: Node;
   updater: LavalinkUpdater;
   client: musicBot = this;
   playerBackups: Map<string, PlayerData> = new Map<string, PlayerData>();
@@ -40,7 +41,7 @@ export class musicBot extends Client {
     
     this.botnum = num + 1;
     this.logger = new logger(this);
-    this.commands = [];
+    this.commands = {};
     this.config = Config;
     this.token = token;
     this.prefix = prefix;
@@ -50,7 +51,7 @@ export class musicBot extends Client {
   }
 
   async ReloadCommands(msg?: Message) {
-    this.commands = [];
+    this.commands = {};
     let aliasnum = 0;
     // load normal commands and aliases
     const files = fs.readdirSync(path.resolve("./", "commands"));
@@ -70,7 +71,7 @@ export class musicBot extends Client {
             aliasnum++;
           });
         }
-      } catch (e) {
+      } catch (e: any) {
         throw `Failed to load ${file}\n${e.stack}`;
       }
     });
@@ -89,7 +90,7 @@ export class musicBot extends Client {
 
       let slash = new SlashCommandBuilder().setName(cmd.name).setDescription(cmd.description);
       // add slash command contexts later because rn they can be ran in dms which isnt good
-      if (cmd.arguments.length != 0) {
+      if (cmd.arguments!.length != 0) {
 
         type SlashCmdOptions = SlashCommandStringOption | 
         SlashCommandIntegerOption | 
@@ -102,27 +103,27 @@ export class musicBot extends Client {
         SlashCommandNumberOption
 
         // add all different types of arguments
-        cmd.arguments.forEach(async arg => {
+        cmd.arguments!.forEach(async arg => {
           function setOption<T extends SlashCmdOptions>(option: T): T {
             option.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
             if (!arg.extras) return option;
             if (option instanceof SlashCommandStringOption) {
               if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
-              if ("minLength" in arg.extras) option.setMinLength(arg.extras.minLength);
-              if ("maxLength" in arg.extras) option.setMaxLength(arg.extras.maxLength);
-              if ("choices" in arg.extras) option.setChoices(arg.extras.choices.map(s => ({name: s, value: s})));
+              if ("minLength" in arg.extras) option.setMinLength(arg.extras.minLength!);
+              if ("maxLength" in arg.extras) option.setMaxLength(arg.extras.maxLength!);
+              if ("choices" in arg.extras && arg.extras.choices) option.setChoices(arg.extras.choices.map(s => ({name: String(s), value: String(s)})));
             } else
             if (option instanceof SlashCommandIntegerOption) {
               if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
-              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue);
-              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue);
-              if ("choices" in arg.extras) option.setChoices(arg.extras.choices.map(s => ({name: s, value: s})));
+              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue!);
+              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue!);
+              if ("choices" in arg.extras && arg.extras.choices) option.setChoices(arg.extras.choices.map(s => ({name: String(s), value: Number(s)})));
             } else
             if (option instanceof SlashCommandUserOption) {
               // no extras
             } else
             if (option instanceof SlashCommandChannelOption) {
-              if ("channelTypes" in arg.extras) option.addChannelTypes(arg.extras.channelTypes);
+              if ("channelTypes" in arg.extras) option.addChannelTypes(arg.extras.channelTypes!);
             } else
             if (option instanceof SlashCommandRoleOption) {
               // no extras
@@ -138,9 +139,9 @@ export class musicBot extends Client {
             } else
             if (option instanceof SlashCommandNumberOption) {
               if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
-              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue);
-              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue);
-              if ("choices" in arg.extras) option.setChoices(arg.extras.choices.map(s => ({name: s, value: s})));
+              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue!);
+              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue!);
+              if ("choices" in arg.extras && arg.extras.choices) option.setChoices(arg.extras.choices.map(s => ({name: String(s), value: Number(s)})));
             } 
             return option;
           }
@@ -161,11 +162,11 @@ export class musicBot extends Client {
       slashCommands.push(slash);
     }
 
-    const rest = new REST({ version: "10" }).setToken(this.token);
+    const rest = new REST({ version: "10" }).setToken(this.token!);
     try {
       this.logger.log("Started refreshing application (/) commands.");
     
-      await rest.put(Routes.applicationCommands(this.user.id), { body: slashCommands });
+      await rest.put(Routes.applicationCommands(this.user!.id), { body: slashCommands });
         
       this.logger.log("Successfully reloaded application (/) commands.");
     } catch (error) {
@@ -220,7 +221,7 @@ export class musicBot extends Client {
   // init
   // login, load commands, event handling etc
   async init() {
-    await this.login(this.token);
+    await this.login(this.token!);
     this.logger.log("Initializing..");
 
     // load commands
@@ -241,7 +242,7 @@ export class musicBot extends Client {
       },
       discord: {
         sendGatewayCommand: (guildId, data) => {
-          this.guilds.cache.get(guildId).shard.send(data);
+          this.guilds.cache.get(guildId)!.shard.send(data);
         }
       }
     });
@@ -259,9 +260,10 @@ export class musicBot extends Client {
     this.on("messageCreate", (msg) => messageCreate(msg, this));
     this.on("interactionCreate", (inter) => interactionCreate(inter, this));
     this.on("voiceStateUpdate", (oldState, newState) => voiceStateUpdate(oldState, newState, this));
+    this.on("guildMemberAdd", (member) => guildMemberAdd(member, this));
     //
     this.logger.log("connecting to lavalink..");
-    this.lavalink.connect({ userId: this.user.id });
+    this.lavalink.connect({ userId: this.user!.id });
   }
 
 }

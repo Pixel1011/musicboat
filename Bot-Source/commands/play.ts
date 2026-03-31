@@ -57,7 +57,7 @@ export default class PlayCmd extends Command {
       return data.send(":x: **You have to be in a voice channel to use this command.**");
     }
     // check if user in same vc
-    if ((vchannel.id != data.guild.members.me.voice.channelId) && data.guild.members.me.voice.channelId != null) {
+    if ((vchannel.id != data.guild.members.me!.voice.channelId) && data.guild.members.me!.voice.channelId) {
       return data.send(":x: **You have to be in the same voice channel to use this command**");
     }
 
@@ -73,7 +73,7 @@ export default class PlayCmd extends Command {
     // Join
     // check if not in vc already and get player
 
-    if (!data.guild.members.me.voice.channelId) {
+    if (!data.guild.members.me!.voice.channelId) {
       player = await music.join(vchannel.id);
       data.send(`:thumbsup: **Joined** \`\`${vchannel.name}\`\` **and bound to** <#${data.channel.id}>`); // store channel somewhere for queues
     } else {
@@ -121,7 +121,7 @@ export default class PlayCmd extends Command {
     
       // if playlist
       if (parsed.isPlaylist) {
-        let totalTracks = await music.addPlaylist(parsed.tracks, data);
+        let totalTracks = await music.addPlaylist(parsed.tracks!, data);
         let timeTillPlaying = "Now!"; // nothing else in queue
         let position = "1";
         await music.sendPlaylistEmbed(data, timeTillPlaying, totalTracks, position, parsed);
@@ -138,11 +138,11 @@ export default class PlayCmd extends Command {
     // if is already playing
     
       await player.queue.add(result, data.author);
-      let song = player.queue.songs.at(-1);
+      let song = player.queue.songs.at(-1)!;
       // embed
-      let avatarURL = song.requester.avatarURL({size: 4096});
+      let avatarURL = song!.requester.avatarURL({size: 4096})!;
     
-      let songLength = music.time(song.length);
+      let songLength = music.time(song!.length);
     
       let timeTillPlaying = 0;
     
@@ -152,11 +152,11 @@ export default class PlayCmd extends Command {
 
       timeTillPlaying = timeTillPlaying + player.queue.currentSong.length - player.position;
       // time to play whole queue including whats currently playing
-      timeTillPlaying = timeTillPlaying - song.length;
+      timeTillPlaying = timeTillPlaying - song!.length;
 
       // adding playlist
       if (parsed.isPlaylist) {
-        let totalTracks = await music.addPlaylist(parsed.tracks, data);
+        let totalTracks = await music.addPlaylist(parsed.tracks!, data);
         await music.sendPlaylistEmbed(data, music.time(timeTillPlaying), totalTracks, player.queue.songs.length + 1, parsed);
       } else {
       // not playlist (single song), already added to queue so just send embed

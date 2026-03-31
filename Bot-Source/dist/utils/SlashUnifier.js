@@ -7,7 +7,7 @@ class UnifiedData {
         this.client = client;
         this.inter = inter;
         this.msg = msg;
-        if (msg != null) {
+        if (msg) {
             this.author = msg.author;
             this.guild = msg.guild;
             this.channel = msg.channel;
@@ -16,7 +16,7 @@ class UnifiedData {
             this.args = msg.content.split(" ");
             this.isMsg = true;
         }
-        else if (inter != null) {
+        else if (inter) {
             this.author = inter.user;
             this.guild = inter.guild;
             this.channel = inter.channel;

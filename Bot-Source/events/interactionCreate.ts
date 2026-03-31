@@ -7,7 +7,7 @@ export default async (interaction: BaseInteraction, client: musicBot) => {
     let Cmdinteraction = interaction as ChatInputCommandInteraction | CommandInteraction;
     let command = Cmdinteraction.commandName;
 
-    let data = new UnifiedData(client, null, Cmdinteraction as ChatInputCommandInteraction);
+    let data = new UnifiedData(client, undefined, Cmdinteraction as ChatInputCommandInteraction);
 
     //console.log(await client.logger.logToHaste(data));
     //console.log(await client.logger.logToHaste(Cmdinteraction));
@@ -21,7 +21,7 @@ export default async (interaction: BaseInteraction, client: musicBot) => {
     try {
       await Cmdinteraction.deferReply();
       await cmd.run(client, data, data.args);
-    } catch (e) {
+    } catch (e: any) {
       client.logger.log(e.stack);
     }
   }

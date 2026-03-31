@@ -21,7 +21,7 @@ let youtube_api = "https://api.github.com/repos/lavalink-devs/youtube-source/rel
 const brick = false;
 
 export class LavalinkUpdater extends EventEmitter {
-  child: ChildProcess;
+  child?: ChildProcess;
   
   constructor() {
     super();
@@ -56,7 +56,7 @@ export class LavalinkUpdater extends EventEmitter {
     });
   
     process.on("exit", () => {
-      this.child.kill();
+      this.child?.kill();
     });
   }
 

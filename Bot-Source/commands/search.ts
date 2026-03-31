@@ -8,7 +8,7 @@ import { BPlayer } from "../Structures/Song";
 import { Queue } from "../utils/queue";
 import { getPagesRow } from "../utils/interactions";
 
-function isInt(value) {
+function isInt(value: any) {
   return !isNaN(value) && parseInt(value) == value && !isNaN(parseInt(value, 10));
 }
 
@@ -36,7 +36,7 @@ export default class SearchCmd extends Command {
       return data.send(":x: **You have to be in a voice channel to use this command.**");
     }
     // check if user in same vc
-    if ((vchannel.id != data.guild.members.me.voice.channelId) && data.guild.members.me.voice.channelId != null) {
+    if ((vchannel.id != data.guild.members.me!.voice.channelId) && data.guild.members.me!.voice.channelId != null) {
       return data.send(":x: **You have to be in the same voice channel to use this command**");
     }
 
@@ -99,7 +99,7 @@ export default class SearchCmd extends Command {
         // Join
         // check if not in vc already and get player
     
-        if (!data.guild.members.me.voice.channelId) {
+        if (!data.guild.members.me!.voice.channelId) {
           player = await music.join(vchannel.id);
           data.send(`:thumbsup: **Joined** \`\`${vchannel.name}\`\` **and bound to** <#${data.channel.id}>`); // store channel somewhere for queues
         } else {
@@ -128,7 +128,7 @@ export default class SearchCmd extends Command {
           // if is already playing
     
           await player.queue.add(trackSelected, data.author);
-          let song = player.queue.songs.at(-1);
+          let song = player.queue.songs.at(-1)!;
           // embed
           let avatarURL = song.requester.avatarURL({size: 4096});
     
@@ -145,7 +145,7 @@ export default class SearchCmd extends Command {
           timeTillPlaying = timeTillPlaying - song.length;
 
           let embed = new EmbedBuilder();
-          embed.setAuthor({name: "Added to queue", iconURL: avatarURL});
+          embed.setAuthor({name: "Added to queue", iconURL: avatarURL!});
           embed.setDescription(`[**${song.title}**](${song.url})`);
           embed.addFields([
             {name: "Channel", value: song.channel, inline: true},
@@ -258,7 +258,7 @@ export default class SearchCmd extends Command {
     embed.setDescription(desc.join("\n"));
     embed.setFooter({
       text: `Page ${page}/${pages}`,
-      iconURL: data.author.avatarURL({size:2048})
+      iconURL: data.author.avatarURL({size:2048})!
     });
     return embed;
   }

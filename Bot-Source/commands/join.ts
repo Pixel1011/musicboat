@@ -21,11 +21,11 @@ export default class JoinCmd extends Command {
     let player = music.getPlayer();
 
     // check if bot already in vc
-    if (data.guild.members.me.voice.channelId == vchannel.id && player) {
+    if (data.guild.members.me!.voice.channelId == vchannel.id && player) {
       return data.send(":x: **I am already connected to your channel**");
     }
     // if in another vc with someone else and they dont have perms
-    if ((data.guild.members.me.voice.channelId && player && data.guild.members.me.voice.channel.members.size >= 2) && !(await music.PermsOrAloneCheck(data,false,false))) {
+    if ((data.guild.members.me!.voice.channelId && player && data.guild.members.me!.voice.channel!.members.size >= 2) && !(await music.PermsOrAloneCheck(data,false,false))) {
       return data.send(":x: **You cannot summon the bot as it is playing elsewhere**");
     }
 

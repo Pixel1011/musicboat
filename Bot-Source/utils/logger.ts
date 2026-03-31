@@ -9,12 +9,12 @@ export class logger {
 
   log(msg: string) {
     let date = new Date();
-    console.log(`[${date.getHours().toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString("en-GB", {minimumIntegerDigits: 2})}][${this.client.user.username}]: ${msg}`);   
+    console.log(`[${date.getHours().toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString("en-GB", {minimumIntegerDigits: 2})}][${this.client.user!.username}]: ${msg}`);   
   }
   
   logFrom(msg: string, from: string) {
     let date = new Date();
-    console.log(`[${date.getHours().toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString("en-GB", {minimumIntegerDigits: 2})}][${this.client.user.username}][${from}]: ${msg}`);   
+    console.log(`[${date.getHours().toLocaleString("en-GB", {minimumIntegerDigits: 2})}:${date.getMinutes().toLocaleString("en-GB", {minimumIntegerDigits: 2})}][${this.client.user!.username}][${from}]: ${msg}`);   
   }
   
   async logToHaste(msg: any, test?: boolean) {

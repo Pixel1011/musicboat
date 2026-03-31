@@ -43,7 +43,7 @@ class LavalinkUpdater extends node_events_1.default {
             this.emit("close");
         });
         process.on("exit", () => {
-            this.child.kill();
+            this.child?.kill();
         });
     }
     async checkVersion() {

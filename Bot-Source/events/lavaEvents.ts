@@ -24,7 +24,7 @@ export default class lavaEvents {
         throw "Unable to connect to the lavalink Server";
       }
       this.client.logger.logFrom("Lavalink connection refused, attempting to reconnect", "Lavalink");
-      this.client.lavalink.connect({userId: this.client.user.id, force: true});
+      this.client.lavalink.connect({userId: this.client.user!.id, force: true});
       this.errorNum += 1;
       sleep(2000);
     }

@@ -1,4 +1,4 @@
-export class config {
+export interface config {
   tokens: string[];
   prefixes: string[];
   ownerid: string;

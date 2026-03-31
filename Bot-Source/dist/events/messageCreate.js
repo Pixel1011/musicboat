@@ -10,7 +10,7 @@ exports.default = async (msg, client) => {
     if (!client.commands[command])
         return;
     let cmd = client.commands[command];
-    let data = new SlashUnifier_1.UnifiedData(client, msg, null);
+    let data = new SlashUnifier_1.UnifiedData(client, msg);
     try {
         await cmd.run(client, data, args);
     }

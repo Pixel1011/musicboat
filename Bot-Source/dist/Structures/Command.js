@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ArgOption = exports.ArgType = exports.Command = void 0;
 class Command {
     async run(client, data, args) { }
+    ;
 }
 exports.Command = Command;
 var ArgType;

@@ -18,7 +18,7 @@ export default class LeaveCmd extends Command {
     if (!await music.check(data, false, false, true, true)) return;
     let player = music.getPlayer();
 
-    if (!data.guild.members.me.voice.channelId || !player) {
+    if (!data.guild.members.me!.voice.channelId || !player) {
       return data.send(`:x: **I am not connected to a voice channel.** Type ${client.prefix}join to get me in one`);
     }
 

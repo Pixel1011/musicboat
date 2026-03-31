@@ -44,7 +44,7 @@ class PlayCmd extends Command_1.Command {
         if (!vchannel) {
             return data.send(":x: **You have to be in a voice channel to use this command.**");
         }
-        if ((vchannel.id != data.guild.members.me.voice.channelId) && data.guild.members.me.voice.channelId != null) {
+        if ((vchannel.id != data.guild.members.me.voice.channelId) && data.guild.members.me.voice.channelId) {
             return data.send(":x: **You have to be in the same voice channel to use this command**");
         }
         if (!vchannel.joinable) {

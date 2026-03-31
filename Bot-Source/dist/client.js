@@ -15,13 +15,23 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -43,6 +53,7 @@ const lavaEvents_js_1 = __importDefault(require("./events/lavaEvents.js"));
 const PlayerData_js_1 = require("./utils/PlayerData.js");
 const musicHelper_js_1 = require("./utils/musicHelper.js");
 const zlib_1 = __importDefault(require("zlib"));
+const guildMemberAdd_js_1 = __importDefault(require("./events/guildMemberAdd.js"));
 class musicBot extends discord_js_1.Client {
     constructor(token, prefix, num, updater) {
         super({
@@ -55,7 +66,7 @@ class musicBot extends discord_js_1.Client {
         this.playerBackups = new Map();
         this.botnum = num + 1;
         this.logger = new logger_js_1.logger(this);
-        this.commands = [];
+        this.commands = {};
         this.config = config_json_1.default;
         this.token = token;
         this.prefix = prefix;
@@ -64,7 +75,7 @@ class musicBot extends discord_js_1.Client {
         this.init();
     }
     async ReloadCommands(msg) {
-        this.commands = [];
+        this.commands = {};
         let aliasnum = 0;
         const files = fs_1.default.readdirSync(path_1.default.resolve("./", "commands"));
         files.forEach(async (file) => {
@@ -109,8 +120,8 @@ class musicBot extends discord_js_1.Client {
                                 option.setMinLength(arg.extras.minLength);
                             if ("maxLength" in arg.extras)
                                 option.setMaxLength(arg.extras.maxLength);
-                            if ("choices" in arg.extras)
-                                option.setChoices(arg.extras.choices.map(s => ({ name: s, value: s })));
+                            if ("choices" in arg.extras && arg.extras.choices)
+                                option.setChoices(arg.extras.choices.map(s => ({ name: String(s), value: String(s) })));
                         }
                         else if (option instanceof discord_js_1.SlashCommandIntegerOption) {
                             if ("autocomplete" in arg.extras && arg.extras.autocomplete)
@@ -119,8 +130,8 @@ class musicBot extends discord_js_1.Client {
                                 option.setMinValue(arg.extras.minValue);
                             if ("maxValue" in arg.extras)
                                 option.setMaxValue(arg.extras.maxValue);
-                            if ("choices" in arg.extras)
-                                option.setChoices(arg.extras.choices.map(s => ({ name: s, value: s })));
+                            if ("choices" in arg.extras && arg.extras.choices)
+                                option.setChoices(arg.extras.choices.map(s => ({ name: String(s), value: Number(s) })));
                         }
                         else if (option instanceof discord_js_1.SlashCommandUserOption) {
                         }
@@ -143,8 +154,8 @@ class musicBot extends discord_js_1.Client {
                                 option.setMinValue(arg.extras.minValue);
                             if ("maxValue" in arg.extras)
                                 option.setMaxValue(arg.extras.maxValue);
-                            if ("choices" in arg.extras)
-                                option.setChoices(arg.extras.choices.map(s => ({ name: s, value: s })));
+                            if ("choices" in arg.extras && arg.extras.choices)
+                                option.setChoices(arg.extras.choices.map(s => ({ name: String(s), value: Number(s) })));
                         }
                         return option;
                     }
@@ -173,8 +184,8 @@ class musicBot extends discord_js_1.Client {
         const rest = new discord_js_1.REST({ version: "10" }).setToken(this.token);
         try {
             this.logger.log("Started refreshing application (/) commands.");
-            let res = await rest.put(discord_js_1.Routes.applicationCommands(this.user.id), { body: slashCommands });
-            this.logger.log(`Successfully reloaded application (/) commands.\n ${res.json()}`);
+            await rest.put(discord_js_1.Routes.applicationCommands(this.user.id), { body: slashCommands });
+            this.logger.log("Successfully reloaded application (/) commands.");
         }
         catch (error) {
             console.error(error);
@@ -239,6 +250,7 @@ class musicBot extends discord_js_1.Client {
         this.on("messageCreate", (msg) => (0, messageCreate_js_1.default)(msg, this));
         this.on("interactionCreate", (inter) => (0, interactionCreate_js_1.default)(inter, this));
         this.on("voiceStateUpdate", (oldState, newState) => (0, voiceStateUpdate_js_1.default)(oldState, newState, this));
+        this.on("guildMemberAdd", (member) => (0, guildMemberAdd_js_1.default)(member, this));
         this.logger.log("connecting to lavalink..");
         this.lavalink.connect({ userId: this.user.id });
     }
