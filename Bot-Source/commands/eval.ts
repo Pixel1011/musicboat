@@ -35,7 +35,7 @@ export default class EvalCmd extends Command {
     try {
       var res = await eval(`(async function(){${codeGiven}}).call()`);
       res = require("util").inspect(res);
-    } catch (e: any) {
+    } catch (e) {
       res = e.message;
       outputText = "Error";
       embedColour = 0xcc1010;

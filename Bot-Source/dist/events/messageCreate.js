@@ -2,6 +2,8 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const SlashUnifier_1 = require("../utils/SlashUnifier");
 exports.default = async (msg, client) => {
+    if (msg.author.id == client.user.id)
+        return;
     let prefix = client.prefix;
     if (!msg.content.startsWith(prefix))
         return;

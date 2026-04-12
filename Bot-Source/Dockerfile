@@ -37,5 +37,5 @@ RUN find /home/node/musicboat ! -path "/home/node/musicboat/node_modules*" -exec
 
 USER node
 
-
+ENV FORCE_COLOR=1
 CMD pnpm run start

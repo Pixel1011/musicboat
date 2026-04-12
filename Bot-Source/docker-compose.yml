@@ -7,3 +7,4 @@ services:
       dockerfile: ./Dockerfile
     volumes:
       - ./cache:/home/node/musicboat/cache
+      - ./logs:/home/node/musicboat/logs

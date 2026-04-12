@@ -31,7 +31,8 @@
     "discord.js": "^14.26.0",
     "lavaclient": "5.0.0-rc.6",
     "minimist": "^1.2.8",
-    "node-fetch": "^2.7.0"
+    "node-fetch": "^2.7.0",
+    "picocolors": "^1.1.1"
   },
   "devDependencies": {
     "@lavaclient/types": "^2.1.1",

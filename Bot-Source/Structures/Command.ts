@@ -30,22 +30,32 @@ type ArgExtras = {
   [ArgType.ATTACHMENT]: null;
   [ArgType.BOOLEAN]: null;
   [ArgType.CHANNEL]: { channelTypes?: ApplicationCommandOptionAllowedChannelTypes[] } | null;
-  [ArgType.INTEGER]: { choices?: number[]; minValue?: number; maxValue?: number, autocomplete?: boolean } | null;
+  [ArgType.INTEGER]: { choices?: ArgNumericChoices; minValue?: number; maxValue?: number, autocomplete?: boolean } | null;
   [ArgType.MENTIONABLE]: null;
-  [ArgType.NUMBER]: { choices?: number[]; minValue?: number; maxValue?: number, autocomplete?: boolean } | null;
+  [ArgType.NUMBER]: { choices?: ArgNumericChoices; minValue?: number; maxValue?: number, autocomplete?: boolean } | null;
   [ArgType.ROLE]: null;
-  [ArgType.STRING]: { choices?: string[]; minLength?: number; maxLength?: number, autocomplete?: boolean } | null;
+  [ArgType.STRING]: { choices?: ArgStringChoices; minLength?: number; maxLength?: number, autocomplete?: boolean } | null;
   [ArgType.USER]: null;
 };
 
+export type ArgNumericChoices = {
+  name: string,
+  value: number
+}[];
+
+export type ArgStringChoices = {
+  name: string,
+  value: Lowercase<string>;
+}[];
+
 export class ArgOption<T extends ArgType = ArgType> {
-  name: string;
+  name: Lowercase<string>;
   description: string;
   required: boolean;
   type: T;
   extras?: ArgExtras[T];
   
-  constructor(name: string, description: string, required: boolean, type: T, extras: ArgExtras[T] = null) {
+  constructor(name: Lowercase<string>, description: string, required: boolean, type: T, extras: ArgExtras[T] = null) {
     this.name = name;
     this.description = description;
     this.required = required;

@@ -1,15 +1,15 @@
-import type { BaseMessageOptionsWithPoll, ChatInputCommandInteraction, EmbedBuilder, Guild, GuildMember, InteractionReplyOptions, Message, TextChannel, User } from "discord.js";
+import type { BaseMessageOptionsWithPoll, ChatInputCommandInteraction, EmbedBuilder, Guild, GuildMember, InteractionReplyOptions, Message, MessageCreateOptions, MessagePayload, Snowflake, TextChannel, User } from "discord.js";
 import type { musicBot } from "../client";
 
 export class UnifiedData {
   client: musicBot;
-  author!: User;
-  guild!: Guild;
-  channel!: TextChannel;
-  member!: GuildMember;
-  createdTimestamp!: number;
-  args!: string[];
-
+  author: User;
+  guild: Guild;
+  channel: TextChannel;
+  member: GuildMember;
+  createdTimestamp: number;
+  args: string[];
+  id: Snowflake;
   replied!: boolean;
 
   // internal vars
@@ -26,18 +26,19 @@ export class UnifiedData {
       this.author = msg.author;
       this.guild = msg.guild!;
       this.channel = msg.channel as TextChannel;
-      this.member = msg.member!;
+      this.member = msg.member;
       this.createdTimestamp = msg.createdTimestamp;
       this.args = msg.content.split(" ");
-
+      this.id = msg.id;
       this.isMsg = true;
     } else if (inter) {
       // if is interaction
       this.author = inter.user;
-      this.guild = inter.guild!;
+      this.guild = inter.guild;
       this.channel = inter.channel as TextChannel;
       this.member = inter.member as GuildMember;
       this.createdTimestamp = inter.createdTimestamp;
+      this.id = this.inter.id;
       // get args from interaction
       this.args = [];
       for (let i = 0; i < inter.options.data.length; i++) {
@@ -46,7 +47,7 @@ export class UnifiedData {
     }
   }
 
-  async send(content: string | BaseMessageOptionsWithPoll): Promise<Message<boolean>> {
+  async send(content: string | MessagePayload | MessageCreateOptions): Promise<Message<boolean>> {
     if (this.isMsg) {
       return await (this.msg!.channel as TextChannel).send(content);
     } else {

@@ -9,7 +9,7 @@ import ready from "./events/ready.js";
 import messageCreate from "./events/messageCreate.js";
 import voiceStateUpdate from "./events/voiceStateUpdate.js";
 import type { config } from "./Structures/Config.js";
-import { ArgType, type Command } from "./Structures/Command.js";
+import { ArgNumericChoices, ArgStringChoices, ArgType, type Command } from "./Structures/Command.js";
 import interactionCreate from "./events/interactionCreate.js";
 import { LavalinkUpdater } from "./updateLavaLink.js";
 import lavaEvents from "./events/lavaEvents.js";
@@ -33,14 +33,14 @@ export class musicBot extends Client {
 
   constructor(token : string, prefix : string, num : number, updater: LavalinkUpdater) {
     super({
-      intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildExpressions, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent], // thats probably fine.. jesus
+      intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildExpressions, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent, Flags.AutoModerationConfiguration, Flags.AutoModerationExecution, Flags.DirectMessagePolls, Flags.DirectMessageTyping, Flags.GuildMessagePolls, Flags.GuildMessageTyping, Flags.GuildModeration, Flags.GuildScheduledEvents, Flags.GuildWebhooks],
       rest: {
         rejectOnRateLimit: (r) => {this.logger.log(r.url + "  : " + r.timeToReset); return false;}
       }
     });
     
     this.botnum = num + 1;
-    this.logger = new logger(this);
+    this.logger = new logger();
     this.commands = {};
     this.config = Config;
     this.token = token;
@@ -83,14 +83,15 @@ export class musicBot extends Client {
     // register slash commands but not aliases
 
     for (let file of files) {
-      file = file.replace("ts", "js");
+      if (!file.endsWith(".ts") && !file.endsWith(".js")) continue;
+      file = file.replace(".ts", ".js");
       let cmdClass = require(`./commands/${file}`).default;
       let cmd:Command  = new cmdClass();
       if (cmd.hide) continue;
 
       let slash = new SlashCommandBuilder().setName(cmd.name).setDescription(cmd.description);
       // add slash command contexts later because rn they can be ran in dms which isnt good
-      if (cmd.arguments!.length != 0) {
+      if (cmd.arguments.length != 0) {
 
         type SlashCmdOptions = SlashCommandStringOption | 
         SlashCommandIntegerOption | 
@@ -100,48 +101,50 @@ export class musicBot extends Client {
         SlashCommandBooleanOption | 
         SlashCommandMentionableOption | 
         SlashCommandAttachmentOption | 
-        SlashCommandNumberOption
+        SlashCommandNumberOption;
 
         // add all different types of arguments
-        cmd.arguments!.forEach(async arg => {
+        cmd.arguments.forEach(async arg => {
+          
           function setOption<T extends SlashCmdOptions>(option: T): T {
             option.setName(arg.name).setDescription(arg.description).setRequired(arg.required);
             if (!arg.extras) return option;
+
             if (option instanceof SlashCommandStringOption) {
               if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
-              if ("minLength" in arg.extras) option.setMinLength(arg.extras.minLength!);
-              if ("maxLength" in arg.extras) option.setMaxLength(arg.extras.maxLength!);
-              if ("choices" in arg.extras && arg.extras.choices) option.setChoices(arg.extras.choices.map(s => ({name: String(s), value: String(s)})));
-            } else
-            if (option instanceof SlashCommandIntegerOption) {
+              if ("minLength" in arg.extras) option.setMinLength(arg.extras.minLength);
+              if ("maxLength" in arg.extras) option.setMaxLength(arg.extras.maxLength);
+              if ("choices" in arg.extras) option.setChoices((arg.extras.choices as ArgStringChoices));
+            
+            } else if (option instanceof SlashCommandIntegerOption) {
               if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
-              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue!);
-              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue!);
-              if ("choices" in arg.extras && arg.extras.choices) option.setChoices(arg.extras.choices.map(s => ({name: String(s), value: Number(s)})));
-            } else
-            if (option instanceof SlashCommandUserOption) {
+              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue);
+              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue);
+              if ("choices" in arg.extras) option.setChoices(arg.extras.choices as ArgNumericChoices);
+            
+            } else if (option instanceof SlashCommandUserOption) {
               // no extras
-            } else
-            if (option instanceof SlashCommandChannelOption) {
-              if ("channelTypes" in arg.extras) option.addChannelTypes(arg.extras.channelTypes!);
-            } else
-            if (option instanceof SlashCommandRoleOption) {
+            
+            } else if (option instanceof SlashCommandChannelOption) {
+              if ("channelTypes" in arg.extras) option.addChannelTypes(arg.extras.channelTypes);
+           
+            } else if (option instanceof SlashCommandRoleOption) {
               // no extras
-            } else
-            if (option instanceof SlashCommandBooleanOption) {
+            
+            } else if (option instanceof SlashCommandBooleanOption) {
               // no extras
-            } else
-            if (option instanceof SlashCommandMentionableOption) {
+            
+            } else if (option instanceof SlashCommandMentionableOption) {
               // no extras
-            } else
-            if (option instanceof SlashCommandAttachmentOption) {
+           
+            } else if (option instanceof SlashCommandAttachmentOption) {
               // no extras
-            } else
-            if (option instanceof SlashCommandNumberOption) {
+           
+            } else if (option instanceof SlashCommandNumberOption) {
               if ("autocomplete" in arg.extras && arg.extras.autocomplete) option.setAutocomplete(arg.extras.autocomplete);
-              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue!);
-              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue!);
-              if ("choices" in arg.extras && arg.extras.choices) option.setChoices(arg.extras.choices.map(s => ({name: String(s), value: Number(s)})));
+              if ("minValue" in arg.extras) option.setMinValue(arg.extras.minValue);
+              if ("maxValue" in arg.extras) option.setMaxValue(arg.extras.maxValue);
+              if ("choices" in arg.extras) option.setChoices(arg.extras.choices as ArgNumericChoices);
             } 
             return option;
           }

@@ -19,7 +19,7 @@
       "alwaysStrict": true,
       "verbatimModuleSyntax": false,
       "preserveConstEnums": true,
-
+      "strict": false,
       "types": [],
       "forceConsistentCasingInFileNames": true
   },

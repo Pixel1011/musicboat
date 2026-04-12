@@ -4,6 +4,8 @@ import { UnifiedData } from "../utils/SlashUnifier";
 import { Command } from "../Structures/Command";
 
 export default async (msg: Message, client: musicBot) => {
+  if (msg.author.id == client.user.id) return;
+  
   let prefix = client.prefix;
   if (!msg.content.startsWith(prefix)) return;
   const args = msg.content.split(" ");

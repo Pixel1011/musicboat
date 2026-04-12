@@ -14,6 +14,7 @@ class UnifiedData {
             this.member = msg.member;
             this.createdTimestamp = msg.createdTimestamp;
             this.args = msg.content.split(" ");
+            this.id = msg.id;
             this.isMsg = true;
         }
         else if (inter) {
@@ -22,6 +23,7 @@ class UnifiedData {
             this.channel = inter.channel;
             this.member = inter.member;
             this.createdTimestamp = inter.createdTimestamp;
+            this.id = this.inter.id;
             this.args = [];
             for (let i = 0; i < inter.options.data.length; i++) {
                 this.args.push(inter.options.data[i].value.toString());

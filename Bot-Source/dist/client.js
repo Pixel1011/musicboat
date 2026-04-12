@@ -57,7 +57,7 @@ const guildMemberAdd_js_1 = __importDefault(require("./events/guildMemberAdd.js"
 class musicBot extends discord_js_1.Client {
     constructor(token, prefix, num, updater) {
         super({
-            intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildExpressions, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent],
+            intents: [Flags.DirectMessages, Flags.DirectMessageReactions, Flags.Guilds, Flags.GuildExpressions, Flags.GuildIntegrations, Flags.GuildInvites, Flags.GuildMembers, Flags.GuildMessages, Flags.GuildMessageReactions, Flags.GuildPresences, Flags.GuildVoiceStates, Flags.MessageContent, Flags.AutoModerationConfiguration, Flags.AutoModerationExecution, Flags.DirectMessagePolls, Flags.DirectMessageTyping, Flags.GuildMessagePolls, Flags.GuildMessageTyping, Flags.GuildModeration, Flags.GuildScheduledEvents, Flags.GuildWebhooks],
             rest: {
                 rejectOnRateLimit: (r) => { this.logger.log(r.url + "  : " + r.timeToReset); return false; }
             }
@@ -65,7 +65,7 @@ class musicBot extends discord_js_1.Client {
         this.client = this;
         this.playerBackups = new Map();
         this.botnum = num + 1;
-        this.logger = new logger_js_1.logger(this);
+        this.logger = new logger_js_1.logger();
         this.commands = {};
         this.config = config_json_1.default;
         this.token = token;
@@ -101,7 +101,9 @@ class musicBot extends discord_js_1.Client {
             msg.channel.send(`**${Object.keys(this.commands).length - aliasnum}** Commands loaded with **${aliasnum}** aliases.`);
         let slashCommands = [];
         for (let file of files) {
-            file = file.replace("ts", "js");
+            if (!file.endsWith(".ts") && !file.endsWith(".js"))
+                continue;
+            file = file.replace(".ts", ".js");
             let cmdClass = require(`./commands/${file}`).default;
             let cmd = new cmdClass();
             if (cmd.hide)
@@ -120,8 +122,8 @@ class musicBot extends discord_js_1.Client {
                                 option.setMinLength(arg.extras.minLength);
                             if ("maxLength" in arg.extras)
                                 option.setMaxLength(arg.extras.maxLength);
-                            if ("choices" in arg.extras && arg.extras.choices)
-                                option.setChoices(arg.extras.choices.map(s => ({ name: String(s), value: String(s) })));
+                            if ("choices" in arg.extras)
+                                option.setChoices(arg.extras.choices);
                         }
                         else if (option instanceof discord_js_1.SlashCommandIntegerOption) {
                             if ("autocomplete" in arg.extras && arg.extras.autocomplete)
@@ -130,8 +132,8 @@ class musicBot extends discord_js_1.Client {
                                 option.setMinValue(arg.extras.minValue);
                             if ("maxValue" in arg.extras)
                                 option.setMaxValue(arg.extras.maxValue);
-                            if ("choices" in arg.extras && arg.extras.choices)
-                                option.setChoices(arg.extras.choices.map(s => ({ name: String(s), value: Number(s) })));
+                            if ("choices" in arg.extras)
+                                option.setChoices(arg.extras.choices);
                         }
                         else if (option instanceof discord_js_1.SlashCommandUserOption) {
                         }
@@ -154,8 +156,8 @@ class musicBot extends discord_js_1.Client {
                                 option.setMinValue(arg.extras.minValue);
                             if ("maxValue" in arg.extras)
                                 option.setMaxValue(arg.extras.maxValue);
-                            if ("choices" in arg.extras && arg.extras.choices)
-                                option.setChoices(arg.extras.choices.map(s => ({ name: String(s), value: Number(s) })));
+                            if ("choices" in arg.extras)
+                                option.setChoices(arg.extras.choices);
                         }
                         return option;
                     }
