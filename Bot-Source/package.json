@@ -29,7 +29,7 @@
     "cheerio": "^1.2.0",
     "concurrently": "^7.6.0",
     "discord.js": "^14.26.0",
-    "lavaclient": "5.0.0-rc.3",
+    "lavaclient": "5.0.0-rc.6",
     "minimist": "^1.2.8",
     "node-fetch": "^2.7.0"
   },
