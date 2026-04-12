@@ -7,8 +7,8 @@ import pico from "picocolors";
 
 export class logger {
   readonly appName = "Music Boat";
-  readonly appColour = pico.bgMagenta;
-  readonly appFromColour = pico.bgMagentaBright;
+  readonly appColour = pico.magenta;
+  readonly appFromColour = pico.magentaBright;
 
   readonly timeColour = pico.cyan;
   readonly textColour = pico.whiteBright;
