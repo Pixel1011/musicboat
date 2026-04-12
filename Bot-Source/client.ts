@@ -263,7 +263,7 @@ export class musicBot extends Client {
     this.on("messageCreate", (msg) => messageCreate(msg, this));
     this.on("interactionCreate", (inter) => interactionCreate(inter, this));
     this.on("voiceStateUpdate", (oldState, newState) => voiceStateUpdate(oldState, newState, this));
-    this.on("guildMemberAdd", (member) => guildMemberAdd(member, this));
+    //this.on("guildMemberAdd", (member) => guildMemberAdd(member, this));
     //
     this.logger.log("connecting to lavalink..");
     this.lavalink.connect({ userId: this.user!.id });
