@@ -24,7 +24,7 @@ export class TrackEnd {
     
       if (!player.loop) await player.queue.shift(player.queueLoop!, player.shuffle!);
       await player.play(player.queue.currentSong.encoded);
-      this.music.save();
+      if (!player.loop) this.music.save();
     } else {
     // shift one last time to null currentSong from queue
       player.loop = false;

@@ -17,10 +17,11 @@ export class PlayerData {
   public queueLoop?: boolean;
   public paused?: boolean;
   public shuffle?: boolean;
+  public striker?: boolean;
 
   // arguably could add position in song and skips but eh
 
-  constructor(vcid: string, bcid: string, gid: string, q_songs: Array<QueueSong>, q_currentSong: QueueSong, q_lastSong: QueueSong, volume: number, loop: boolean, queueLoop: boolean, paused: boolean, shuffle: boolean) {
+  constructor(vcid: string, bcid: string, gid: string, q_songs: Array<QueueSong>, q_currentSong: QueueSong, q_lastSong: QueueSong, volume: number, loop: boolean, queueLoop: boolean, paused: boolean, shuffle: boolean, striker: boolean) {
     this.vchannelid = vcid;
     this.guildid = gid;
     this.boundChannelid = bcid;
@@ -32,6 +33,7 @@ export class PlayerData {
     this.queueLoop = queueLoop;
     this.paused = paused;
     this.shuffle = shuffle;
+    this.striker = striker;
   }
 
   async restore(music: musicHelper): Promise<void> {
@@ -61,7 +63,7 @@ export class PlayerData {
       }, 500);
     }
     music.registerEvents();
-    music.registerInactivityStriker(vchannel);
+    if (this.striker) music.registerInactivityStriker(vchannel);
     if (tchannel.isSendable()) {
       let s = this.q_songs!.length == 0 ? "" : "s";
       tchannel.send(`Rejoining \`\`${vchannel.name}\`\` with ${this.q_songs!.length + 1} loaded song${s}`);

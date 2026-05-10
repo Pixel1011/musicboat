@@ -239,88 +239,6 @@ export class musicHelper {
         }
     }
     return returnVals;
-
-    // legacy code which im leaving for reference for now
-    // high chance that with lavasrc most of this will be useless
-    /*    if (spotify.isSpotifyUrl(args.join(" "))) {
-      let results = await this.loadSpotify(args.join(" "));
-  
-      switch (results.data.type) {
-          case "track": {
-            let track = results as SpotifyTrack;
-            result = await track.resolveYoutubeTrack();
-            result.info.url = results.data.external_urls.spotify;
-            result.info.thumbnail = results.data.album.images[0].url;
-            result.info.title = results.data.name;
-            result.info.spotify = true;  
-            break;
-          }
-          case "playlist": {
-            isPlaylist = true;
-            let playlist = results as SpotifyPlaylist;
-            // run before resolveYoutubeTracks otherwise very random videos get resolved into non existent songs
-            for (let i= 0; i < playlist.tracks.length; i++) {
-              // apparantly songs can be nonexistent in spotify and they have a duration of 0
-              // i swear theres an edge case if someone tries to play a playlist that only has a nonexistent song
-              // i could return another variable and handle that in play.ts
-              if (playlist.tracks[i].data.duration_ms == 0) {
-                // splice out song
-                playlist.tracks.splice(i, 1);
-                i--;
-                continue;
-              }
-            }
-
-            tracks = await playlist.resolveYoutubeTracks();
-            let i = 0;
-            for (let t of tracks) {
-              t.info.spotify = true;
-              t.info.url = playlist.tracks[i].data.external_urls.spotify;
-              t.info.thumbnail = playlist.tracks[i].data.album.images[0].url;
-              t.info.title = playlist.tracks[i].data.name;
-              i++;
-            }
-
-            playlistName = playlist.data.name;
-            totalTracks = tracks.length;
-            playlistThumb = playlist.data.images[0].url;
-            result = tracks[0];  
-            break;
-          }
-  
-      }
-    } 
-    
-    // else if is not spotify
-    else { 
-      if (youtubeVideoRegex.test(args.join(" ")) || youtubePlaylistRegex.test(args.join(" ")) || soundcloudTrackRegex.test(args.join(" "))) {
-        results = await this.search(args.join(" "));
-      } else {
-        results = await this.search(args.join(" "), "ytsearch:");
-      }
-            
-      // playlist
-      if (results.loadType == LoadType.PlaylistLoaded) {        
-        isPlaylist = true;
-        tracks = results.tracks;
-        totalTracks = tracks.length;
-        playlistName = results.playlistInfo.name;
-        playlistThumb = await Queue.getThumbnail(tracks[0]);
-  
-        let selectedTrack = results.playlistInfo.selectedTrack;
-        if (selectedTrack == -1) selectedTrack = 0;
-        result = tracks[selectedTrack];
-      } else 
-      
-      // single track / search result
-      if (results.loadType == LoadType.TrackLoaded || results.loadType == LoadType.SearchResult) {
-        result = results.tracks[0];
-      } 
-      
-    }
-    return {result, results, isPlaylist, tracks, playlistName, playlistThumb, totalTracks};
-  }*/
-
   }
 
   async addPlaylist(tracks: Track[], data: UnifiedData): Promise<number> {
@@ -412,7 +330,8 @@ export class musicHelper {
         player.loop!,
         player.queueLoop!,
         player.paused,
-        player.shuffle!
+        player.shuffle!,
+        (!!player.striker)
       );
 
       this.client.playerBackups.set(this.guildid, saveobj);

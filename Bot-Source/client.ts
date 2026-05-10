@@ -210,7 +210,8 @@ export class musicBot extends Client {
           val.loop,
           val.queueLoop,
           val.paused,
-          val.shuffle
+          val.shuffle,
+          val.striker
         ), val);
         map.set(key, val);
       }
